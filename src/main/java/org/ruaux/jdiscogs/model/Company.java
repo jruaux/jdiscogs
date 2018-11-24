@@ -1,0 +1,14 @@
+package org.ruaux.jdiscogs.model;
+
+import lombok.Data;
+
+@Data
+public class Company {
+	private String name;
+	private String entityType;
+	private String catno;
+	private String resourceUrl;
+	private Long id;
+	private String entityTypeName;
+
+}
