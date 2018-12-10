@@ -32,17 +32,21 @@ public class DiscogsClient {
 		this.restTemplate = restTemplateBuilder.build();
 	}
 
-	public Master getMaster(long id) {
-		return getEntity("masters", Master.class, id);
+	public Master getMaster(String masterId) {
+		return getEntity("masters", Master.class, masterId);
 	}
 
-	private <T> T getEntity(String entity, Class<T> entityClass, long id) {
+	public Release getRelease(String releaseId) {
+		return getEntity("releases", Release.class, releaseId);
+	}
+
+	private <T> T getEntity(String entity, Class<T> entityClass, String id) {
 		log.info("RateLimitRemaining: {}", rateLimitRemaining);
 		boolean after1Min = (System.currentTimeMillis() - rateLimitLastTime) > 60000;
 		if (rateLimitRemaining > 1 || after1Min) {
 			Map<String, String> uriParams = new HashMap<String, String>();
 			uriParams.put("entity", entity);
-			uriParams.put("id", String.valueOf(id));
+			uriParams.put("id", id);
 			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(config.getUrl()).queryParam("token",
 					config.getToken());
 			URI uri = builder.buildAndExpand(uriParams).toUri();
@@ -62,7 +66,4 @@ public class DiscogsClient {
 		return null;
 	}
 
-	public Release getRelease(long id) {
-		return getEntity("releases", Release.class, id);
-	}
 }

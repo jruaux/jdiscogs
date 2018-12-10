@@ -19,7 +19,7 @@ public class JDiscogsClientTests {
 
 	@Test
 	public void testMaster() {
-		Master master = client.getMaster(16969L);
+		Master master = client.getMaster("16969");
 		assertEquals("The Royal Scam", master.getTitle());
 		assertEquals(2, master.getStyles().size());
 		assertEquals("Pop Rock", master.getStyles().get(0));
@@ -41,7 +41,7 @@ public class JDiscogsClientTests {
 
 	@Test
 	public void testRelease() {
-		Release release = client.getRelease(9680548L);
+		Release release = client.getRelease("9680548");
 		assertEquals("The Royal Scam", release.getTitle());
 		assertEquals(2, release.getGenres().size());
 		assertEquals("Jazz", release.getGenres().get(0));
