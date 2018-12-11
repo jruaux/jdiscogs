@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ruaux.jdiscogs.model.Master;
-import org.ruaux.jdiscogs.model.Release;
+import org.ruaux.jdiscogs.api.DiscogsClient;
+import org.ruaux.jdiscogs.api.Master;
+import org.ruaux.jdiscogs.api.Release;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;

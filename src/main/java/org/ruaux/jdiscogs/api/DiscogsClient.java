@@ -1,11 +1,10 @@
-package org.ruaux.jdiscogs;
+package org.ruaux.jdiscogs.api;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ruaux.jdiscogs.model.Master;
-import org.ruaux.jdiscogs.model.Release;
+import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
