@@ -94,7 +94,7 @@ public class BatchConfiguration {
 		if (config.isNoopWriters()) {
 			return new NoopItemWriter<T>();
 		}
-		return null;
+		return writer;
 	}
 
 	public Job getReleaseLoadJob() throws MalformedURLException {
