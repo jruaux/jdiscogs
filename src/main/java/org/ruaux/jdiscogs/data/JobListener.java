@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JobListener implements ItemWriteListener<Object> {
 
 	private long count = 0;
+	private long startTime = System.currentTimeMillis();
 	private String entity;
 
 	public JobListener(String entity) {
@@ -19,7 +20,9 @@ public class JobListener implements ItemWriteListener<Object> {
 	@Override
 	public void afterWrite(List<? extends Object> items) {
 		count += items.size();
-		log.info("Wrote {} {} items", count, entity);
+		double elapsedTimeInSeconds = (double) (System.currentTimeMillis() - startTime) / 1000;
+		long itemsPerSecond = Math.round(count / elapsedTimeInSeconds);
+		log.info("Wrote {} {} items ({} items/sec)", count, entity, String.format("%d", itemsPerSecond));
 	}
 
 	@Override

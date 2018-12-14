@@ -92,9 +92,16 @@ public class BatchConfiguration {
 	private <T> Job getJob(String jobName, String stepName, Class<T> clazz, ItemWriter<T> writer)
 			throws MalformedURLException {
 		TaskletStep loadStep = stepBuilderFactory.get(stepName).<T, T>chunk(config.getBatchSize())
-				.reader(getReader(clazz)).writer(writer).listener(new JobListener(stepName + "-listener"))
+				.reader(getReader(clazz)).writer(getWriter(writer)).listener(new JobListener(stepName + "-listener"))
 				.taskExecutor(taskExecutor()).build();
 		return jobBuilderFactory.get(jobName).incrementer(new RunIdIncrementer()).flow(loadStep).end().build();
+	}
+
+	private <T> ItemWriter<T> getWriter(ItemWriter<T> writer) {
+		if (config.isNoopWriters()) {
+			return new NoopItemWriter<T>();
+		}
+		return null;
 	}
 
 	public Job getReleaseLoadJob() throws MalformedURLException {
