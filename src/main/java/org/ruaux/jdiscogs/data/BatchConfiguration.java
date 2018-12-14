@@ -82,41 +82,51 @@ public class BatchConfiguration {
 		return new FileSystemResource(uri.toString());
 	}
 
-	private <T> Job getJob(String jobName, String stepName, Class<T> clazz, ItemWriter<T> writer)
-			throws MalformedURLException {
+	private <T> Job getJob(String name, Class<T> clazz, ItemWriter<T> writer) throws MalformedURLException {
+		String entityName = clazz.getSimpleName().toLowerCase();
+		String stepName = replace(config.getStepNamingTemplate(), entityName, name);
+		String jobName = replace(config.getJobNamingTemplate(), entityName, name);
 		TaskletStep loadStep = stepBuilderFactory.get(stepName).<T, T>chunk(config.getBatchSize())
-				.reader(getReader(clazz)).writer(getWriter(writer))
-				.listener(new JobListener(clazz.getSimpleName().toLowerCase())).taskExecutor(taskExecutor).build();
+				.reader(getReader(clazz)).writer(getWriter(writer)).listener(new JobListener(entityName))
+				.taskExecutor(taskExecutor).build();
 		return jobBuilderFactory.get(jobName).incrementer(new RunIdIncrementer()).flow(loadStep).end().build();
 	}
 
+	private String replace(String template, String entity, String action) {
+		return template.replace("{entity}", entity).replace("{action}", action);
+	}
+
 	private <T> ItemWriter<T> getWriter(ItemWriter<T> writer) {
-		if (config.isNoopWriters()) {
+		if (config.isNoop()) {
 			return new NoopItemWriter<T>();
 		}
 		return writer;
 	}
 
-	public Job getReleaseLoadJob() throws MalformedURLException {
-		return getJob("release-load-job", "release-load-step", Release.class, releaseWriter);
-	}
-
-	public Job getReleaseIndexJob() throws MalformedURLException {
-		return getJob("release-index-job", "release-index-step", Release.class, releaseIndexWriter);
-	}
-
-	public Job getReleaseIndexAndLoadJob() throws MalformedURLException {
-		return getJob("release-index-and-load-job", "release-index-and-load-step", Release.class,
-				new CompositeItemWriterBuilder<Release>().delegates(Arrays.asList(releaseIndexWriter, releaseWriter))
-						.build());
-	}
-
-	public Job getMasterLoadJob() throws MalformedURLException {
-		return getJob("master-load-job", "master-load-step", Master.class, masterWriter);
+	public Job getMasterDocsJob() throws MalformedURLException {
+		return getJob("docs", Master.class, masterWriter);
 	}
 
 	public Job getMasterIndexJob() throws MalformedURLException {
-		return getJob("master-index-job", "master-index-step", Master.class, masterIndexWriter);
+		return getJob("index", Master.class, masterIndexWriter);
+	}
+
+	public Job getMasterDocsAndIndexJob() throws MalformedURLException {
+		return getJob("docs-and-index", Master.class, new CompositeItemWriterBuilder<Master>()
+				.delegates(Arrays.asList(masterWriter, masterIndexWriter)).build());
+	}
+
+	public Job getReleaseDocsJob() throws MalformedURLException {
+		return getJob("docs", Release.class, releaseWriter);
+	}
+
+	public Job getReleaseIndexJob() throws MalformedURLException {
+		return getJob("index", Release.class, releaseIndexWriter);
+	}
+
+	public Job getReleaseDocsAndIndexJob() throws MalformedURLException {
+		return getJob("docs-and-index", Release.class, new CompositeItemWriterBuilder<Release>()
+				.delegates(Arrays.asList(releaseWriter, releaseIndexWriter)).build());
 	}
 
 }

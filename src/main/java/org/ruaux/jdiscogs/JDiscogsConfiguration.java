@@ -16,10 +16,12 @@ import lombok.Data;
 public class JDiscogsConfiguration {
 
 	private String url = "https://api.discogs.com/{entity}/{id}";
+	private String stepNamingTemplate = "{entity}-{action}-step";
+	private String jobNamingTemplate = "{entity}-{action}-job";
 	private String token;
 	private String userAgent = "com.redislabs.rediscogs.useragent";
 	private int batchSize = 50;
-	private boolean noopWriters = false;
+	private boolean noop = false;
 	private String hashArrayDelimiter = ",";
 	private String fileUrlTemplate = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2018/discogs_20181001_{entity}s.xml.gz";
 	private String releaseIndex = "releaseIdx";
