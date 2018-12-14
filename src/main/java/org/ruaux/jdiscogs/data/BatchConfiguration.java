@@ -15,13 +15,20 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.SynchronizedItemStreamReader;
 import org.springframework.batch.item.support.builder.CompositeItemWriterBuilder;
+import org.springframework.batch.item.support.builder.SynchronizedItemStreamReaderBuilder;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Configuration
@@ -47,8 +54,12 @@ public class BatchConfiguration {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
 		marshaller.setClassesToBeBound(entityClass);
 		String entityName = entityClass.getSimpleName().toLowerCase();
-		return new StaxEventItemReaderBuilder<T>().name(entityName + "-reader").addFragmentRootElements(entityName)
-				.resource(resource(entityName)).unmarshaller(marshaller).build();
+		return synchronizedReader(new StaxEventItemReaderBuilder<T>().name(entityName + "-reader")
+				.addFragmentRootElements(entityName).resource(resource(entityName)).unmarshaller(marshaller).build());
+	}
+
+	private <T> SynchronizedItemStreamReader<T> synchronizedReader(ItemStreamReader<T> reader) {
+		return new SynchronizedItemStreamReaderBuilder<T>().delegate(reader).build();
 	}
 
 	private Resource resource(String entityName) throws MalformedURLException {
@@ -71,44 +82,41 @@ public class BatchConfiguration {
 		return new FileSystemResource(uri.toString());
 	}
 
+	@Bean
+	public TaskExecutor taskExecutor() {
+		SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor("spring-batch");
+		asyncTaskExecutor.setConcurrencyLimit(config.getConcurrencyLimit());
+		return asyncTaskExecutor;
+	}
+
+	private <T> Job getJob(String jobName, String stepName, Class<T> clazz, ItemWriter<T> writer)
+			throws MalformedURLException {
+		TaskletStep loadStep = stepBuilderFactory.get(stepName).<T, T>chunk(config.getBatchSize())
+				.reader(getReader(clazz)).writer(writer).listener(new JobListener(stepName + "-listener"))
+				.taskExecutor(taskExecutor()).build();
+		return jobBuilderFactory.get(jobName).incrementer(new RunIdIncrementer()).flow(loadStep).end().build();
+	}
+
 	public Job getReleaseLoadJob() throws MalformedURLException {
-		TaskletStep loadStep = stepBuilderFactory.get("release-load-step")
-				.<Release, Release>chunk(config.getBatchSize()).reader(getReader(Release.class)).writer(releaseWriter)
-				.listener(new JobListener("release")).build();
-		return jobBuilderFactory.get("release-load-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
-				.build();
+		return getJob("release-load-job", "release-load-step", Release.class, releaseWriter);
 	}
 
 	public Job getReleaseIndexJob() throws MalformedURLException {
-		TaskletStep loadStep = stepBuilderFactory.get("release-index-step")
-				.<Release, Release>chunk(config.getBatchSize()).reader(getReader(Release.class))
-				.writer(releaseIndexWriter).listener(new JobListener("release")).build();
-		return jobBuilderFactory.get("release-index-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
-				.build();
+		return getJob("release-index-job", "release-index-step", Release.class, releaseIndexWriter);
 	}
 
 	public Job getReleaseIndexAndLoadJob() throws MalformedURLException {
-		CompositeItemWriterBuilder<Release> compositeBuilder = new CompositeItemWriterBuilder<Release>();
-		compositeBuilder.delegates(Arrays.asList(releaseIndexWriter, releaseWriter));
-		TaskletStep loadStep = stepBuilderFactory.get("release-index-and-load-step")
-				.<Release, Release>chunk(config.getBatchSize()).reader(getReader(Release.class))
-				.writer(compositeBuilder.build()).listener(new JobListener("release")).build();
-		return jobBuilderFactory.get("release-index-and-load-job").incrementer(new RunIdIncrementer()).flow(loadStep)
-				.end().build();
+		return getJob("release-index-and-load-job", "release-index-and-load-step", Release.class,
+				new CompositeItemWriterBuilder<Release>().delegates(Arrays.asList(releaseIndexWriter, releaseWriter))
+						.build());
 	}
 
 	public Job getMasterLoadJob() throws MalformedURLException {
-		TaskletStep loadStep = stepBuilderFactory.get("master-load-step").<Master, Master>chunk(config.getBatchSize())
-				.reader(getReader(Master.class)).writer(masterWriter).listener(new JobListener("master")).build();
-		return jobBuilderFactory.get("master-load-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
-				.build();
+		return getJob("master-load-job", "master-load-step", Master.class, masterWriter);
 	}
 
 	public Job getMasterIndexJob() throws MalformedURLException {
-		TaskletStep loadStep = stepBuilderFactory.get("master-index-step").<Master, Master>chunk(config.getBatchSize())
-				.reader(getReader(Master.class)).writer(masterIndexWriter).listener(new JobListener("master")).build();
-		return jobBuilderFactory.get("master-index-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
-				.build();
+		return getJob("master-index-job", "master-index-step", Master.class, masterIndexWriter);
 	}
 
 }
