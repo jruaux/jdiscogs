@@ -4,7 +4,7 @@
 
 	<groupId>org.ruaux</groupId>
 	<artifactId>jdiscogs</artifactId>
-	<version>0.0.5</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>jdiscogs</name>
@@ -21,7 +21,7 @@
 		<url>https://github.com/jruaux/jdiscogs.git</url>
 		<connection>scm:git:git://github.com/jruaux/jdiscogs.git</connection>
 		<developerConnection>scm:git:git@github.com:jruaux/jdiscogs.git</developerConnection>
-		<tag>jdiscogs-0.0.5</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<repositories>
