@@ -1,5 +1,6 @@
 package org.ruaux.jdiscogs.data;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 import org.springframework.batch.core.ItemWriteListener;
@@ -12,6 +13,7 @@ public class JobListener implements ItemWriteListener<Object> {
 	private long count = 0;
 	private long startTime = System.currentTimeMillis();
 	private String entity;
+	private NumberFormat formatter = NumberFormat.getIntegerInstance();
 
 	public JobListener(String entity) {
 		this.entity = entity;
@@ -22,7 +24,7 @@ public class JobListener implements ItemWriteListener<Object> {
 		count += items.size();
 		double elapsedTimeInSeconds = (double) (System.currentTimeMillis() - startTime) / 1000;
 		long itemsPerSecond = Math.round(count / elapsedTimeInSeconds);
-		log.info("Wrote {} {} items ({} items/sec)", count, entity, String.format("%d", itemsPerSecond));
+		log.info("Wrote {} {} items ({} items/sec)", formatter.format(count), entity, formatter.format(itemsPerSecond));
 	}
 
 	@Override

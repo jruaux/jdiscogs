@@ -22,12 +22,10 @@ import org.springframework.batch.item.support.builder.CompositeItemWriterBuilder
 import org.springframework.batch.item.support.builder.SynchronizedItemStreamReaderBuilder;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
@@ -49,6 +47,8 @@ public class BatchConfiguration {
 	private ReleaseIndexWriter releaseIndexWriter;
 	@Autowired
 	private JDiscogsConfiguration config;
+	@Autowired
+	private TaskExecutor taskExecutor;
 
 	private <T> ItemReader<T> getReader(Class<T> entityClass) throws MalformedURLException {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
@@ -82,18 +82,11 @@ public class BatchConfiguration {
 		return new FileSystemResource(uri.toString());
 	}
 
-	@Bean
-	public TaskExecutor taskExecutor() {
-		SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor("spring-batch");
-		asyncTaskExecutor.setConcurrencyLimit(config.getConcurrencyLimit());
-		return asyncTaskExecutor;
-	}
-
 	private <T> Job getJob(String jobName, String stepName, Class<T> clazz, ItemWriter<T> writer)
 			throws MalformedURLException {
 		TaskletStep loadStep = stepBuilderFactory.get(stepName).<T, T>chunk(config.getBatchSize())
-				.reader(getReader(clazz)).writer(getWriter(writer)).listener(new JobListener(stepName + "-listener"))
-				.taskExecutor(taskExecutor()).build();
+				.reader(getReader(clazz)).writer(getWriter(writer))
+				.listener(new JobListener(clazz.getSimpleName().toLowerCase())).taskExecutor(taskExecutor).build();
 		return jobBuilderFactory.get(jobName).incrementer(new RunIdIncrementer()).flow(loadStep).end().build();
 	}
 

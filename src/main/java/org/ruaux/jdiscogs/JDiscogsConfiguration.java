@@ -19,7 +19,6 @@ public class JDiscogsConfiguration {
 	private String token;
 	private String userAgent = "com.redislabs.rediscogs.useragent";
 	private int batchSize = 50;
-	private int concurrencyLimit = 5;
 	private boolean noopWriters = false;
 	private String hashArrayDelimiter = ",";
 	private String fileUrlTemplate = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2018/discogs_20181001_{entity}s.xml.gz";
