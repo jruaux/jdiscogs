@@ -65,7 +65,7 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 			doc.set(FIELD_TITLE, release.getTitle());
 			docs[index] = doc;
 		}
-		rediSearchConfig.addDocuments(client, new AddOptions().setNosave(), docs);
+		client.addDocuments(new AddOptions().setNosave(), docs);
 	}
 
 }
