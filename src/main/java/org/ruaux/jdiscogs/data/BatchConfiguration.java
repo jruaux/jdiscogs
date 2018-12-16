@@ -9,10 +9,16 @@ import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.ruaux.jdiscogs.data.xml.Release;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
@@ -49,6 +55,8 @@ public class BatchConfiguration {
 	private JDiscogsConfiguration config;
 	@Autowired
 	private TaskExecutor taskExecutor;
+	@Autowired
+	private JobLauncher jobLauncher;
 
 	private <T> ItemReader<T> getReader(Class<T> entityClass) throws MalformedURLException {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
@@ -82,18 +90,15 @@ public class BatchConfiguration {
 		return new FileSystemResource(uri.toString());
 	}
 
-	private <T> Job getJob(String name, Class<T> clazz, ItemWriter<T> writer) throws MalformedURLException {
+	@SuppressWarnings("unchecked")
+	private <T> Job getJob(LoadJob job, ItemWriter<T> writer) throws MalformedURLException {
+		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
-		String stepName = replace(config.getStepNamingTemplate(), entityName, name);
-		String jobName = replace(config.getJobNamingTemplate(), entityName, name);
-		TaskletStep loadStep = stepBuilderFactory.get(stepName).<T, T>chunk(config.getBatchSize())
+		TaskletStep loadStep = stepBuilderFactory.get(job.name() + "-step").<T, T>chunk(config.getBatchSize())
 				.reader(getReader(clazz)).writer(getWriter(writer)).listener(new JobListener(entityName))
 				.taskExecutor(taskExecutor).build();
-		return jobBuilderFactory.get(jobName).incrementer(new RunIdIncrementer()).flow(loadStep).end().build();
-	}
-
-	private String replace(String template, String entity, String action) {
-		return template.replace("{entity}", entity).replace("{action}", action);
+		return jobBuilderFactory.get(job.name() + "-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
+				.build();
 	}
 
 	private <T> ItemWriter<T> getWriter(ItemWriter<T> writer) {
@@ -103,30 +108,45 @@ public class BatchConfiguration {
 		return writer;
 	}
 
-	public Job getMasterDocsJob() throws MalformedURLException {
-		return getJob("docs", Master.class, masterWriter);
+	public void runJobs() throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException, MalformedURLException {
+		for (LoadJob job : config.getJobs()) {
+			jobLauncher.run(getLoadJob(job), new JobParameters());
+		}
 	}
 
-	public Job getMasterIndexJob() throws MalformedURLException {
-		return getJob("index", Master.class, masterIndexWriter);
+	public Job getLoadJob(LoadJob job) throws MalformedURLException {
+		switch (job) {
+		case MasterDocs:
+			return getJob(job, masterWriter);
+		case MasterIndex:
+			return getJob(job, masterIndexWriter);
+		case ReleaseDocs:
+			return getJob(job, releaseWriter);
+		case ReleaseIndex:
+			return getJob(job, releaseIndexWriter);
+		case ReleaseDocsIndex:
+			return getJob(job, new CompositeItemWriterBuilder<Release>()
+					.delegates(Arrays.asList(releaseWriter, releaseIndexWriter)).build());
+		default:
+			return getJob(job, new CompositeItemWriterBuilder<Master>()
+					.delegates(Arrays.asList(masterWriter, masterIndexWriter)).build());
+		}
 	}
 
-	public Job getMasterDocsAndIndexJob() throws MalformedURLException {
-		return getJob("docs-and-index", Master.class, new CompositeItemWriterBuilder<Master>()
-				.delegates(Arrays.asList(masterWriter, masterIndexWriter)).build());
-	}
+	public enum LoadJob {
+		MasterDocs(Master.class), MasterIndex(Master.class), MasterDocsIndex(Master.class), ReleaseDocs(Release.class),
+		ReleaseIndex(Release.class), ReleaseDocsIndex(Release.class);
 
-	public Job getReleaseDocsJob() throws MalformedURLException {
-		return getJob("docs", Release.class, releaseWriter);
-	}
+		private Class<?> clazz;
 
-	public Job getReleaseIndexJob() throws MalformedURLException {
-		return getJob("index", Release.class, releaseIndexWriter);
-	}
+		private LoadJob(Class<?> clazz) {
+			this.clazz = clazz;
+		}
 
-	public Job getReleaseDocsAndIndexJob() throws MalformedURLException {
-		return getJob("docs-and-index", Release.class, new CompositeItemWriterBuilder<Release>()
-				.delegates(Arrays.asList(releaseWriter, releaseIndexWriter)).build());
+		public Class<?> getJobClass() {
+			return clazz;
+		}
+
 	}
 
 }

@@ -1,5 +1,6 @@
 package org.ruaux.jdiscogs;
 
+import org.ruaux.jdiscogs.data.BatchConfiguration.LoadJob;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ public class JDiscogsConfiguration {
 	private String releaseIndex = "releaseIdx";
 	private String masterIndex = "masterIdx";
 	private String artistSuggestionIndex = "artistSuggestIdx";
+	private LoadJob[] jobs = { LoadJob.MasterDocsIndex };
 
 	@Bean
 	public StringRedisTemplate redisTemplate(LettuceConnectionFactory connectionFactory) {

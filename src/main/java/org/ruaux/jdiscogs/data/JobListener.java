@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.springframework.batch.core.ItemWriteListener;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class JobListener implements ItemWriteListener<Object> {
 
 	private long count = 0;
@@ -24,7 +21,8 @@ public class JobListener implements ItemWriteListener<Object> {
 		count += items.size();
 		double elapsedTimeInSeconds = (double) (System.currentTimeMillis() - startTime) / 1000;
 		long itemsPerSecond = Math.round(count / elapsedTimeInSeconds);
-		log.info("Wrote {} {} items ({} items/sec)", formatter.format(count), entity, formatter.format(itemsPerSecond));
+		System.out.print(String.format("\rWrote %s %s items (%s items/sec)", formatter.format(count), entity,
+				formatter.format(itemsPerSecond)));
 	}
 
 	@Override
