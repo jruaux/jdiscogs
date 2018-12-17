@@ -61,8 +61,9 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 			doc.set(FIELD_TITLE, release.getTitle());
 			docs[index] = doc;
 		}
+		log.debug("Adding {} docs to index {}", docs.length, config.getReleaseIndex());
 		client.addDocuments(new AddOptions().setNosave(), docs);
-		log.debug("Added {} documents to index {}", docs.length, config.getReleaseIndex());
+		log.debug("Added {} docs to index {}", docs.length, config.getReleaseIndex());
 	}
 
 }

@@ -98,7 +98,9 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			}
 			docs[index] = doc;
 		}
+		log.debug("Adding {} docs to index {}", docs.length, config.getMasterIndex());
 		client.addDocuments(docs);
+		log.debug("Added {} docs to index {}", docs.length, config.getMasterIndex());
 	}
 
 }
