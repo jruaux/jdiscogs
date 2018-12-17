@@ -3,7 +3,6 @@ package org.ruaux.jdiscogs.data;
 import java.util.List;
 
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
-import org.ruaux.jdiscogs.data.xml.Artist;
 import org.ruaux.jdiscogs.data.xml.Release;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
@@ -56,16 +55,14 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 			Release release = items.get(index);
 			String releaseId = release.getId();
 			Document doc = new Document(releaseId);
-			if (release.getArtists() != null) {
-				List<Artist> artists = release.getArtists().getArtists();
-				if (artists != null && artists.size() > 0) {
-					doc.set(FIELD_ARTIST, artists.get(0));
-				}
+			if (release.getArtists() != null && !release.getArtists().getArtists().isEmpty()) {
+				doc.set(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
 			}
 			doc.set(FIELD_TITLE, release.getTitle());
 			docs[index] = doc;
 		}
 		client.addDocuments(new AddOptions().setNosave(), docs);
+		log.debug("Added {} documents to index {}", docs.length, config.getReleaseIndex());
 	}
 
 }

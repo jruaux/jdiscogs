@@ -58,7 +58,7 @@ public class Release {
 
 	public List<Track> getTracks() {
 		return trackList.getTracks().stream()
-				.filter(track -> track.getPosition() != null && track.getPosition().length() > 0)
+				.filter(track -> track.getPosition() != null && !track.getPosition().isEmpty())
 				.collect(Collectors.toList());
 	}
 

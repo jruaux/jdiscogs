@@ -56,11 +56,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		try {
 			client.createIndex(schema, Client.IndexOptions.Default());
 		} catch (JedisException e) {
-			if (log.isDebugEnabled()) {
-				log.debug("Could not create index", e);
-			} else {
-				log.info("Could not create index, might already exist");
-			}
+			log.info("Could not create index, might already exist");
 		}
 	}
 
@@ -71,32 +67,35 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			Master master = items.get(index);
 			String masterId = master.getId();
 			Document doc = new Document(masterId);
-			if (master.getArtists() != null) {
-				List<Artist> artists = master.getArtists().getArtists();
-				if (artists != null && artists.size() > 0) {
-					Artist artist = artists.get(0);
+			if (master.getArtists() != null && !master.getArtists().getArtists().isEmpty()) {
+				Artist artist = master.getArtists().getArtists().get(0);
+				if (artist != null) {
 					doc.set(FIELD_ARTIST, artist.getName());
 					doc.set(FIELD_ARTISTID, artist.getId());
-					Suggestion suggestion = Suggestion.builder().str(artist.getName()).payload(artist.getId()).build();
-					artistSuggestionClient.addSuggestion(suggestion, true);
+					Suggestion.Builder suggestionBuilder = Suggestion.builder();
+					suggestionBuilder.str(artist.getName());
+					suggestionBuilder.payload(artist.getId());
+					artistSuggestionClient.addSuggestion(suggestionBuilder.build(), true);
 				}
 			}
 			doc.set(FIELD_DATAQUALITY, master.getDataQuality());
 			if (master.getGenres() != null) {
 				List<String> genres = master.getGenres().getGenres();
-				if (genres != null && genres.size() > 0) {
+				if (genres != null && !genres.isEmpty()) {
 					doc.set(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), genres));
 				}
 			}
 			if (master.getStyles() != null) {
 				List<String> styles = master.getStyles().getStyles();
-				if (styles != null && styles.size() > 0) {
+				if (styles != null && !styles.isEmpty()) {
 					doc.set(FIELD_STYLES, String.join(config.getHashArrayDelimiter(), styles));
 				}
 			}
 			doc.set(FIELD_TITLE, master.getTitle());
 			doc.set(FIELD_YEAR, master.getYear());
-			doc.set(FIELD_IMAGE, master.getImages() != null && master.getImages().getImages().size() > 0);
+			if (master.getImages() != null && !master.getImages().getImages().isEmpty()) {
+				doc.set(FIELD_IMAGE, true);
+			}
 			docs[index] = doc;
 		}
 		client.addDocuments(docs);
