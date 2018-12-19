@@ -3,6 +3,7 @@ package org.ruaux.jdiscogs.data;
 import java.util.List;
 
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
+import org.ruaux.jdiscogs.JDiscogsConfiguration.DataConfiguration;
 import org.ruaux.jdiscogs.data.xml.Artist;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.springframework.batch.item.ExecutionContext;
@@ -42,10 +43,11 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		log.info("Creating client to RediSearch index {}", config.getMasterIndex());
-		this.client = rediSearchConfig.getClient(config.getMasterIndex());
-		log.info("Creating client to RediSearch suggestion index {}", config.getArtistSuggestionIndex());
-		this.artistSuggestionClient = rediSearchConfig.getClient(config.getArtistSuggestionIndex());
+		DataConfiguration data = config.getData();
+		log.info("Creating client to RediSearch index {}", data.getMasterIndex());
+		this.client = rediSearchConfig.getClient(data.getMasterIndex());
+		log.info("Creating client to RediSearch suggestion index {}", data.getArtistSuggestionIndex());
+		this.artistSuggestionClient = rediSearchConfig.getClient(data.getArtistSuggestionIndex());
 		Schema schema = new Schema();
 		schema.addSortableTextField(FIELD_ARTIST, 1);
 		schema.addSortableTextField(FIELD_ARTISTID, 1);
@@ -55,7 +57,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		schema.addSortableTextField(FIELD_TITLE, 1);
 		schema.addSortableNumericField(FIELD_YEAR);
 		schema.addSortableTextField(FIELD_IMAGE, 1);
-		log.info("Creating index {}", config.getMasterIndex());
+		log.info("Creating index {}", data.getMasterIndex());
 		try {
 			client.createIndex(schema, Client.IndexOptions.Default());
 		} catch (JedisException e) {
@@ -101,9 +103,9 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			}
 			docs[index] = doc;
 		}
-		log.debug("Adding {} docs to index {}", docs.length, config.getMasterIndex());
+		log.debug("Adding {} docs to index {}", docs.length, config.getData().getMasterIndex());
 		client.addDocuments(docs);
-		log.debug("Added {} docs to index {}", docs.length, config.getMasterIndex());
+		log.debug("Added {} docs to index {}", docs.length, config.getData().getMasterIndex());
 	}
 
 }

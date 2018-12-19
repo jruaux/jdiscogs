@@ -33,7 +33,7 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		this.client = rediSearchConfig.getClient(config.getReleaseIndex());
+		this.client = rediSearchConfig.getClient(config.getData().getReleaseIndex());
 		Schema schema = new Schema();
 		schema.addSortableTextField(FIELD_ARTIST, 1);
 		schema.addSortableTextField(FIELD_TITLE, 1);
@@ -61,9 +61,9 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 			doc.set(FIELD_TITLE, release.getTitle());
 			docs[index] = doc;
 		}
-		log.debug("Adding {} docs to index {}", docs.length, config.getReleaseIndex());
+		log.debug("Adding {} docs to index {}", docs.length, config.getData().getReleaseIndex());
 		client.addDocuments(new AddOptions().setNosave(), docs);
-		log.debug("Added {} docs to index {}", docs.length, config.getReleaseIndex());
+		log.debug("Added {} docs to index {}", docs.length, config.getData().getReleaseIndex());
 	}
 
 }

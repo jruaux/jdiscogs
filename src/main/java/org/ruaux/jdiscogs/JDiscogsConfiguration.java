@@ -16,9 +16,6 @@ import lombok.Data;
 @Data
 public class JDiscogsConfiguration {
 
-	private String releaseIndex = "releaseIdx";
-	private String masterIndex = "masterIdx";
-	private String artistSuggestionIndex = "artistSuggestIdx";
 	private DataConfiguration data = new DataConfiguration();
 	private ApiConfiguration api = new ApiConfiguration();
 	private String hashArrayDelimiter = ",";
@@ -37,6 +34,9 @@ public class JDiscogsConfiguration {
 		private LoadJob[] jobs = { LoadJob.MasterDocsIndex };
 		private boolean skip = false;
 		private boolean noOp = false;
+		private String releaseIndex = "releaseIdx";
+		private String masterIndex = "masterIdx";
+		private String artistSuggestionIndex = "artistSuggestIdx";
 	}
 
 	@Data
