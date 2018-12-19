@@ -46,11 +46,11 @@ public class DiscogsClient {
 			Map<String, String> uriParams = new HashMap<String, String>();
 			uriParams.put("entity", entity);
 			uriParams.put("id", id);
-			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(config.getUrl()).queryParam("token",
-					config.getToken());
+			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(config.getApi().getUrl())
+					.queryParam("token", config.getApi().getToken());
 			URI uri = builder.buildAndExpand(uriParams).toUri();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("User-Agent", config.getUserAgent());
+			headers.set("User-Agent", config.getApi().getUserAgent());
 			RequestEntity<Object> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, uri);
 			ResponseEntity<T> response = restTemplate.exchange(requestEntity, entityClass);
 			HttpHeaders responseHeaders = response.getHeaders();

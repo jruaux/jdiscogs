@@ -42,7 +42,9 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 
 	@Override
 	public void open(ExecutionContext executionContext) {
+		log.info("Creating client to RediSearch index {}", config.getMasterIndex());
 		this.client = rediSearchConfig.getClient(config.getMasterIndex());
+		log.info("Creating client to RediSearch suggestion index {}", config.getArtistSuggestionIndex());
 		this.artistSuggestionClient = rediSearchConfig.getClient(config.getArtistSuggestionIndex());
 		Schema schema = new Schema();
 		schema.addSortableTextField(FIELD_ARTIST, 1);
@@ -53,6 +55,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		schema.addSortableTextField(FIELD_TITLE, 1);
 		schema.addSortableNumericField(FIELD_YEAR);
 		schema.addSortableTextField(FIELD_IMAGE, 1);
+		log.info("Creating index {}", config.getMasterIndex());
 		try {
 			client.createIndex(schema, Client.IndexOptions.Default());
 		} catch (JedisException e) {

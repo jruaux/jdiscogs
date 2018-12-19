@@ -71,7 +71,7 @@ public class BatchConfiguration {
 	}
 
 	private Resource resource(String entityName) throws MalformedURLException {
-		URI uri = URI.create(config.getFileUrlTemplate().replace("{entity}", entityName));
+		URI uri = URI.create(config.getData().getUrl().replace("{entity}", entityName));
 		Resource resource = getResource(uri);
 		if (uri.getPath().endsWith(".gz")) {
 			try {
@@ -94,7 +94,7 @@ public class BatchConfiguration {
 	private <T> Job getJob(LoadJob job, ItemWriter<T> writer) throws MalformedURLException {
 		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
-		TaskletStep loadStep = stepBuilderFactory.get(job.name() + "-step").<T, T>chunk(config.getBatchSize())
+		TaskletStep loadStep = stepBuilderFactory.get(job.name() + "-step").<T, T>chunk(config.getData().getBatchSize())
 				.reader(getReader(clazz)).writer(getWriter(writer)).listener(new JobListener(entityName))
 				.taskExecutor(taskExecutor).build();
 		return jobBuilderFactory.get(job.name() + "-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
@@ -102,14 +102,18 @@ public class BatchConfiguration {
 	}
 
 	private <T> ItemWriter<T> getWriter(ItemWriter<T> writer) {
-		if (config.isNoop()) {
+		if (config.getData().isNoOp()) {
 			return new NoopItemWriter<T>();
 		}
 		return writer;
 	}
 
-	public void runJobs() throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException, MalformedURLException {
-		for (LoadJob job : config.getJobs()) {
+	public void runJobs() throws JobExecutionAlreadyRunningException, JobRestartException,
+			JobInstanceAlreadyCompleteException, JobParametersInvalidException, MalformedURLException {
+		if (config.getData().isSkip()) {
+			return;
+		}
+		for (LoadJob job : config.getData().getJobs()) {
 			jobLauncher.run(getLoadJob(job), new JobParameters());
 		}
 	}
