@@ -63,6 +63,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 
 	@Override
 	public void write(List<? extends Master> items) throws Exception {
+		log.debug("Writing {} master items", items.size());
 		SearchAsyncCommands<String, String> commands = client.connect().async();
 		commands.setAutoFlushCommands(false);
 		for (Master master : items) {
