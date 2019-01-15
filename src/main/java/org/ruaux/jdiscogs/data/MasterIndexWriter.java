@@ -1,9 +1,10 @@
 package org.ruaux.jdiscogs.data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
-import org.ruaux.jdiscogs.JDiscogsConfiguration.DataConfiguration;
 import org.ruaux.jdiscogs.data.xml.Artist;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.springframework.batch.item.ExecutionContext;
@@ -12,14 +13,17 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.redislabs.lettusearch.RediSearchClient;
+import com.redislabs.lettusearch.api.Document;
+import com.redislabs.lettusearch.api.DropOptions;
+import com.redislabs.lettusearch.api.Schema;
+import com.redislabs.lettusearch.api.Suggestion;
+import com.redislabs.lettusearch.api.async.SearchAsyncCommands;
+import com.redislabs.lettusearch.api.sync.SearchCommands;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
-import io.redisearch.Document;
-import io.redisearch.Schema;
-import io.redisearch.Suggestion;
-import io.redisearch.client.Client;
+import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
-import redis.clients.jedis.exceptions.JedisException;
 
 @Component
 @Slf4j
@@ -35,77 +39,64 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	public static final String FIELD_IMAGE = "image";
 
 	@Autowired
-	private RediSearchConfiguration rediSearchConfig;
+	private RediSearchConfiguration searchConfig;
 	@Autowired
 	private JDiscogsConfiguration config;
-	private Client client;
-	private Client artistSuggestionClient;
+	private RediSearchClient client;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		DataConfiguration data = config.getData();
-		log.info("Creating client to RediSearch index {}", data.getMasterIndex());
-		this.client = rediSearchConfig.getClient(data.getMasterIndex());
-		log.info("Creating client to RediSearch suggestion index {}", data.getArtistSuggestionIndex());
-		this.artistSuggestionClient = rediSearchConfig.getClient(data.getArtistSuggestionIndex());
-		Schema schema = new Schema();
-		schema.addSortableTextField(FIELD_ARTIST, 1);
-		schema.addSortableTextField(FIELD_ARTISTID, 1);
-		schema.addSortableTextField(FIELD_DATAQUALITY, 1);
-		schema.addSortableTextField(FIELD_GENRES, 1);
-		schema.addSortableTextField(FIELD_STYLES, 1);
-		schema.addSortableTextField(FIELD_TITLE, 1);
-		schema.addSortableNumericField(FIELD_YEAR);
-		schema.addSortableTextField(FIELD_IMAGE, 1);
-		log.info("Creating index {}", data.getMasterIndex());
+		client = searchConfig.getClient();
+		SearchCommands<String, String> commands = client.connect().sync();
 		try {
-			client.createIndex(schema, Client.IndexOptions.Default());
-		} catch (JedisException e) {
-			log.info("Could not create index, might already exist");
+			commands.drop(config.getData().getMasterIndex(), DropOptions.builder().build());
+		} catch (RedisException e) {
+			log.debug("Could not drop index {}", config.getData().getMasterIndex(), e);
 		}
+		log.info("Creating index {}", config.getData().getMasterIndex());
+		commands.create(config.getData().getMasterIndex(),
+				Schema.builder().textField(FIELD_ARTIST, true).textField(FIELD_ARTISTID, true)
+						.textField(FIELD_DATAQUALITY, true).textField(FIELD_GENRES, true).textField(FIELD_STYLES, true)
+						.textField(FIELD_TITLE, true).numericField(FIELD_YEAR, true).textField(FIELD_IMAGE, true)
+						.build());
 	}
 
 	@Override
 	public void write(List<? extends Master> items) throws Exception {
-		Document[] docs = new Document[items.size()];
-		for (int index = 0; index < docs.length; index++) {
-			Master master = items.get(index);
-			String masterId = master.getId();
-			Document doc = new Document(masterId);
+		SearchAsyncCommands<String, String> commands = client.connect().async();
+		commands.setAutoFlushCommands(false);
+		for (Master master : items) {
+			Map<String, String> fields = new HashMap<>();
 			if (master.getArtists() != null && !master.getArtists().getArtists().isEmpty()) {
 				Artist artist = master.getArtists().getArtists().get(0);
 				if (artist != null) {
-					doc.set(FIELD_ARTIST, artist.getName());
-					doc.set(FIELD_ARTISTID, artist.getId());
-					Suggestion.Builder suggestionBuilder = Suggestion.builder();
-					suggestionBuilder.str(artist.getName());
-					suggestionBuilder.payload(artist.getId());
-					artistSuggestionClient.addSuggestion(suggestionBuilder.build(), true);
+					fields.put(FIELD_ARTIST, artist.getName());
+					fields.put(FIELD_ARTISTID, artist.getId());
+					commands.add(config.getData().getArtistSuggestionIndex(), Suggestion.builder()
+							.string(artist.getName()).increment(true).payload(artist.getId()).build());
 				}
 			}
-			doc.set(FIELD_DATAQUALITY, master.getDataQuality());
+			fields.put(FIELD_DATAQUALITY, master.getDataQuality());
 			if (master.getGenres() != null) {
 				List<String> genres = master.getGenres().getGenres();
 				if (genres != null && !genres.isEmpty()) {
-					doc.set(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), genres));
+					fields.put(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), genres));
 				}
 			}
 			if (master.getStyles() != null) {
 				List<String> styles = master.getStyles().getStyles();
 				if (styles != null && !styles.isEmpty()) {
-					doc.set(FIELD_STYLES, String.join(config.getHashArrayDelimiter(), styles));
+					fields.put(FIELD_STYLES, String.join(config.getHashArrayDelimiter(), styles));
 				}
 			}
-			doc.set(FIELD_TITLE, master.getTitle());
-			doc.set(FIELD_YEAR, master.getYear());
-			if (master.getImages() != null && !master.getImages().getImages().isEmpty()) {
-				doc.set(FIELD_IMAGE, true);
-			}
-			docs[index] = doc;
+			fields.put(FIELD_TITLE, master.getTitle());
+			fields.put(FIELD_YEAR, master.getYear());
+			Boolean image = master.getImages() != null && !master.getImages().getImages().isEmpty();
+			fields.put(FIELD_IMAGE, image.toString());
+			commands.add(config.getData().getMasterIndex(),
+					Document.builder().id(master.getId()).fields(fields).build());
 		}
-		log.debug("Adding {} docs to index {}", docs.length, config.getData().getMasterIndex());
-		client.addDocuments(docs);
-		log.debug("Added {} docs to index {}", docs.length, config.getData().getMasterIndex());
+		commands.flushCommands();
 	}
 
 }

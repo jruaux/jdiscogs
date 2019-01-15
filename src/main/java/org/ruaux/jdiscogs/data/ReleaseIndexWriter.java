@@ -1,6 +1,8 @@
 package org.ruaux.jdiscogs.data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Release;
@@ -10,14 +12,16 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.redislabs.lettusearch.RediSearchClient;
+import com.redislabs.lettusearch.api.Document;
+import com.redislabs.lettusearch.api.DropOptions;
+import com.redislabs.lettusearch.api.Schema;
+import com.redislabs.lettusearch.api.async.SearchAsyncCommands;
+import com.redislabs.lettusearch.api.sync.SearchCommands;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
-import io.redisearch.Document;
-import io.redisearch.Schema;
-import io.redisearch.client.AddOptions;
-import io.redisearch.client.Client;
+import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
-import redis.clients.jedis.exceptions.JedisException;
 
 @Component
 @Slf4j
@@ -29,41 +33,36 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	private JDiscogsConfiguration config;
 	@Autowired
 	private RediSearchConfiguration rediSearchConfig;
-	private Client client;
+	private RediSearchClient client;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		this.client = rediSearchConfig.getClient(config.getData().getReleaseIndex());
-		Schema schema = new Schema();
-		schema.addSortableTextField(FIELD_ARTIST, 1);
-		schema.addSortableTextField(FIELD_TITLE, 1);
+		client = rediSearchConfig.getClient();
+		SearchCommands<String, String> commands = client.connect().sync();
 		try {
-			client.createIndex(schema, Client.IndexOptions.Default());
-		} catch (JedisException e) {
-			if (log.isDebugEnabled()) {
-				log.debug("Could not create index", e);
-			} else {
-				log.info("Could not create index, might already exist");
-			}
+			commands.drop(config.getData().getReleaseIndex(), DropOptions.builder().build());
+		} catch (RedisException e) {
+			log.debug("Could not drop index {}", config.getData().getReleaseIndex(), e);
 		}
+		log.info("Creating index {}", config.getData().getReleaseIndex());
+		commands.create(config.getData().getReleaseIndex(),
+				Schema.builder().textField(FIELD_ARTIST, true).textField(FIELD_TITLE, true).build());
 	}
 
 	@Override
 	public void write(List<? extends Release> items) throws Exception {
-		Document[] docs = new Document[items.size()];
-		for (int index = 0; index < docs.length; index++) {
-			Release release = items.get(index);
-			String releaseId = release.getId();
-			Document doc = new Document(releaseId);
+		SearchAsyncCommands<String, String> commands = client.connect().async();
+		commands.setAutoFlushCommands(false);
+		for (Release release : items) {
+			Map<String, String> fields = new HashMap<>();
 			if (release.getArtists() != null && !release.getArtists().getArtists().isEmpty()) {
-				doc.set(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
+				fields.put(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
 			}
-			doc.set(FIELD_TITLE, release.getTitle());
-			docs[index] = doc;
+			fields.put(FIELD_TITLE, release.getTitle());
+			commands.add(config.getData().getReleaseIndex(),
+					Document.builder().id(release.getId()).fields(fields).noSave(true).build());
 		}
-		log.debug("Adding {} docs to index {}", docs.length, config.getData().getReleaseIndex());
-		client.addDocuments(new AddOptions().setNosave(), docs);
-		log.debug("Added {} docs to index {}", docs.length, config.getData().getReleaseIndex());
+		commands.flushCommands();
 	}
 
 }

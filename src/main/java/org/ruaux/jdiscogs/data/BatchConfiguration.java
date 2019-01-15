@@ -5,6 +5,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.annotation.PostConstruct;
+
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.ruaux.jdiscogs.data.xml.Release;
@@ -33,6 +35,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Configuration
@@ -40,9 +43,11 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 public class BatchConfiguration {
 
 	@Autowired
-	public JobBuilderFactory jobBuilderFactory;
+	private LettuceConnectionFactory lettuceConnectionFactory;
 	@Autowired
-	public StepBuilderFactory stepBuilderFactory;
+	private JobBuilderFactory jobBuilderFactory;
+	@Autowired
+	private StepBuilderFactory stepBuilderFactory;
 	@Autowired
 	private MasterWriter masterWriter;
 	@Autowired
@@ -57,6 +62,12 @@ public class BatchConfiguration {
 	private TaskExecutor taskExecutor;
 	@Autowired
 	private JobLauncher jobLauncher;
+
+	@PostConstruct
+	public void init() {
+		Object nativeConnection = lettuceConnectionFactory.getConnection().getNativeConnection();
+		System.out.println(nativeConnection.getClass().getName());
+	}
 
 	private <T> ItemReader<T> getReader(Class<T> entityClass) throws MalformedURLException {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
