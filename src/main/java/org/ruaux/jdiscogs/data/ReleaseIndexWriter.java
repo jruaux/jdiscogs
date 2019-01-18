@@ -1,8 +1,10 @@
 package org.ruaux.jdiscogs.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Release;
@@ -13,14 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
-import com.redislabs.lettusearch.search.Document;
+import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
 import com.redislabs.lettusearch.search.Schema;
 import com.redislabs.lettusearch.search.api.async.SearchAsyncCommands;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
+import io.lettuce.core.LettuceFutures;
 import io.lettuce.core.RedisException;
+import io.lettuce.core.RedisFuture;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -32,12 +36,11 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	@Autowired
 	private JDiscogsConfiguration config;
 	@Autowired
-	private RediSearchConfiguration rediSearchConfig;
-	private StatefulRediSearchConnection<String, String> connection;
+	private RediSearchConfiguration searchConfig;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		connection = rediSearchConfig.getClient().connect();
+		StatefulRediSearchConnection<String, String> connection = searchConfig.getClient().connect();
 		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getReleaseIndex(), DropOptions.builder().build());
@@ -47,30 +50,39 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 		log.info("Creating index {}", config.getData().getReleaseIndex());
 		commands.create(config.getData().getReleaseIndex(),
 				Schema.builder().textField(FIELD_ARTIST, true).textField(FIELD_TITLE, true).build());
-	}
-
-	@Override
-	public void close() {
-		if (connection != null) {
-			connection.close();
-			connection = null;
-		}
+		connection.close();
 	}
 
 	@Override
 	public void write(List<? extends Release> items) throws Exception {
+		log.debug("Writing {} release items", items.size());
+		StatefulRediSearchConnection<String, String> connection = searchConfig.getClient().connect();
 		SearchAsyncCommands<String, String> commands = connection.async();
 		commands.setAutoFlushCommands(false);
+		List<RedisFuture<?>> futures = new ArrayList<>();
 		for (Release release : items) {
 			Map<String, String> fields = new HashMap<>();
 			if (release.getArtists() != null && !release.getArtists().getArtists().isEmpty()) {
 				fields.put(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
 			}
 			fields.put(FIELD_TITLE, release.getTitle());
-			commands.add(config.getData().getReleaseIndex(),
-					Document.builder().id(release.getId()).fields(fields).noSave(true).build());
+			futures.add(commands.add(config.getData().getReleaseIndex(), release.getId(), fields, 1d,
+					AddOptions.builder().noSave(true).build()));
 		}
 		commands.flushCommands();
+		boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS, futures.toArray(new RedisFuture[futures.size()]));
+		if (result) {
+			log.debug("Wrote {} release items", items.size());
+		} else {
+			log.warn("Could not write {} release items", items.size());
+			for (RedisFuture<?> future : futures) {
+				if (future.getError() != null) {
+					log.error(future.getError());
+				}
+			}
+		}
+		connection.close();
+
 	}
 
 }
