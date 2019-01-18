@@ -24,7 +24,9 @@ public class JobListener implements ItemWriteListener<Object> {
 		count += items.size();
 		double elapsedTimeInSeconds = (double) (System.currentTimeMillis() - startTime) / 1000;
 		long itemsPerSecond = Math.round(count / elapsedTimeInSeconds);
-		if (!log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
+			log.debug("Wrote {} items ({} items/sec)", count, itemsPerSecond);
+		} else {
 			System.out.print(String.format("\rWrote %s %s items (%s items/sec)", formatter.format(count), entity,
 					formatter.format(itemsPerSecond)));
 		}

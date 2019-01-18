@@ -12,12 +12,12 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.redislabs.lettusearch.RediSearchClient;
-import com.redislabs.lettusearch.api.Document;
-import com.redislabs.lettusearch.api.DropOptions;
-import com.redislabs.lettusearch.api.Schema;
-import com.redislabs.lettusearch.api.async.SearchAsyncCommands;
-import com.redislabs.lettusearch.api.sync.SearchCommands;
+import com.redislabs.lettusearch.StatefulRediSearchConnection;
+import com.redislabs.lettusearch.search.Document;
+import com.redislabs.lettusearch.search.DropOptions;
+import com.redislabs.lettusearch.search.Schema;
+import com.redislabs.lettusearch.search.api.async.SearchAsyncCommands;
+import com.redislabs.lettusearch.search.api.sync.SearchCommands;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
 import io.lettuce.core.RedisException;
@@ -33,12 +33,12 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	private JDiscogsConfiguration config;
 	@Autowired
 	private RediSearchConfiguration rediSearchConfig;
-	private RediSearchClient client;
+	private StatefulRediSearchConnection<String, String> connection;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		client = rediSearchConfig.getClient();
-		SearchCommands<String, String> commands = client.connect().sync();
+		connection = rediSearchConfig.getClient().connect();
+		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getReleaseIndex(), DropOptions.builder().build());
 		} catch (RedisException e) {
@@ -50,8 +50,16 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	}
 
 	@Override
+	public void close() {
+		if (connection != null) {
+			connection.close();
+			connection = null;
+		}
+	}
+
+	@Override
 	public void write(List<? extends Release> items) throws Exception {
-		SearchAsyncCommands<String, String> commands = client.connect().async();
+		SearchAsyncCommands<String, String> commands = connection.async();
 		commands.setAutoFlushCommands(false);
 		for (Release release : items) {
 			Map<String, String> fields = new HashMap<>();

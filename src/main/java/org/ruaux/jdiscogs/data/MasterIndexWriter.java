@@ -13,13 +13,13 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.redislabs.lettusearch.RediSearchClient;
-import com.redislabs.lettusearch.api.Document;
-import com.redislabs.lettusearch.api.DropOptions;
-import com.redislabs.lettusearch.api.Schema;
-import com.redislabs.lettusearch.api.Suggestion;
-import com.redislabs.lettusearch.api.async.SearchAsyncCommands;
-import com.redislabs.lettusearch.api.sync.SearchCommands;
+import com.redislabs.lettusearch.RediSearchAsyncCommands;
+import com.redislabs.lettusearch.StatefulRediSearchConnection;
+import com.redislabs.lettusearch.search.Document;
+import com.redislabs.lettusearch.search.DropOptions;
+import com.redislabs.lettusearch.search.Schema;
+import com.redislabs.lettusearch.search.api.sync.SearchCommands;
+import com.redislabs.lettusearch.suggest.SuggestAddOptions;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
 import io.lettuce.core.RedisException;
@@ -42,12 +42,12 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	private RediSearchConfiguration searchConfig;
 	@Autowired
 	private JDiscogsConfiguration config;
-	private RediSearchClient client;
+	private StatefulRediSearchConnection<String, String> connection;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		client = searchConfig.getClient();
-		SearchCommands<String, String> commands = client.connect().sync();
+		connection = searchConfig.getClient().connect();
+		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getMasterIndex(), DropOptions.builder().build());
 		} catch (RedisException e) {
@@ -62,9 +62,17 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	}
 
 	@Override
+	public void close() {
+		if (connection != null) {
+			connection.close();
+			connection = null;
+		}
+	}
+
+	@Override
 	public void write(List<? extends Master> items) throws Exception {
 		log.debug("Writing {} master items", items.size());
-		SearchAsyncCommands<String, String> commands = client.connect().async();
+		RediSearchAsyncCommands<String, String> commands = connection.async();
 		commands.setAutoFlushCommands(false);
 		for (Master master : items) {
 			Map<String, String> fields = new HashMap<>();
@@ -73,8 +81,8 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 				if (artist != null) {
 					fields.put(FIELD_ARTIST, artist.getName());
 					fields.put(FIELD_ARTISTID, artist.getId());
-					commands.add(config.getData().getArtistSuggestionIndex(), Suggestion.builder()
-							.string(artist.getName()).increment(true).payload(artist.getId()).build());
+					commands.sugadd(config.getData().getArtistSuggestionIndex(), artist.getName(),
+							SuggestAddOptions.builder().increment(true).payload(artist.getId()).build());
 				}
 			}
 			fields.put(FIELD_DATAQUALITY, master.getDataQuality());
