@@ -78,6 +78,10 @@
 			<artifactId>spring-redisearch</artifactId>
 			<version>1.0.5-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>

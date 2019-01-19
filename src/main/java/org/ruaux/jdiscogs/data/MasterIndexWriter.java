@@ -25,7 +25,6 @@ import com.redislabs.lettusearch.suggest.SuggestAddOptions;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
 import io.lettuce.core.LettuceFutures;
-import io.lettuce.core.RedisException;
 import io.lettuce.core.RedisFuture;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,14 +45,15 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	private RediSearchConfiguration searchConfig;
 	@Autowired
 	private JDiscogsConfiguration config;
+	private StatefulRediSearchConnection<String, String> connection;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		StatefulRediSearchConnection<String, String> connection = searchConfig.getClient().connect();
+		connection = searchConfig.getClient().connect();
 		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getMasterIndex(), DropOptions.builder().build());
-		} catch (RedisException e) {
+		} catch (Exception e) {
 			log.debug("Could not drop index {}", config.getData().getMasterIndex(), e);
 		}
 		log.info("Creating index {}", config.getData().getMasterIndex());
@@ -62,13 +62,20 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 						.textField(FIELD_DATAQUALITY, true).textField(FIELD_GENRES, true).textField(FIELD_STYLES, true)
 						.textField(FIELD_TITLE, true).numericField(FIELD_YEAR, true).textField(FIELD_IMAGE, true)
 						.build());
+	}
+
+	@Override
+	public synchronized void close() {
+		if (connection == null) {
+			return;
+		}
 		connection.close();
+		connection = null;
 	}
 
 	@Override
 	public void write(List<? extends Master> items) throws Exception {
 		log.debug("Writing {} master items", items.size());
-		StatefulRediSearchConnection<String, String> connection = searchConfig.getClient().connect();
 		RediSearchAsyncCommands<String, String> commands = connection.async();
 		commands.setAutoFlushCommands(false);
 		List<RedisFuture<?>> futures = new ArrayList<>();
@@ -103,6 +110,9 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), fields, 1d,
 					AddOptions.builder().build()));
 		}
+		if (config.getData().isNoOp()) {
+			return;
+		}
 		commands.flushCommands();
 		boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS, futures.toArray(new RedisFuture[futures.size()]));
 		if (result) {
@@ -115,7 +125,6 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 				}
 			}
 		}
-		connection.close();
 	}
 
 }

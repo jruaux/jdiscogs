@@ -95,17 +95,10 @@ public class BatchConfiguration {
 		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
 		TaskletStep loadStep = stepBuilderFactory.get(job.name() + "-step").<T, T>chunk(config.getData().getBatchSize())
-				.reader(getReader(clazz)).writer(getWriter(writer)).listener(new JobListener(entityName))
+				.reader(getReader(clazz)).writer(writer).listener(new JobListener(entityName))
 				.taskExecutor(taskExecutor).build();
 		return jobBuilderFactory.get(job.name() + "-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
 				.build();
-	}
-
-	private <T> ItemWriter<T> getWriter(ItemWriter<T> writer) {
-		if (config.getData().isNoOp()) {
-			return new NoopItemWriter<T>();
-		}
-		return writer;
 	}
 
 	public void runJobs() throws JobExecutionAlreadyRunningException, JobRestartException,
