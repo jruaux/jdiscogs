@@ -10,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<name>jdiscogs</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Java client for Discogs API and Data</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>com.redislabs</groupId>
 			<artifactId>spring-redisearch</artifactId>
-			<version>1.0.5-SNAPSHOT</version>
+			<version>1.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

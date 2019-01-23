@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Configuration
@@ -53,8 +52,6 @@ public class BatchConfiguration {
 	private ReleaseIndexWriter releaseIndexWriter;
 	@Autowired
 	private JDiscogsConfiguration config;
-	@Autowired
-	private TaskExecutor taskExecutor;
 	@Autowired
 	private JobLauncher jobLauncher;
 
@@ -95,8 +92,7 @@ public class BatchConfiguration {
 		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
 		TaskletStep loadStep = stepBuilderFactory.get(job.name() + "-step").<T, T>chunk(config.getData().getBatchSize())
-				.reader(getReader(clazz)).writer(writer).listener(new JobListener(entityName))
-				.taskExecutor(taskExecutor).build();
+				.reader(getReader(clazz)).writer(writer).listener(new JobListener(entityName)).build();
 		return jobBuilderFactory.get(job.name() + "-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
 				.build();
 	}

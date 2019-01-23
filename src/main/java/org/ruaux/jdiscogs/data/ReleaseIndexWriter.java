@@ -18,8 +18,10 @@ import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
 import com.redislabs.lettusearch.search.Schema;
+import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
 import com.redislabs.lettusearch.search.api.async.SearchAsyncCommands;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
+import com.redislabs.lettusearch.search.field.TextField;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
 import io.lettuce.core.LettuceFutures;
@@ -48,8 +50,10 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 			log.debug("Could not drop index {}", config.getData().getReleaseIndex(), e);
 		}
 		log.info("Creating index {}", config.getData().getReleaseIndex());
-		commands.create(config.getData().getReleaseIndex(),
-				Schema.builder().textField(FIELD_ARTIST, true).textField(FIELD_TITLE, true).build());
+		SchemaBuilder builder = Schema.builder();
+		builder.field(TextField.builder().name(FIELD_ARTIST).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_TITLE).sortable(true).build());
+		commands.create(config.getData().getReleaseIndex(), builder.build());
 	}
 
 	@Override
@@ -73,7 +77,7 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 				fields.put(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
 			}
 			fields.put(FIELD_TITLE, release.getTitle());
-			futures.add(commands.add(config.getData().getReleaseIndex(), release.getId(), fields, 1d,
+			futures.add(commands.add(config.getData().getReleaseIndex(), release.getId(), 1, fields,
 					AddOptions.builder().noSave(true).build()));
 		}
 		if (config.getData().isNoOp()) {

@@ -20,7 +20,10 @@ import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
 import com.redislabs.lettusearch.search.Schema;
+import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
+import com.redislabs.lettusearch.search.field.NumericField;
+import com.redislabs.lettusearch.search.field.TextField;
 import com.redislabs.lettusearch.suggest.SuggestAddOptions;
 import com.redislabs.springredisearch.RediSearchConfiguration;
 
@@ -57,11 +60,16 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			log.debug("Could not drop index {}", config.getData().getMasterIndex(), e);
 		}
 		log.info("Creating index {}", config.getData().getMasterIndex());
-		commands.create(config.getData().getMasterIndex(),
-				Schema.builder().textField(FIELD_ARTIST, true).textField(FIELD_ARTISTID, true)
-						.textField(FIELD_DATAQUALITY, true).textField(FIELD_GENRES, true).textField(FIELD_STYLES, true)
-						.textField(FIELD_TITLE, true).numericField(FIELD_YEAR, true).textField(FIELD_IMAGE, true)
-						.build());
+		SchemaBuilder builder = Schema.builder();
+		builder.field(TextField.builder().name(FIELD_ARTIST).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_ARTISTID).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_DATAQUALITY).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_GENRES).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_STYLES).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_TITLE).sortable(true).build());
+		builder.field(NumericField.builder().name(FIELD_YEAR).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_IMAGE).sortable(true).build());
+		commands.create(config.getData().getMasterIndex(), builder.build());
 	}
 
 	@Override
@@ -86,7 +94,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 				if (artist != null) {
 					fields.put(FIELD_ARTIST, artist.getName());
 					fields.put(FIELD_ARTISTID, artist.getId());
-					futures.add(commands.sugadd(config.getData().getArtistSuggestionIndex(), artist.getName(),
+					futures.add(commands.sugadd(config.getData().getArtistSuggestionIndex(), artist.getName(), 1,
 							SuggestAddOptions.builder().increment(true).payload(artist.getId()).build()));
 				}
 			}
@@ -107,7 +115,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			fields.put(FIELD_YEAR, master.getYear());
 			Boolean image = master.getImages() != null && !master.getImages().getImages().isEmpty();
 			fields.put(FIELD_IMAGE, image.toString());
-			futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), fields, 1d,
+			futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), 1, fields,
 					AddOptions.builder().build()));
 		}
 		if (config.getData().isNoOp()) {
