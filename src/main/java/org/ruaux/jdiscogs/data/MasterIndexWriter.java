@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.redislabs.lettusearch.RediSearchAsyncCommands;
+import com.redislabs.lettusearch.RediSearchClient;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
@@ -25,7 +26,6 @@ import com.redislabs.lettusearch.search.api.sync.SearchCommands;
 import com.redislabs.lettusearch.search.field.NumericField;
 import com.redislabs.lettusearch.search.field.TextField;
 import com.redislabs.lettusearch.suggest.SuggestAddOptions;
-import com.redislabs.springredisearch.RediSearchConfiguration;
 
 import io.lettuce.core.LettuceFutures;
 import io.lettuce.core.RedisFuture;
@@ -45,14 +45,14 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	public static final String FIELD_IMAGE = "image";
 
 	@Autowired
-	private RediSearchConfiguration searchConfig;
+	private RediSearchClient client;
 	@Autowired
 	private JDiscogsConfiguration config;
 	private StatefulRediSearchConnection<String, String> connection;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		connection = searchConfig.getClient().connect();
+		connection = client.connect();
 		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getMasterIndex(), DropOptions.builder().build());

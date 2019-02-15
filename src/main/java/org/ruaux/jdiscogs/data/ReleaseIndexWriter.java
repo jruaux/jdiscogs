@@ -14,6 +14,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.redislabs.lettusearch.RediSearchClient;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
@@ -22,7 +23,6 @@ import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
 import com.redislabs.lettusearch.search.api.async.SearchAsyncCommands;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
 import com.redislabs.lettusearch.search.field.TextField;
-import com.redislabs.springredisearch.RediSearchConfiguration;
 
 import io.lettuce.core.LettuceFutures;
 import io.lettuce.core.RedisFuture;
@@ -37,12 +37,12 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	@Autowired
 	private JDiscogsConfiguration config;
 	@Autowired
-	private RediSearchConfiguration searchConfig;
+	private RediSearchClient client;
 	private StatefulRediSearchConnection<String, String> connection;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		connection = searchConfig.getClient().connect();
+		connection = client.connect();
 		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getReleaseIndex(), DropOptions.builder().build());

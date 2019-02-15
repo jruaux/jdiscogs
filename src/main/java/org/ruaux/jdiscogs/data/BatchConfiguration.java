@@ -14,12 +14,12 @@ import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
@@ -32,6 +32,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Configuration
@@ -39,9 +41,11 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 public class BatchConfiguration {
 
 	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+	private JobRepository jobRepository;
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private JobBuilderFactory jobs;
+	@Autowired
+	private StepBuilderFactory steps;
 	@Autowired
 	private MasterWriter masterWriter;
 	@Autowired
@@ -53,7 +57,7 @@ public class BatchConfiguration {
 	@Autowired
 	private JDiscogsConfiguration config;
 	@Autowired
-	private JobLauncher jobLauncher;
+	private TaskExecutor executor;
 
 	private <T> ItemReader<T> getReader(Class<T> entityClass) throws MalformedURLException {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
@@ -88,13 +92,15 @@ public class BatchConfiguration {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> Job getJob(LoadJob job, ItemWriter<T> writer) throws MalformedURLException {
+	private <T> Job job(LoadJob job, ItemWriter<T> writer) throws MalformedURLException {
 		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
-		TaskletStep loadStep = stepBuilderFactory.get(job.name() + "-step").<T, T>chunk(config.getData().getBatchSize())
-				.reader(getReader(clazz)).writer(writer).listener(new JobListener(entityName)).build();
-		return jobBuilderFactory.get(job.name() + "-job").incrementer(new RunIdIncrementer()).flow(loadStep).end()
-				.build();
+		SimpleStepBuilder<T, T> builder = steps.get(job + "-step").<T, T>chunk(config.getData().getBatchSize());
+		builder.reader(getReader(clazz));
+		builder.writer(writer);
+		builder.listener(new JobListener(entityName));
+		builder.taskExecutor(executor);
+		return jobs.get(job + "-job").start(builder.build()).build();
 	}
 
 	public void runJobs() throws JobExecutionAlreadyRunningException, JobRestartException,
@@ -102,26 +108,29 @@ public class BatchConfiguration {
 		if (config.getData().isSkip()) {
 			return;
 		}
+		SimpleJobLauncher launcher = new SimpleJobLauncher();
+		launcher.setJobRepository(jobRepository);
+		launcher.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		for (LoadJob job : config.getData().getJobs()) {
-			jobLauncher.run(getLoadJob(job), new JobParameters());
+			launcher.run(loadJob(job), new JobParameters());
 		}
 	}
 
-	public Job getLoadJob(LoadJob job) throws MalformedURLException {
+	private Job loadJob(LoadJob job) throws MalformedURLException {
 		switch (job) {
 		case MasterDocs:
-			return getJob(job, masterWriter);
+			return job(job, masterWriter);
 		case MasterIndex:
-			return getJob(job, masterIndexWriter);
+			return job(job, masterIndexWriter);
 		case ReleaseDocs:
-			return getJob(job, releaseWriter);
+			return job(job, releaseWriter);
 		case ReleaseIndex:
-			return getJob(job, releaseIndexWriter);
+			return job(job, releaseIndexWriter);
 		case ReleaseDocsIndex:
-			return getJob(job, new CompositeItemWriterBuilder<Release>()
+			return job(job, new CompositeItemWriterBuilder<Release>()
 					.delegates(Arrays.asList(releaseWriter, releaseIndexWriter)).build());
 		default:
-			return getJob(job, new CompositeItemWriterBuilder<Master>()
+			return job(job, new CompositeItemWriterBuilder<Master>()
 					.delegates(Arrays.asList(masterWriter, masterIndexWriter)).build());
 		}
 	}
