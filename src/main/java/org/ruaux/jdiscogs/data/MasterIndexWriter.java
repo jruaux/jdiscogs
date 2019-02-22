@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Artist;
+import org.ruaux.jdiscogs.data.xml.Image;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
@@ -16,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.redislabs.lettusearch.RediSearchAsyncCommands;
-import com.redislabs.lettusearch.RediSearchClient;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
@@ -45,14 +46,15 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	public static final String FIELD_IMAGE = "image";
 
 	@Autowired
-	private RediSearchClient client;
-	@Autowired
 	private JDiscogsConfiguration config;
+
+	@Autowired
+	GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
+	@Autowired
 	private StatefulRediSearchConnection<String, String> connection;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		connection = client.connect();
 		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getMasterIndex(), DropOptions.builder().build());
@@ -73,66 +75,74 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	}
 
 	@Override
-	public synchronized void close() {
-		if (connection == null) {
-			return;
-		}
-		connection.close();
-		connection = null;
-	}
-
-	@Override
 	public void write(List<? extends Master> items) throws Exception {
 		log.debug("Writing {} master items", items.size());
-		RediSearchAsyncCommands<String, String> commands = connection.async();
-		commands.setAutoFlushCommands(false);
-		List<RedisFuture<?>> futures = new ArrayList<>();
-		for (Master master : items) {
-			Map<String, String> fields = new HashMap<>();
-			if (master.getArtists() != null && !master.getArtists().getArtists().isEmpty()) {
-				Artist artist = master.getArtists().getArtists().get(0);
-				if (artist != null) {
-					fields.put(FIELD_ARTIST, artist.getName());
-					fields.put(FIELD_ARTISTID, artist.getId());
-					futures.add(commands.sugadd(config.getData().getArtistSuggestionIndex(), artist.getName(), 1,
-							SuggestAddOptions.builder().increment(true).payload(artist.getId()).build()));
+		StatefulRediSearchConnection<String, String> connection = pool.borrowObject();
+		try {
+			RediSearchAsyncCommands<String, String> commands = connection.async();
+			commands.setAutoFlushCommands(false);
+			List<RedisFuture<?>> futures = new ArrayList<>();
+			for (Master master : items) {
+				Map<String, String> fields = new HashMap<>();
+				if (master.getArtists() != null && !master.getArtists().getArtists().isEmpty()) {
+					Artist artist = master.getArtists().getArtists().get(0);
+					if (artist != null) {
+						fields.put(FIELD_ARTIST, artist.getName());
+						fields.put(FIELD_ARTISTID, artist.getId());
+						futures.add(commands.sugadd(config.getData().getArtistSuggestionIndex(), artist.getName(), 1,
+								SuggestAddOptions.builder().increment(true).payload(artist.getId()).build()));
+					}
+				}
+				fields.put(FIELD_DATAQUALITY, master.getDataQuality());
+				if (master.getGenres() != null) {
+					List<String> genres = master.getGenres().getGenres();
+					if (genres != null && !genres.isEmpty()) {
+						fields.put(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), genres));
+					}
+				}
+				if (master.getStyles() != null) {
+					List<String> styles = master.getStyles().getStyles();
+					if (styles != null && !styles.isEmpty()) {
+						fields.put(FIELD_STYLES, String.join(config.getHashArrayDelimiter(), styles));
+					}
+				}
+				fields.put(FIELD_TITLE, master.getTitle());
+				fields.put(FIELD_YEAR, master.getYear());
+				fields.put(FIELD_IMAGE, String.valueOf(hasImage(master)));
+				futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), 1, fields,
+						AddOptions.builder().build()));
+			}
+			if (config.getData().isNoOp()) {
+				return;
+			}
+			commands.flushCommands();
+			boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS,
+					futures.toArray(new RedisFuture[futures.size()]));
+			if (result) {
+				log.debug("Wrote {} master items", items.size());
+			} else {
+				log.warn("Could not write {} master items", items.size());
+				for (RedisFuture<?> future : futures) {
+					if (future.getError() != null) {
+						log.error(future.getError());
+					}
 				}
 			}
-			fields.put(FIELD_DATAQUALITY, master.getDataQuality());
-			if (master.getGenres() != null) {
-				List<String> genres = master.getGenres().getGenres();
-				if (genres != null && !genres.isEmpty()) {
-					fields.put(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), genres));
-				}
-			}
-			if (master.getStyles() != null) {
-				List<String> styles = master.getStyles().getStyles();
-				if (styles != null && !styles.isEmpty()) {
-					fields.put(FIELD_STYLES, String.join(config.getHashArrayDelimiter(), styles));
-				}
-			}
-			fields.put(FIELD_TITLE, master.getTitle());
-			fields.put(FIELD_YEAR, master.getYear());
-			Boolean image = master.getImages() != null && !master.getImages().getImages().isEmpty();
-			fields.put(FIELD_IMAGE, image.toString());
-			futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), 1, fields,
-					AddOptions.builder().build()));
+		} finally {
+			pool.returnObject(connection);
 		}
-		if (config.getData().isNoOp()) {
-			return;
+	}
+
+	private boolean hasImage(Master master) {
+		if (master.getImages() == null) {
+			return false;
 		}
-		commands.flushCommands();
-		boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS, futures.toArray(new RedisFuture[futures.size()]));
-		if (result) {
-			log.debug("Wrote {} master items", items.size());
-		} else {
-			log.warn("Could not write {} master items", items.size());
-			for (RedisFuture<?> future : futures) {
-				if (future.getError() != null) {
-					log.error(future.getError());
-				}
-			}
+		if (master.getImages().getImages().isEmpty()) {
+			return false;
 		}
+		Image image = master.getImages().getImages().get(0);
+		double ratio = (double) image.getHeight() / image.getWidth();
+		return ratio > 0.9 && ratio < 1.1;
 	}
 
 }

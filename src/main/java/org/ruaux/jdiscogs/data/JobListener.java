@@ -2,6 +2,7 @@ package org.ruaux.jdiscogs.data;
 
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.batch.core.ItemWriteListener;
 
@@ -14,6 +15,7 @@ public class JobListener implements ItemWriteListener<Object> {
 	private long startTime = System.currentTimeMillis();
 	private String entity;
 	private NumberFormat formatter = NumberFormat.getIntegerInstance();
+	private long lastPrint;
 
 	public JobListener(String entity) {
 		this.entity = entity;
@@ -22,13 +24,18 @@ public class JobListener implements ItemWriteListener<Object> {
 	@Override
 	public void afterWrite(List<? extends Object> items) {
 		count += items.size();
-		double elapsedTimeInSeconds = (double) (System.currentTimeMillis() - startTime) / 1000;
-		long itemsPerSecond = Math.round(count / elapsedTimeInSeconds);
-		if (log.isDebugEnabled()) {
-			log.debug("Wrote {} items ({} items/sec)", count, itemsPerSecond);
-		} else {
-			System.out.print(String.format("\rWrote %s %s items (%s items/sec)", formatter.format(count), entity,
-					formatter.format(itemsPerSecond)));
+		if ((System.currentTimeMillis() - lastPrint) > 3000) {
+			long seconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
+			if (seconds > 0) {
+				long itemsPerSecond = count / seconds;
+				if (log.isDebugEnabled()) {
+					log.debug("Wrote {} items ({} items/sec)", count, itemsPerSecond);
+				} else {
+					log.info("Wrote {} {} items ({} items/sec)", formatter.format(count), entity,
+							formatter.format(itemsPerSecond));
+				}
+				lastPrint = System.currentTimeMillis();
+			}
 		}
 	}
 

@@ -8,16 +8,17 @@ import java.util.Arrays;
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.ruaux.jdiscogs.data.xml.Release;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.item.ItemReader;
@@ -32,16 +33,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableBatchProcessing
+@Slf4j
 public class BatchConfiguration {
 
+	private static final String JOBS_KEY = BatchConfiguration.class.getPackageName() + ".jobs";
+	private static final Object VALUE_DONE = "done";
 	@Autowired
-	private JobRepository jobRepository;
+	private JobLauncher launcher;
 	@Autowired
 	private JobBuilderFactory jobs;
 	@Autowired
@@ -58,6 +64,8 @@ public class BatchConfiguration {
 	private JDiscogsConfiguration config;
 	@Autowired
 	private TaskExecutor executor;
+	@Autowired
+	private StringRedisTemplate template;
 
 	private <T> ItemReader<T> getReader(Class<T> entityClass) throws MalformedURLException {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
@@ -108,11 +116,15 @@ public class BatchConfiguration {
 		if (config.getData().isSkip()) {
 			return;
 		}
-		SimpleJobLauncher launcher = new SimpleJobLauncher();
-		launcher.setJobRepository(jobRepository);
-		launcher.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		for (LoadJob job : config.getData().getJobs()) {
-			launcher.run(loadJob(job), new JobParameters());
+			Object status = template.opsForHash().get(JOBS_KEY, job.name());
+			log.info("Job status: {}", status);
+			if (!VALUE_DONE.equals(status)) {
+				JobExecution execution = launcher.run(loadJob(job), new JobParameters());
+				if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
+					template.opsForHash().put(JOBS_KEY, job.name(), VALUE_DONE);
+				}
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.api;
+package org.ruaux.jdiscogs.api.model;
 
 import lombok.Data;
 

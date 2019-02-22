@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
+import org.ruaux.jdiscogs.api.model.Master;
+import org.ruaux.jdiscogs.api.model.Release;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
@@ -39,7 +41,14 @@ public class DiscogsClient {
 		return getEntity("releases", Release.class, releaseId);
 	}
 
-	private <T> T getEntity(String entity, Class<T> entityClass, String id) {
+	/**
+	 * synchronized to avoid running into this bug: https://bugs.openjdk.java.net/browse/JDK-8213202
+	 * @param entity
+	 * @param entityClass
+	 * @param id
+	 * @return
+	 */
+	private synchronized <T> T getEntity(String entity, Class<T> entityClass, String id) {
 		log.info("RateLimitRemaining: {}", rateLimitRemaining);
 		boolean after1Min = (System.currentTimeMillis() - rateLimitLastTime) > 60000;
 		if (rateLimitRemaining > 1 || after1Min) {

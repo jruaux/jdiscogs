@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Release;
 import org.springframework.batch.item.ExecutionContext;
@@ -14,7 +15,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.redislabs.lettusearch.RediSearchClient;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
@@ -37,12 +37,12 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	@Autowired
 	private JDiscogsConfiguration config;
 	@Autowired
-	private RediSearchClient client;
+	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
+	@Autowired
 	private StatefulRediSearchConnection<String, String> connection;
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		connection = client.connect();
 		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(config.getData().getReleaseIndex(), DropOptions.builder().build());
@@ -57,45 +57,41 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	}
 
 	@Override
-	public synchronized void close() {
-		if (connection == null) {
-			return;
-		}
-		connection.close();
-		connection = null;
-	}
-
-	@Override
 	public void write(List<? extends Release> items) throws Exception {
 		log.debug("Writing {} release items", items.size());
-		SearchAsyncCommands<String, String> commands = connection.async();
-		commands.setAutoFlushCommands(false);
-		List<RedisFuture<?>> futures = new ArrayList<>();
-		for (Release release : items) {
-			Map<String, String> fields = new HashMap<>();
-			if (release.getArtists() != null && !release.getArtists().getArtists().isEmpty()) {
-				fields.put(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
+		StatefulRediSearchConnection<String, String> connection = pool.borrowObject();
+		try {
+			SearchAsyncCommands<String, String> commands = connection.async();
+			commands.setAutoFlushCommands(false);
+			List<RedisFuture<?>> futures = new ArrayList<>();
+			for (Release release : items) {
+				Map<String, String> fields = new HashMap<>();
+				if (release.getArtists() != null && !release.getArtists().getArtists().isEmpty()) {
+					fields.put(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
+				}
+				fields.put(FIELD_TITLE, release.getTitle());
+				futures.add(commands.add(config.getData().getReleaseIndex(), release.getId(), 1, fields,
+						AddOptions.builder().noSave(true).build()));
 			}
-			fields.put(FIELD_TITLE, release.getTitle());
-			futures.add(commands.add(config.getData().getReleaseIndex(), release.getId(), 1, fields,
-					AddOptions.builder().noSave(true).build()));
-		}
-		if (config.getData().isNoOp()) {
-			return;
-		}
-		commands.flushCommands();
-		boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS, futures.toArray(new RedisFuture[futures.size()]));
-		if (result) {
-			log.debug("Wrote {} release items", items.size());
-		} else {
-			log.warn("Could not write {} release items", items.size());
-			for (RedisFuture<?> future : futures) {
-				if (future.getError() != null) {
-					log.error(future.getError());
+			if (config.getData().isNoOp()) {
+				return;
+			}
+			commands.flushCommands();
+			boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS,
+					futures.toArray(new RedisFuture[futures.size()]));
+			if (result) {
+				log.debug("Wrote {} release items", items.size());
+			} else {
+				log.warn("Could not write {} release items", items.size());
+				for (RedisFuture<?> future : futures) {
+					if (future.getError() != null) {
+						log.error(future.getError());
+					}
 				}
 			}
+		} finally {
+			pool.returnObject(connection);
 		}
-
 	}
 
 }
