@@ -43,7 +43,6 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	public static final String FIELD_STYLES = "styles";
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_YEAR = "year";
-	public static final String FIELD_IMAGE = "image";
 
 	@Autowired
 	private JDiscogsConfiguration config;
@@ -70,7 +69,6 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		builder.field(TextField.builder().name(FIELD_STYLES).sortable(true).build());
 		builder.field(TextField.builder().name(FIELD_TITLE).sortable(true).build());
 		builder.field(NumericField.builder().name(FIELD_YEAR).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_IMAGE).sortable(true).build());
 		commands.create(config.getData().getMasterIndex(), builder.build());
 	}
 
@@ -83,6 +81,12 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			commands.setAutoFlushCommands(false);
 			List<RedisFuture<?>> futures = new ArrayList<>();
 			for (Master master : items) {
+				if (!imageWithinRatio(master)) {
+					continue;
+				}
+				if (master.getYear() == null || master.getYear().length() < 4) {
+					continue;
+				}
 				Map<String, String> fields = new HashMap<>();
 				if (master.getArtists() != null && !master.getArtists().getArtists().isEmpty()) {
 					Artist artist = master.getArtists().getArtists().get(0);
@@ -108,7 +112,6 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 				}
 				fields.put(FIELD_TITLE, master.getTitle());
 				fields.put(FIELD_YEAR, master.getYear());
-				fields.put(FIELD_IMAGE, String.valueOf(hasImage(master)));
 				futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), 1, fields,
 						AddOptions.builder().build()));
 			}
@@ -133,7 +136,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		}
 	}
 
-	private boolean hasImage(Master master) {
+	private boolean imageWithinRatio(Master master) {
 		if (master.getImages() == null) {
 			return false;
 		}
@@ -142,7 +145,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		}
 		Image image = master.getImages().getImages().get(0);
 		double ratio = (double) image.getHeight() / image.getWidth();
-		return ratio > 0.9 && ratio < 1.1;
+		return ratio > config.getData().getImageRatioMin() && ratio < config.getData().getImageRatioMax();
 	}
 
 }

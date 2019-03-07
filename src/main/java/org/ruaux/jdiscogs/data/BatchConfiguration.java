@@ -37,11 +37,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Configuration
 @EnableBatchProcessing
-@Slf4j
 public class BatchConfiguration {
 
 	private static final String JOBS_KEY = BatchConfiguration.class.getPackageName() + ".jobs";
@@ -118,7 +115,6 @@ public class BatchConfiguration {
 		}
 		for (LoadJob job : config.getData().getJobs()) {
 			Object status = template.opsForHash().get(JOBS_KEY, job.name());
-			log.info("Job status: {}", status);
 			if (!VALUE_DONE.equals(status)) {
 				JobExecution execution = launcher.run(loadJob(job), new JobParameters());
 				if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {

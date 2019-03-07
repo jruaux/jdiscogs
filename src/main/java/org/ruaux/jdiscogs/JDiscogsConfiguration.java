@@ -34,9 +34,11 @@ public class JDiscogsConfiguration {
 		private LoadJob[] jobs = { LoadJob.MasterDocsIndex };
 		private boolean skip = false;
 		private boolean noOp = false;
-		private String releaseIndex = "releaseIdx";
-		private String masterIndex = "masterIdx";
-		private String artistSuggestionIndex = "artistSuggestIdx";
+		private String releaseIndex = "releases";
+		private String masterIndex = "masters";
+		private String artistSuggestionIndex = "artists";
+		private double imageRatioMin = .9;
+		private double imageRatioMax = 1.1;
 	}
 
 	@Data
