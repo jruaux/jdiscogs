@@ -41,7 +41,7 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 @EnableBatchProcessing
 public class BatchConfiguration {
 
-	private static final String JOBS_KEY = BatchConfiguration.class.getPackageName() + ".jobs";
+	private static final String JOBS_KEY = "org.ruaux.jdiscogs.data.jobs";
 	private static final Object VALUE_DONE = "done";
 	@Autowired
 	private JobLauncher launcher;
