@@ -25,8 +25,8 @@ import com.redislabs.lettusearch.search.Schema;
 import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
 import com.redislabs.lettusearch.search.field.NumericField;
+import com.redislabs.lettusearch.search.field.PhoneticMatcher;
 import com.redislabs.lettusearch.search.field.TextField;
-import com.redislabs.lettusearch.suggest.SuggestAddOptions;
 
 import io.lettuce.core.LettuceFutures;
 import io.lettuce.core.RedisFuture;
@@ -65,9 +65,9 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		builder.field(TextField.builder().name(FIELD_ARTIST).sortable(true).build());
 		builder.field(TextField.builder().name(FIELD_ARTISTID).sortable(true).build());
 		builder.field(TextField.builder().name(FIELD_DATAQUALITY).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_GENRES).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_STYLES).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_TITLE).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_GENRES).matcher(PhoneticMatcher.English).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_STYLES).matcher(PhoneticMatcher.English).sortable(true).build());
+		builder.field(TextField.builder().name(FIELD_TITLE).matcher(PhoneticMatcher.English).sortable(true).build());
 		builder.field(NumericField.builder().name(FIELD_YEAR).sortable(true).build());
 		commands.create(config.getData().getMasterIndex(), builder.build());
 	}
@@ -94,7 +94,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 						fields.put(FIELD_ARTIST, artist.getName());
 						fields.put(FIELD_ARTISTID, artist.getId());
 						futures.add(commands.sugadd(config.getData().getArtistSuggestionIndex(), artist.getName(), 1,
-								SuggestAddOptions.builder().increment(true).payload(artist.getId()).build()));
+								true, artist.getId()));
 					}
 				}
 				fields.put(FIELD_DATAQUALITY, master.getDataQuality());
