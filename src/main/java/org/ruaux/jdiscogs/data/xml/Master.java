@@ -34,4 +34,7 @@ public class Master {
 	private String title;
 	@XmlElement(name = "year")
 	private String year;
+	@XmlElement(name = "videos")
+	private Videos videos = new Videos();
+
 }

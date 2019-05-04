@@ -29,7 +29,7 @@ public class JDiscogsConfiguration {
 
 	@Data
 	public static class DataConfiguration {
-		private String url = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2018/discogs_20181001_{entity}s.xml.gz";
+		private String url = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20190402_{entity}s.xml.gz";
 		private int batchSize = 50;
 		private LoadJob[] jobs = { LoadJob.MasterDocsIndex };
 		private boolean skip = false;

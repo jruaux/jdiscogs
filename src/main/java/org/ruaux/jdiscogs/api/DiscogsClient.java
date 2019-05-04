@@ -49,7 +49,6 @@ public class DiscogsClient {
 	 * @return
 	 */
 	private synchronized <T> T getEntity(String entity, Class<T> entityClass, String id) {
-		log.info("RateLimitRemaining: {}", rateLimitRemaining);
 		boolean after1Min = (System.currentTimeMillis() - rateLimitLastTime) > 60000;
 		if (rateLimitRemaining > 1 || after1Min) {
 			Map<String, String> uriParams = new HashMap<String, String>();

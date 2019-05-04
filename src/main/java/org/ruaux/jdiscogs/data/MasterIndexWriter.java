@@ -2,8 +2,10 @@ package org.ruaux.jdiscogs.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -26,6 +28,7 @@ import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
 import com.redislabs.lettusearch.search.field.NumericField;
 import com.redislabs.lettusearch.search.field.PhoneticMatcher;
+import com.redislabs.lettusearch.search.field.TagField;
 import com.redislabs.lettusearch.search.field.TextField;
 
 import io.lettuce.core.LettuceFutures;
@@ -38,9 +41,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 
 	public static final String FIELD_ARTIST = "artist";
 	public static final String FIELD_ARTISTID = "artistId";
-	public static final String FIELD_DATAQUALITY = "dataQuality";
 	public static final String FIELD_GENRES = "genres";
-	public static final String FIELD_STYLES = "styles";
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_YEAR = "year";
 
@@ -63,10 +64,8 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		log.info("Creating index {}", config.getData().getMasterIndex());
 		SchemaBuilder builder = Schema.builder();
 		builder.field(TextField.builder().name(FIELD_ARTIST).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_ARTISTID).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_DATAQUALITY).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_GENRES).matcher(PhoneticMatcher.English).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_STYLES).matcher(PhoneticMatcher.English).sortable(true).build());
+		builder.field(TagField.builder().name(FIELD_ARTISTID).sortable(true).build());
+		builder.field(TagField.builder().name(FIELD_GENRES).sortable(true).build());
 		builder.field(TextField.builder().name(FIELD_TITLE).matcher(PhoneticMatcher.English).sortable(true).build());
 		builder.field(NumericField.builder().name(FIELD_YEAR).sortable(true).build());
 		commands.create(config.getData().getMasterIndex(), builder.build());
@@ -81,9 +80,15 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			commands.setAutoFlushCommands(false);
 			List<RedisFuture<?>> futures = new ArrayList<>();
 			for (Master master : items) {
-				if (!imageWithinRatio(master)) {
+				if (master.getImages() == null || master.getImages().getImages() == null
+						|| master.getImages().getImages().size() < 4) {
 					continue;
 				}
+//				Image image = master.getImages().getImages().get(0);
+//				double ratio = (double) image.getHeight() / image.getWidth();
+//				if (ratio < config.getData().getImageRatioMin() || ratio > config.getData().getImageRatioMax()) {
+//					continue;
+//				}
 				if (master.getYear() == null || master.getYear().length() < 4) {
 					continue;
 				}
@@ -97,19 +102,14 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 								true, artist.getId()));
 					}
 				}
-				fields.put(FIELD_DATAQUALITY, master.getDataQuality());
-				if (master.getGenres() != null) {
-					List<String> genres = master.getGenres().getGenres();
-					if (genres != null && !genres.isEmpty()) {
-						fields.put(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), genres));
-					}
+				Set<String> genreSet = new LinkedHashSet<>();
+				if (master.getGenres() != null && master.getGenres().getGenres() != null) {
+					genreSet.addAll(master.getGenres().getGenres());
 				}
-				if (master.getStyles() != null) {
-					List<String> styles = master.getStyles().getStyles();
-					if (styles != null && !styles.isEmpty()) {
-						fields.put(FIELD_STYLES, String.join(config.getHashArrayDelimiter(), styles));
-					}
+				if (master.getStyles() != null && master.getStyles().getStyles() != null) {
+					genreSet.addAll(master.getStyles().getStyles());
 				}
+				fields.put(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), sanitize(genreSet)));
 				fields.put(FIELD_TITLE, master.getTitle());
 				fields.put(FIELD_YEAR, master.getYear());
 				futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), 1, fields,
@@ -131,21 +131,17 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 					}
 				}
 			}
-		} finally {
+		} finally
+
+		{
 			pool.returnObject(connection);
 		}
 	}
 
-	private boolean imageWithinRatio(Master master) {
-		if (master.getImages() == null) {
-			return false;
-		}
-		if (master.getImages().getImages().isEmpty()) {
-			return false;
-		}
-		Image image = master.getImages().getImages().get(0);
-		double ratio = (double) image.getHeight() / image.getWidth();
-		return ratio > config.getData().getImageRatioMin() && ratio < config.getData().getImageRatioMax();
+	private List<String> sanitize(Set<String> genres) {
+		List<String> result = new ArrayList<>();
+		genres.forEach(genre -> result.add(genre.replace(',', ' ')));
+		return result;
 	}
 
 }
