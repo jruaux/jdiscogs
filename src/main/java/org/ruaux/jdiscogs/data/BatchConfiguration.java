@@ -12,14 +12,12 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
@@ -28,26 +26,23 @@ import org.springframework.batch.item.support.SynchronizedItemStreamReader;
 import org.springframework.batch.item.support.builder.CompositeItemWriterBuilder;
 import org.springframework.batch.item.support.builder.SynchronizedItemStreamReaderBuilder;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration {
+public class BatchConfiguration implements InitializingBean {
 
 	private static final String JOBS_KEY = "org.ruaux.jdiscogs.data.jobs";
 	private static final Object VALUE_DONE = "done";
-	@Autowired
-	private JobLauncher launcher;
-	@Autowired
-	private JobBuilderFactory jobs;
-	@Autowired
-	private StepBuilderFactory steps;
 	@Autowired
 	private MasterWriter masterWriter;
 	@Autowired
@@ -60,6 +55,16 @@ public class BatchConfiguration {
 	private JDiscogsConfiguration config;
 	@Autowired
 	private StringRedisTemplate template;
+	private ResourcelessTransactionManager transactionManager;
+	private JobRepository jobRepository;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.transactionManager = new ResourcelessTransactionManager();
+		MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(transactionManager);
+		jobRepositoryFactory.afterPropertiesSet();
+		this.jobRepository = jobRepositoryFactory.getObject();
+	}
 
 	private <T> ItemReader<T> getReader(Class<T> entityClass) throws MalformedURLException {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
@@ -94,25 +99,31 @@ public class BatchConfiguration {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> Job job(LoadJob job, ItemWriter<T> writer) throws MalformedURLException {
+	private <T> Job job(LoadJob job, ItemWriter<T> writer) throws Exception {
+		StepBuilderFactory stepBuilderFactory = new StepBuilderFactory(jobRepository, transactionManager);
 		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
-		SimpleStepBuilder<T, T> builder = steps.get(job + "-step").<T, T>chunk(config.getData().getBatchSize());
+		SimpleStepBuilder<T, T> builder = stepBuilderFactory.get(job + "-step")
+				.<T, T>chunk(config.getData().getBatchSize());
 		builder.reader(getReader(clazz));
 		builder.writer(writer);
 		builder.listener(new JobListener(entityName));
-		return jobs.get(job + "-job").start(builder.build()).build();
+		JobBuilderFactory jobBuilderFactory = new JobBuilderFactory(jobRepository);
+		return jobBuilderFactory.get(job + "-job").start(builder.build()).build();
 	}
 
-	public void runJobs() throws JobExecutionAlreadyRunningException, JobRestartException,
-			JobInstanceAlreadyCompleteException, JobParametersInvalidException, MalformedURLException {
+	public void runJobs() throws Exception {
 		if (config.getData().isSkip()) {
 			return;
 		}
 		for (LoadJob job : config.getData().getJobs()) {
 			Object status = template.opsForHash().get(JOBS_KEY, job.name());
 			if (!VALUE_DONE.equals(status)) {
-				JobExecution execution = launcher.run(loadJob(job), new JobParameters());
+				SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+				jobLauncher.setJobRepository(jobRepository);
+				jobLauncher.setTaskExecutor(new SyncTaskExecutor());
+				jobLauncher.afterPropertiesSet();
+				JobExecution execution = jobLauncher.run(loadJob(job), new JobParameters());
 				if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
 					template.opsForHash().put(JOBS_KEY, job.name(), VALUE_DONE);
 				}
@@ -120,7 +131,7 @@ public class BatchConfiguration {
 		}
 	}
 
-	private Job loadJob(LoadJob job) throws MalformedURLException {
+	private Job loadJob(LoadJob job) throws Exception {
 		switch (job) {
 		case MasterDocs:
 			return job(job, masterWriter);

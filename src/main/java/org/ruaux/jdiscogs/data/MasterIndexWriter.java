@@ -10,7 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
+import org.ruaux.jdiscogs.JDiscogsConfiguration.Range;
 import org.ruaux.jdiscogs.data.xml.Artist;
+import org.ruaux.jdiscogs.data.xml.Image;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
@@ -80,15 +82,25 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			commands.setAutoFlushCommands(false);
 			List<RedisFuture<?>> futures = new ArrayList<>();
 			for (Master master : items) {
-				if (master.getImages() == null || master.getImages().getImages() == null
-						|| master.getImages().getImages().size() < 4) {
+				if (master.getImages() == null || master.getImages().getImages() == null) {
 					continue;
 				}
-//				Image image = master.getImages().getImages().get(0);
-//				double ratio = (double) image.getHeight() / image.getWidth();
-//				if (ratio < config.getData().getImageRatioMin() || ratio > config.getData().getImageRatioMax()) {
-//					continue;
-//				}
+				if (master.getImages().getImages().size() < config.getData().getMinImages()) {
+					continue;
+				}
+				Image image = master.getPrimaryImage();
+				if (image == null) {
+					continue;
+				}
+				if (!withinRange(image.getHeight(), config.getData().getImageHeight())) {
+					continue;
+				}
+				if (!withinRange(image.getWidth(), config.getData().getImageWidth())) {
+					continue;
+				}
+				if (!withinRange(image.getRatio(), config.getData().getImageRatio())) {
+					continue;
+				}
 				if (master.getYear() == null || master.getYear().length() < 4) {
 					continue;
 				}
@@ -136,6 +148,13 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		{
 			pool.returnObject(connection);
 		}
+	}
+
+	private boolean withinRange(Number value, Range range) {
+		if (value == null) {
+			return false;
+		}
+		return value.doubleValue() >= range.getMin() && value.doubleValue() <= range.getMax();
 	}
 
 	private List<String> sanitize(Set<String> genres) {

@@ -39,6 +39,24 @@ public class JDiscogsConfiguration {
 		private String artistSuggestionIndex = "artists";
 		private double imageRatioMin = .9;
 		private double imageRatioMax = 1.1;
+		private int minImages = 2;
+		private Range imageHeight = new Range(400, 600);
+		private Range imageWidth = new Range(400, 600);
+		private Range imageRatio = new Range(.95, 1.05);
+	}
+
+	@Data
+	public static class Range {
+		private double min;
+		private double max;
+
+		public Range() {
+		}
+
+		public Range(double min, double max) {
+			this.min = min;
+			this.max = max;
+		}
 	}
 
 	@Data

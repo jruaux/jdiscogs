@@ -37,4 +37,14 @@ public class Master {
 	@XmlElement(name = "videos")
 	private Videos videos = new Videos();
 
+	public Image getPrimaryImage() {
+		if (images == null) {
+			return null;
+		}
+		if (images.getImages() == null) {
+			return null;
+		}
+		return images.getImages().stream().filter(image -> image.isPrimary()).findFirst().orElse(null);
+	}
+
 }

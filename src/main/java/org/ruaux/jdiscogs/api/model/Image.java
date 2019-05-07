@@ -9,4 +9,8 @@ public class Image {
 	private String type;
 	private int height;
 	private int width;
+	
+	public boolean isPrimary() {
+		return org.ruaux.jdiscogs.data.xml.Image.TYPE_PRIMARY.equals(type);
+	}
 }

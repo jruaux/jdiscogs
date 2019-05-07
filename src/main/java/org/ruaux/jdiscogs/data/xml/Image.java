@@ -12,6 +12,7 @@ import lombok.Data;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Image {
 
+	public static final String TYPE_PRIMARY = "primary";
 	@XmlAttribute(name = "height")
 	private Integer height;
 	@XmlAttribute(name = "type")
@@ -22,5 +23,19 @@ public class Image {
 	private String uri150;
 	@XmlAttribute(name = "width")
 	private Integer width;
+
+	public Double getRatio() {
+		if (height == null) {
+			return null;
+		}
+		if (width == null) {
+			return null;
+		}
+		return height.doubleValue() / width.doubleValue();
+	}
+
+	public boolean isPrimary() {
+		return TYPE_PRIMARY.equals(type);
+	}
 
 }

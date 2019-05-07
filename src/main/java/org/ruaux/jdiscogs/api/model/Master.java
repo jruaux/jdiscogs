@@ -26,4 +26,11 @@ public class Master {
 	private Long id;
 	private String dataQuality;
 
+	public Image getPrimaryImage() {
+		if (images == null) {
+			return null;
+		}
+		return images.stream().filter(image -> image.isPrimary()).findFirst().orElse(null);
+	}
+
 }
