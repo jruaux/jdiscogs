@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
@@ -59,8 +58,6 @@ public class BatchConfiguration {
 	private ReleaseIndexWriter releaseIndexWriter;
 	@Autowired
 	private JDiscogsConfiguration config;
-	@Autowired
-	private TaskExecutor executor;
 	@Autowired
 	private StringRedisTemplate template;
 
@@ -104,7 +101,6 @@ public class BatchConfiguration {
 		builder.reader(getReader(clazz));
 		builder.writer(writer);
 		builder.listener(new JobListener(entityName));
-		builder.taskExecutor(executor);
 		return jobs.get(job + "-job").start(builder.build()).build();
 	}
 

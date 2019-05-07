@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.JDiscogsConfiguration;
 import org.ruaux.jdiscogs.data.xml.Artist;
-import org.ruaux.jdiscogs.data.xml.Image;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
@@ -39,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<Master> {
 
+	public static final String FIELD_ID = "id";
 	public static final String FIELD_ARTIST = "artist";
 	public static final String FIELD_ARTISTID = "artistId";
 	public static final String FIELD_GENRES = "genres";
