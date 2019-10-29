@@ -15,16 +15,15 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.redislabs.lettusearch.RediSearchAsyncCommands;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
 import com.redislabs.lettusearch.search.DropOptions;
 import com.redislabs.lettusearch.search.Schema;
 import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
-import com.redislabs.lettusearch.search.api.async.SearchAsyncCommands;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
 import com.redislabs.lettusearch.search.field.TextField;
 
-import io.lettuce.core.LettuceFutures;
 import io.lettuce.core.RedisFuture;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,7 +60,7 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 		log.debug("Writing {} release items", items.size());
 		StatefulRediSearchConnection<String, String> connection = pool.borrowObject();
 		try {
-			SearchAsyncCommands<String, String> commands = connection.async();
+			RediSearchAsyncCommands<String, String> commands = connection.async();
 			commands.setAutoFlushCommands(false);
 			List<RedisFuture<?>> futures = new ArrayList<>();
 			for (Release release : items) {
@@ -77,16 +76,15 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 				return;
 			}
 			commands.flushCommands();
-			boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS,
-					futures.toArray(new RedisFuture[futures.size()]));
-			if (result) {
-				log.debug("Wrote {} release items", items.size());
-			} else {
-				log.warn("Could not write {} release items", items.size());
-				for (RedisFuture<?> future : futures) {
-					if (future.getError() != null) {
-						log.error(future.getError());
-					}
+			for (int index = 0; index < futures.size(); index++) {
+				RedisFuture<?> future = futures.get(index);
+				if (future == null) {
+					continue;
+				}
+				try {
+					future.get(1, TimeUnit.SECONDS);
+				} catch (Exception e) {
+					log.error("Could not write record {}", items.get(index), e);
 				}
 			}
 		} finally {
