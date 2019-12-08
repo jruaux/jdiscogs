@@ -18,11 +18,9 @@ import org.springframework.stereotype.Component;
 import com.redislabs.lettusearch.RediSearchAsyncCommands;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.search.AddOptions;
-import com.redislabs.lettusearch.search.DropOptions;
 import com.redislabs.lettusearch.search.Schema;
-import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
-import com.redislabs.lettusearch.search.field.TextField;
+import com.redislabs.lettusearch.search.field.Field;
 
 import io.lettuce.core.RedisFuture;
 import lombok.extern.slf4j.Slf4j;
@@ -44,15 +42,15 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 	public void open(ExecutionContext executionContext) {
 		SearchCommands<String, String> commands = connection.sync();
 		try {
-			commands.drop(config.getData().getReleaseIndex(), DropOptions.builder().build());
+			commands.drop(config.getData().getReleaseIndex());
 		} catch (Exception e) {
 			log.debug("Could not drop index {}", config.getData().getReleaseIndex(), e);
 		}
 		log.info("Creating index {}", config.getData().getReleaseIndex());
-		SchemaBuilder builder = Schema.builder();
-		builder.field(TextField.builder().name(FIELD_ARTIST).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_TITLE).sortable(true).build());
-		commands.create(config.getData().getReleaseIndex(), builder.build());
+		Schema schema = new Schema();
+		schema.field(Field.text(FIELD_ARTIST).sortable(true));
+		schema.field(Field.text(FIELD_TITLE).sortable(true));
+		commands.create(config.getData().getReleaseIndex(), schema);
 	}
 
 	@Override
@@ -70,7 +68,7 @@ public class ReleaseIndexWriter extends ItemStreamSupport implements ItemWriter<
 				}
 				fields.put(FIELD_TITLE, release.getTitle());
 				futures.add(commands.add(config.getData().getReleaseIndex(), release.getId(), 1, fields,
-						AddOptions.builder().noSave(true).build()));
+						new AddOptions().noSave(true)));
 			}
 			if (config.getData().isNoOp()) {
 				return;

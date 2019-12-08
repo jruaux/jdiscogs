@@ -22,15 +22,10 @@ import org.springframework.stereotype.Component;
 
 import com.redislabs.lettusearch.RediSearchAsyncCommands;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
-import com.redislabs.lettusearch.search.AddOptions;
-import com.redislabs.lettusearch.search.DropOptions;
 import com.redislabs.lettusearch.search.Schema;
-import com.redislabs.lettusearch.search.Schema.SchemaBuilder;
 import com.redislabs.lettusearch.search.api.sync.SearchCommands;
-import com.redislabs.lettusearch.search.field.NumericField;
+import com.redislabs.lettusearch.search.field.Field;
 import com.redislabs.lettusearch.search.field.PhoneticMatcher;
-import com.redislabs.lettusearch.search.field.TagField;
-import com.redislabs.lettusearch.search.field.TextField;
 
 import io.lettuce.core.LettuceFutures;
 import io.lettuce.core.RedisFuture;
@@ -59,18 +54,18 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	public void open(ExecutionContext executionContext) {
 		SearchCommands<String, String> commands = connection.sync();
 		try {
-			commands.drop(config.getData().getMasterIndex(), DropOptions.builder().build());
+			commands.drop(config.getData().getMasterIndex());
 		} catch (Exception e) {
 			log.debug("Could not drop index {}", config.getData().getMasterIndex(), e);
 		}
 		log.info("Creating index {}", config.getData().getMasterIndex());
-		SchemaBuilder builder = Schema.builder();
-		builder.field(TextField.builder().name(FIELD_ARTIST).sortable(true).build());
-		builder.field(TagField.builder().name(FIELD_ARTISTID).sortable(true).build());
-		builder.field(TagField.builder().name(FIELD_GENRES).sortable(true).build());
-		builder.field(TextField.builder().name(FIELD_TITLE).matcher(PhoneticMatcher.English).sortable(true).build());
-		builder.field(NumericField.builder().name(FIELD_YEAR).sortable(true).build());
-		commands.create(config.getData().getMasterIndex(), builder.build());
+		Schema schema = new Schema();
+		schema.field(Field.text(FIELD_ARTIST).sortable(true));
+		schema.field(Field.tag(FIELD_ARTISTID).sortable(true));
+		schema.field(Field.tag(FIELD_GENRES).sortable(true));
+		schema.field(Field.text(FIELD_TITLE).matcher(PhoneticMatcher.English).sortable(true));
+		schema.field(Field.numeric(FIELD_YEAR).sortable(true));
+		commands.create(config.getData().getMasterIndex(), schema);
 	}
 
 	@Override
@@ -124,8 +119,7 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 				fields.put(FIELD_GENRES, String.join(config.getHashArrayDelimiter(), sanitize(genreSet)));
 				fields.put(FIELD_TITLE, master.getTitle());
 				fields.put(FIELD_YEAR, master.getYear());
-				futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), 1, fields,
-						AddOptions.builder().build()));
+				futures.add(commands.add(config.getData().getMasterIndex(), master.getId(), 1, fields));
 			}
 			if (config.getData().isNoOp()) {
 				return;
