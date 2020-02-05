@@ -56,9 +56,8 @@ public class Release {
 	@XmlElement(name = "companies")
 	private Companies companies;
 
-	public List<Track> getTracks() {
-		return trackList.getTracks().stream()
-				.filter(track -> track.getPosition() != null && !track.getPosition().isEmpty())
+	public List<Track> tracks() {
+		return trackList.tracks().stream().filter(track -> track.position() != null && !track.position().isEmpty())
 				.collect(Collectors.toList());
 	}
 

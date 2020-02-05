@@ -41,10 +41,10 @@ public class Master {
 		if (images == null) {
 			return null;
 		}
-		if (images.getImages() == null) {
+		if (images.images() == null) {
 			return null;
 		}
-		return images.getImages().stream().filter(image -> image.isPrimary()).findFirst().orElse(null);
+		return images.images().stream().filter(image -> image.isPrimary()).findFirst().orElse(null);
 	}
 
 }

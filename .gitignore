@@ -25,3 +25,5 @@
 /.nb-gradle/
 /pom.xml.releaseBackup
 /release.properties
+/.gradle/
+/bin/

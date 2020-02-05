@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
 
-import org.ruaux.jdiscogs.JDiscogsConfiguration;
+import org.ruaux.jdiscogs.JDiscogsProperties;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.ruaux.jdiscogs.data.xml.Release;
 import org.springframework.batch.core.ExitStatus;
@@ -28,35 +28,42 @@ import org.springframework.batch.item.support.builder.SynchronizedItemStreamRead
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+
+import com.redislabs.lettusearch.StatefulRediSearchConnection;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration implements InitializingBean {
+public class JDiscogsBatchConfiguration implements InitializingBean {
 
 	private static final String JOBS_KEY = "org.ruaux.jdiscogs.data.jobs";
-	private static final Object VALUE_DONE = "done";
-	@Autowired
+	private static final String VALUE_DONE = "done";
 	private MasterWriter masterWriter;
-	@Autowired
 	private ReleaseWriter releaseWriter;
-	@Autowired
 	private MasterIndexWriter masterIndexWriter;
-	@Autowired
 	private ReleaseIndexWriter releaseIndexWriter;
-	@Autowired
-	private JDiscogsConfiguration config;
-	@Autowired
-	private StringRedisTemplate template;
+	private JDiscogsProperties config;
+	private StatefulRediSearchConnection<String, String> connection;
 	private ResourcelessTransactionManager transactionManager;
 	private JobRepository jobRepository;
+
+	public JDiscogsBatchConfiguration(MasterWriter masterWriter, ReleaseWriter releaseWriter,
+			MasterIndexWriter masterIndexWriter, ReleaseIndexWriter releaseIndexWriter, JDiscogsProperties config,
+			StatefulRediSearchConnection<String, String> connection) {
+		super();
+		this.masterWriter = masterWriter;
+		this.releaseWriter = releaseWriter;
+		this.masterIndexWriter = masterIndexWriter;
+		this.releaseIndexWriter = releaseIndexWriter;
+		this.config = config;
+		this.connection = connection;
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -79,7 +86,7 @@ public class BatchConfiguration implements InitializingBean {
 	}
 
 	private Resource resource(String entityName) throws MalformedURLException {
-		URI uri = URI.create(config.getData().getUrl().replace("{entity}", entityName));
+		URI uri = URI.create(config.dataUrl().replace("{entity}", entityName));
 		Resource resource = getResource(uri);
 		if (uri.getPath().endsWith(".gz")) {
 			try {
@@ -103,21 +110,26 @@ public class BatchConfiguration implements InitializingBean {
 		StepBuilderFactory stepBuilderFactory = new StepBuilderFactory(jobRepository, transactionManager);
 		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
-		SimpleStepBuilder<T, T> builder = stepBuilderFactory.get(job + "-step")
-				.<T, T>chunk(config.getData().getBatchSize());
+		SimpleStepBuilder<T, T> builder = stepBuilderFactory.get(job + "-step").<T, T>chunk(config.batchSize());
 		builder.reader(getReader(clazz));
 		builder.writer(writer);
+		if (config.threads() > 1) {
+			SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
+			executor.setConcurrencyLimit(config.threads());
+			builder.taskExecutor(executor);
+			builder.throttleLimit(config.threads());
+		}
 		builder.listener(new JobListener(entityName));
 		JobBuilderFactory jobBuilderFactory = new JobBuilderFactory(jobRepository);
 		return jobBuilderFactory.get(job + "-job").start(builder.build()).build();
 	}
 
 	public void runJobs() throws Exception {
-		if (config.getData().isSkip()) {
+		if (config.skip()) {
 			return;
 		}
-		for (LoadJob job : config.getData().getJobs()) {
-			Object status = template.opsForHash().get(JOBS_KEY, job.name());
+		for (LoadJob job : config.jobs()) {
+			String status = connection.sync().hget(JOBS_KEY, job.name());
 			if (!VALUE_DONE.equals(status)) {
 				SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 				jobLauncher.setJobRepository(jobRepository);
@@ -125,7 +137,7 @@ public class BatchConfiguration implements InitializingBean {
 				jobLauncher.afterPropertiesSet();
 				JobExecution execution = jobLauncher.run(loadJob(job), new JobParameters());
 				if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
-					template.opsForHash().put(JOBS_KEY, job.name(), VALUE_DONE);
+					connection.sync().hset(JOBS_KEY, job.name(), VALUE_DONE);
 				}
 			}
 		}

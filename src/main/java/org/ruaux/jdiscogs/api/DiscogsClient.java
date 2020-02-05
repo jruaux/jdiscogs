@@ -4,33 +4,36 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ruaux.jdiscogs.JDiscogsConfiguration;
+import org.ruaux.jdiscogs.JDiscogsProperties;
 import org.ruaux.jdiscogs.api.model.Master;
 import org.ruaux.jdiscogs.api.model.Release;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
+@Service
 public class DiscogsClient {
 
-	@Autowired
-	private JDiscogsConfiguration config;
-	private RestTemplate restTemplate;
+	private final JDiscogsProperties config;
+	private final RestTemplate restTemplate;
 	private long rateLimitLastTime;
 	private int rateLimitRemaining;
 
-	public DiscogsClient(RestTemplateBuilder restTemplateBuilder) {
-		this.restTemplate = restTemplateBuilder.build();
+	public DiscogsClient(JDiscogsProperties config, RestTemplateBuilder restTemplateBuilder) {
+		this(config, restTemplateBuilder.build());
+	}
+
+	public DiscogsClient(JDiscogsProperties config, RestTemplate restTemplate) {
+		this.config = config;
+		this.restTemplate = restTemplate;
 	}
 
 	public Master getMaster(String masterId) {
@@ -42,7 +45,9 @@ public class DiscogsClient {
 	}
 
 	/**
-	 * synchronized to avoid running into this bug: https://bugs.openjdk.java.net/browse/JDK-8213202
+	 * synchronized to avoid running into this bug:
+	 * https://bugs.openjdk.java.net/browse/JDK-8213202
+	 * 
 	 * @param entity
 	 * @param entityClass
 	 * @param id
@@ -54,11 +59,11 @@ public class DiscogsClient {
 			Map<String, String> uriParams = new HashMap<String, String>();
 			uriParams.put("entity", entity);
 			uriParams.put("id", id);
-			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(config.getApi().getUrl())
-					.queryParam("token", config.getApi().getToken());
+			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(config.apiUrl()).queryParam("token",
+					config.token());
 			URI uri = builder.buildAndExpand(uriParams).toUri();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("User-Agent", config.getApi().getUserAgent());
+			headers.set("User-Agent", config.userAgent());
 			RequestEntity<Object> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, uri);
 			ResponseEntity<T> response = restTemplate.exchange(requestEntity, entityClass);
 			HttpHeaders responseHeaders = response.getHeaders();
