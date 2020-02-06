@@ -51,7 +51,7 @@ bintray {
     publish = true
     pkg {
         repo = 'maven'
-        name = 'jdiscogs'
+        name = 'org.ruaux:jdiscogs'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/jruaux/jdiscogs.git'
 	    version {
