@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs;
+package org.ruaux.jdiscogs.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

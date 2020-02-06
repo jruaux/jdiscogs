@@ -57,7 +57,8 @@ public class Release {
 	private Companies companies;
 
 	public List<Track> tracks() {
-		return trackList.tracks().stream().filter(track -> track.position() != null && !track.position().isEmpty())
+		return trackList.getTracks().stream()
+				.filter(track -> track.getPosition() != null && !track.getPosition().isEmpty())
 				.collect(Collectors.toList());
 	}
 

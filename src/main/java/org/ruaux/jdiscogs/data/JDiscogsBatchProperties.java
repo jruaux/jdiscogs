@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs;
+package org.ruaux.jdiscogs.data;
 
 import org.ruaux.jdiscogs.data.JDiscogsBatchConfiguration.LoadJob;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -6,12 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import lombok.Data;
 
 @ConfigurationProperties(prefix = "discogs")
-public @Data class JDiscogsProperties {
+public @Data class JDiscogsBatchProperties {
 
 	private String hashArrayDelimiter = ",";
-	private String apiUrl = "https://api.discogs.com/{entity}/{id}";
-	private String token;
-	private String userAgent = "com.redislabs.rediscogs.useragent";
 	private String dataUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_{entity}s.xml.gz";
 	private int batchSize = 50;
 	private LoadJob[] jobs = { LoadJob.MasterDocsIndex };

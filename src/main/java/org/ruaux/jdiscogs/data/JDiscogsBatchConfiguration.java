@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
 
-import org.ruaux.jdiscogs.JDiscogsProperties;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.ruaux.jdiscogs.data.xml.Release;
 import org.springframework.batch.core.ExitStatus;
@@ -28,41 +28,43 @@ import org.springframework.batch.item.support.builder.SynchronizedItemStreamRead
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 
 @Configuration
+@EnableConfigurationProperties(JDiscogsBatchProperties.class)
 @EnableBatchProcessing
+@EnableRedisRepositories
 public class JDiscogsBatchConfiguration implements InitializingBean {
 
-	private static final String JOBS_KEY = "org.ruaux.jdiscogs.data.jobs";
+	private static final String JOBS_KEY = JDiscogsBatchConfiguration.class.getPackage().getName() + ".jobs";
 	private static final String VALUE_DONE = "done";
-	private MasterWriter masterWriter;
-	private ReleaseWriter releaseWriter;
-	private MasterIndexWriter masterIndexWriter;
-	private ReleaseIndexWriter releaseIndexWriter;
-	private JDiscogsProperties config;
+	private JDiscogsBatchProperties props;
+	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
 	private StatefulRediSearchConnection<String, String> connection;
 	private ResourcelessTransactionManager transactionManager;
 	private JobRepository jobRepository;
+	private MasterRepository masterRepository;
+	private ReleaseRepository releaseRepository;
 
-	public JDiscogsBatchConfiguration(MasterWriter masterWriter, ReleaseWriter releaseWriter,
-			MasterIndexWriter masterIndexWriter, ReleaseIndexWriter releaseIndexWriter, JDiscogsProperties config,
-			StatefulRediSearchConnection<String, String> connection) {
-		super();
-		this.masterWriter = masterWriter;
-		this.releaseWriter = releaseWriter;
-		this.masterIndexWriter = masterIndexWriter;
-		this.releaseIndexWriter = releaseIndexWriter;
-		this.config = config;
+	public JDiscogsBatchConfiguration(JDiscogsBatchProperties props,
+			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool,
+			StatefulRediSearchConnection<String, String> connection, MasterRepository masterRepository,
+			ReleaseRepository releaseRepository) {
+		this.props = props;
+		this.pool = pool;
 		this.connection = connection;
+		this.masterRepository = masterRepository;
+		this.releaseRepository = releaseRepository;
 	}
 
 	@Override
@@ -86,7 +88,7 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 	}
 
 	private Resource resource(String entityName) throws MalformedURLException {
-		URI uri = URI.create(config.dataUrl().replace("{entity}", entityName));
+		URI uri = URI.create(props.getDataUrl().replace("{entity}", entityName));
 		Resource resource = getResource(uri);
 		if (uri.getPath().endsWith(".gz")) {
 			try {
@@ -110,14 +112,14 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 		StepBuilderFactory stepBuilderFactory = new StepBuilderFactory(jobRepository, transactionManager);
 		Class<T> clazz = (Class<T>) job.getJobClass();
 		String entityName = clazz.getSimpleName().toLowerCase();
-		SimpleStepBuilder<T, T> builder = stepBuilderFactory.get(job + "-step").<T, T>chunk(config.batchSize());
+		SimpleStepBuilder<T, T> builder = stepBuilderFactory.get(job + "-step").<T, T>chunk(props.getBatchSize());
 		builder.reader(getReader(clazz));
 		builder.writer(writer);
-		if (config.threads() > 1) {
+		if (props.getThreads() > 1) {
 			SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
-			executor.setConcurrencyLimit(config.threads());
+			executor.setConcurrencyLimit(props.getThreads());
 			builder.taskExecutor(executor);
-			builder.throttleLimit(config.threads());
+			builder.throttleLimit(props.getThreads());
 		}
 		builder.listener(new JobListener(entityName));
 		JobBuilderFactory jobBuilderFactory = new JobBuilderFactory(jobRepository);
@@ -125,17 +127,17 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 	}
 
 	public void runJobs() throws Exception {
-		if (config.skip()) {
+		if (props.isSkip()) {
 			return;
 		}
-		for (LoadJob job : config.jobs()) {
+		for (LoadJob job : props.getJobs()) {
 			String status = connection.sync().hget(JOBS_KEY, job.name());
 			if (!VALUE_DONE.equals(status)) {
 				SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 				jobLauncher.setJobRepository(jobRepository);
 				jobLauncher.setTaskExecutor(new SyncTaskExecutor());
 				jobLauncher.afterPropertiesSet();
-				JobExecution execution = jobLauncher.run(loadJob(job), new JobParameters());
+				JobExecution execution = jobLauncher.run(job(job, writer(job)), new JobParameters());
 				if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
 					connection.sync().hset(JOBS_KEY, job.name(), VALUE_DONE);
 				}
@@ -143,22 +145,28 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 		}
 	}
 
-	private Job loadJob(LoadJob job) throws Exception {
+	private ItemWriter<?> writer(LoadJob job) {
+		if (props.isNoOp()) {
+			return new NoopWriter();
+		}
 		switch (job) {
 		case MasterDocs:
-			return job(job, masterWriter);
+			return new MasterWriter(masterRepository);
 		case MasterIndex:
-			return job(job, masterIndexWriter);
+			return new MasterIndexWriter(props, pool, connection);
 		case ReleaseDocs:
-			return job(job, releaseWriter);
+			return new ReleaseWriter(releaseRepository);
 		case ReleaseIndex:
-			return job(job, releaseIndexWriter);
+			return new ReleaseIndexWriter(props.getReleaseIndex(), pool, connection);
 		case ReleaseDocsIndex:
-			return job(job, new CompositeItemWriterBuilder<Release>()
-					.delegates(Arrays.asList(releaseWriter, releaseIndexWriter)).build());
+			return new CompositeItemWriterBuilder<Release>()
+					.delegates(Arrays.asList(new ReleaseWriter(releaseRepository),
+							new ReleaseIndexWriter(props.getReleaseIndex(), pool, connection)))
+					.build();
 		default:
-			return job(job, new CompositeItemWriterBuilder<Master>()
-					.delegates(Arrays.asList(masterWriter, masterIndexWriter)).build());
+			return new CompositeItemWriterBuilder<Master>().delegates(
+					Arrays.asList(new MasterWriter(masterRepository), new MasterIndexWriter(props, pool, connection)))
+					.build();
 		}
 	}
 

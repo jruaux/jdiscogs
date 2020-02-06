@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.ruaux.jdiscogs.api.DiscogsClient;
+import org.ruaux.jdiscogs.api.JDiscogsApiProperties;
 import org.ruaux.jdiscogs.api.model.Master;
 import org.ruaux.jdiscogs.api.model.Release;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +15,19 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = JDiscogsAutoConfiguration.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = JDiscogsApiProperties.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class JDiscogsClientTests {
 
 	@Autowired
-	private JDiscogsProperties props;
+	private JDiscogsApiProperties props;
 	@Autowired
 	private TestRestTemplate restTemplate;
 
 	private DiscogsClient client() {
-		return new DiscogsClient(props, restTemplate.getRestTemplate());
+		DiscogsClient client = new DiscogsClient();
+		client.setProps(props);
+		client.setRestTemplate(restTemplate.getRestTemplate());
+		return client;
 	}
 
 	@Test

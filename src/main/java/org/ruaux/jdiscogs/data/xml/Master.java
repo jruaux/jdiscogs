@@ -10,11 +10,10 @@ import org.springframework.data.redis.core.RedisHash;
 
 import lombok.Data;
 
-@Data
 @XmlRootElement(name = "master")
 @XmlAccessorType(XmlAccessType.FIELD)
 @RedisHash("master")
-public class Master {
+public @Data class Master {
 
 	@XmlAttribute(name = "id")
 	private String id;
@@ -41,10 +40,10 @@ public class Master {
 		if (images == null) {
 			return null;
 		}
-		if (images.images() == null) {
+		if (images.getImages() == null) {
 			return null;
 		}
-		return images.images().stream().filter(image -> image.isPrimary()).findFirst().orElse(null);
+		return images.getImages().stream().filter(image -> image.isPrimary()).findFirst().orElse(null);
 	}
 
 }

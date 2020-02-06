@@ -17,11 +17,11 @@ public class XmlLoaderTests {
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		Release release = (Release) unmarshaller
 				.unmarshal(this.getClass().getClassLoader().getResourceAsStream("release-4210378.xml"));
-		assertEquals(14, release.trackList().tracks().size());
-		Track bonusHeading = release.trackList().tracks().get(10);
-		assertEquals("Bonus Tracks", bonusHeading.title());
-		assertEquals("", bonusHeading.position());
-		assertEquals("", bonusHeading.duration());
+		assertEquals(14, release.getTrackList().getTracks().size());
+		Track bonusHeading = release.getTrackList().getTracks().get(10);
+		assertEquals("Bonus Tracks", bonusHeading.getTitle());
+		assertEquals("", bonusHeading.getPosition());
+		assertEquals("", bonusHeading.getDuration());
 	}
 
 }

@@ -9,15 +9,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.ruaux.jdiscogs.JDiscogsProperties;
-import org.ruaux.jdiscogs.Range;
 import org.ruaux.jdiscogs.data.xml.Artist;
 import org.ruaux.jdiscogs.data.xml.Image;
 import org.ruaux.jdiscogs.data.xml.Master;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.stereotype.Component;
 
 import com.redislabs.lettusearch.RediSearchAsyncCommands;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
@@ -30,22 +27,21 @@ import io.lettuce.core.LettuceFutures;
 import io.lettuce.core.RedisFuture;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
 public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<Master> {
 
 	public static final String FIELD_ID = "id";
 	public static final String FIELD_ARTIST = "artist";
 	public static final String FIELD_ARTISTID = "artistId";
-	public static final String FIELD_GENRES = "genres";
+	public static final String FIELD_GENRES = "getGenres";
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_YEAR = "year";
 
-	private JDiscogsProperties props;
+	private JDiscogsBatchProperties props;
 	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
 	private StatefulRediSearchConnection<String, String> connection;
 
-	public MasterIndexWriter(JDiscogsProperties props,
+	public MasterIndexWriter(JDiscogsBatchProperties props,
 			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool,
 			StatefulRediSearchConnection<String, String> connection) {
 		this.props = props;
@@ -57,16 +53,16 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 	public void open(ExecutionContext executionContext) {
 		SearchCommands<String, String> commands = connection.sync();
 		try {
-			commands.drop(props.masterIndex());
+			commands.drop(props.getMasterIndex());
 		} catch (Exception e) {
-			log.debug("Could not drop index {}", props.masterIndex(), e);
+			log.debug("Could not drop index {}", props.getMasterIndex(), e);
 		}
-		log.info("Creating index {}", props.masterIndex());
+		log.info("Creating index {}", props.getMasterIndex());
 		Schema schema = Schema.builder().field(Field.text(FIELD_ARTIST).sortable(true))
 				.field(Field.tag(FIELD_ARTISTID).sortable(true)).field(Field.tag(FIELD_GENRES).sortable(true))
 				.field(Field.text(FIELD_TITLE).matcher(PhoneticMatcher.English).sortable(true))
 				.field(Field.numeric(FIELD_YEAR).sortable(true)).build();
-		commands.create(props.masterIndex(), schema);
+		commands.create(props.getMasterIndex(), schema);
 	}
 
 	@Override
@@ -77,52 +73,49 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 			commands.setAutoFlushCommands(false);
 			List<RedisFuture<?>> futures = new ArrayList<>();
 			for (Master master : items) {
-				if (master.images() == null || master.images().images() == null) {
+				if (master.getImages() == null || master.getImages().getImages() == null) {
 					continue;
 				}
-				if (master.images().images().size() < props.minImages()) {
+				if (master.getImages().getImages().size() < props.getMinImages()) {
 					continue;
 				}
 				Image image = master.getPrimaryImage();
 				if (image == null) {
 					continue;
 				}
-				if (!withinRange(image.height(), props.imageHeight())) {
+				if (!withinRange(image.getHeight(), props.getImageHeight())) {
 					continue;
 				}
-				if (!withinRange(image.width(), props.imageWidth())) {
+				if (!withinRange(image.getWidth(), props.getImageWidth())) {
 					continue;
 				}
-				if (!withinRange(image.getRatio(), props.imageRatio())) {
+				if (!withinRange(image.getRatio(), props.getImageRatio())) {
 					continue;
 				}
-				if (master.year() == null || master.year().length() < 4) {
+				if (master.getYear() == null || master.getYear().length() < 4) {
 					continue;
 				}
 				Map<String, String> fields = new HashMap<>();
-				if (master.artists() != null && !master.artists().artists().isEmpty()) {
-					Artist artist = master.artists().artists().get(0);
+				if (master.getArtists() != null && !master.getArtists().getArtists().isEmpty()) {
+					Artist artist = master.getArtists().getArtists().get(0);
 					if (artist != null) {
-						fields.put(FIELD_ARTIST, artist.name());
-						fields.put(FIELD_ARTISTID, artist.id());
-						futures.add(
-								commands.sugadd(props.artistSuggestionIndex(), artist.name(), 1, true, artist.id()));
+						fields.put(FIELD_ARTIST, artist.getName());
+						fields.put(FIELD_ARTISTID, artist.getId());
+						futures.add(commands.sugadd(props.getArtistSuggestionIndex(), artist.getName(), 1, true,
+								artist.getId()));
 					}
 				}
 				Set<String> genreSet = new LinkedHashSet<>();
-				if (master.genres() != null && master.genres().genres() != null) {
-					genreSet.addAll(master.genres().genres());
+				if (master.getGenres() != null && master.getGenres().getGenres() != null) {
+					genreSet.addAll(master.getGenres().getGenres());
 				}
-				if (master.styles() != null && master.styles().styles() != null) {
-					genreSet.addAll(master.styles().styles());
+				if (master.getStyles() != null && master.getStyles().getStyles() != null) {
+					genreSet.addAll(master.getStyles().getStyles());
 				}
-				fields.put(FIELD_GENRES, String.join(props.hashArrayDelimiter(), sanitize(genreSet)));
-				fields.put(FIELD_TITLE, master.title());
-				fields.put(FIELD_YEAR, master.year());
-				futures.add(commands.add(props.masterIndex(), master.id(), 1, fields));
-			}
-			if (props.noOp()) {
-				return;
+				fields.put(FIELD_GENRES, String.join(props.getHashArrayDelimiter(), sanitize(genreSet)));
+				fields.put(FIELD_TITLE, master.getTitle());
+				fields.put(FIELD_YEAR, master.getYear());
+				futures.add(commands.add(props.getMasterIndex(), master.getId(), 1, fields));
 			}
 			commands.flushCommands();
 			boolean result = LettuceFutures.awaitAll(5, TimeUnit.SECONDS,
@@ -144,12 +137,12 @@ public class MasterIndexWriter extends ItemStreamSupport implements ItemWriter<M
 		if (value == null) {
 			return false;
 		}
-		return value.doubleValue() >= range.min() && value.doubleValue() <= range.max();
+		return value.doubleValue() >= range.getMin() && value.doubleValue() <= range.getMax();
 	}
 
-	private List<String> sanitize(Set<String> genres) {
+	private List<String> sanitize(Set<String> getGenres) {
 		List<String> result = new ArrayList<>();
-		genres.forEach(genre -> result.add(genre.replace(',', ' ')));
+		getGenres.forEach(genre -> result.add(genre.replace(',', ' ')));
 		return result;
 	}
 
