@@ -1,15 +1,17 @@
 package org.ruaux.jdiscogs.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.data.xml.Release;
+import org.ruaux.jdiscogs.data.xml.Track;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
@@ -21,6 +23,8 @@ import com.redislabs.lettusearch.search.api.SearchCommands;
 import com.redislabs.lettusearch.search.field.Field;
 
 import io.lettuce.core.RedisFuture;
+import lombok.Builder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -34,19 +38,21 @@ public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Relea
 	public static final String FIELD_TRACKS = "tracks";
 	public static final String FIELD_TRACK_NUMBERS = "trackNumbers";
 	public static final String FIELD_TRACK_DURATIONS = "trackDurations";
-	private String index;
+	private JDiscogsBatchProperties props;
 	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
 	private StatefulRediSearchConnection<String, String> connection;
 
-	public ReleaseWriter(JDiscogsBatchProperties props, GenericObjectPool<StatefulRediSearchConnection<String, String>> pool,
+	public ReleaseWriter(JDiscogsBatchProperties props,
+			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool,
 			StatefulRediSearchConnection<String, String> connection) {
-		this.index = props.getReleaseIndex();
+		this.props = props;
 		this.pool = pool;
 		this.connection = connection;
 	}
 
 	@Override
 	public void open(ExecutionContext executionContext) {
+		String index = props.getReleaseIndex();
 		SearchCommands<String, String> commands = connection.sync();
 		try {
 			commands.drop(index);
@@ -81,15 +87,14 @@ public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Relea
 				}
 				if (release.getTrackList() != null && !release.getTrackList().getTracks().isEmpty()) {
 					fields.put(FIELD_TRACKS, String.valueOf(release.getTrackList().getTracks().size()));
-					fields.put(FIELD_TRACK_NUMBERS,
-							Arrays.toString(release.getTrackList().getTracks().stream().map(t -> t.getTrackNumber())
-									.filter(n -> n != null).map(n -> n.getTrackNumber()).collect(Collectors.toList()).toArray()));
-					fields.put(FIELD_TRACK_DURATIONS,
-							Arrays.toString(
-									release.getTrackList().getTracks().stream().map(t -> t.getDurationInSeconds())
-											.filter(d -> d != null).collect(Collectors.toList()).toArray()));
+					String positions = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks()
+							.stream().map(t -> t.getPosition()).collect(Collectors.toList()));
+					fields.put(FIELD_TRACK_NUMBERS, positions);
+					String durations = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks().stream()
+									.map(t -> t.getDuration()).collect(Collectors.toList()));
+					fields.put(FIELD_TRACK_DURATIONS, durations);
 				}
-				futures.add(commands.add(index, release.getId(), 1, fields));
+				futures.add(commands.add(props.getReleaseIndex(), release.getId(), 1, fields));
 			}
 			commands.flushCommands();
 			for (int index = 0; index < futures.size(); index++) {
@@ -104,6 +109,61 @@ public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Relea
 				}
 			}
 		}
+	}
+
+	private final static Pattern cdTrackPattern = Pattern.compile("^((?<disc>\\d+)[\\.\\-])?(?<track>\\d+)");
+	private final static Pattern vinylTrackPattern = Pattern.compile("^(?<side>[a-zΑ-Ω\\wа-яА-Я])(?<track>\\d+)?",
+			Pattern.CASE_INSENSITIVE);
+	private final static Pattern durationPattern = Pattern.compile("^(?<minutes>\\d+)\\:(?<seconds>\\d+)");
+
+	@Builder
+	public static @Data class TrackNumber {
+		private Integer discNumber;
+		private Integer trackNumber;
+		private String side;
+	}
+
+	public TrackNumber getTrackNumber(Track track) {
+		String position = track.getPosition();
+		if (position != null && !position.isBlank()) {
+			Matcher cdMatcher = cdTrackPattern.matcher(position.trim());
+			if (cdMatcher.find()) {
+				String disc = cdMatcher.group("disc");
+				try {
+					int trackNumber = Integer.parseInt(cdMatcher.group("track"));
+					Integer discNumber = disc == null ? null : Integer.parseInt(disc);
+					return TrackNumber.builder().discNumber(discNumber).trackNumber(trackNumber).build();
+				} catch (NumberFormatException e) {
+					log.error("Could not parse cd track position {}", position);
+				}
+			} else {
+				Matcher vinylMatcher = vinylTrackPattern.matcher(position.trim());
+				if (vinylMatcher.find()) {
+					String trackNumberString = vinylMatcher.group("track");
+					try {
+						Integer trackNumber = trackNumberString == null ? null : Integer.parseInt(trackNumberString);
+						return TrackNumber.builder().side(vinylMatcher.group("side")).trackNumber(trackNumber).build();
+					} catch (NumberFormatException e) {
+						log.error("Could not parse vinyl track position {}", position);
+					}
+				} else {
+					log.error("Could not match track position to CD or Vinyl formats '{}'", position);
+				}
+			}
+		}
+		return null;
+	}
+
+	public Integer getDurationInSeconds(Track track) {
+		Matcher matcher = durationPattern.matcher(track.getDuration().trim());
+		if (matcher.matches()) {
+			try {
+				return Integer.parseInt(matcher.group("minutes")) * 60 + Integer.parseInt(matcher.group("seconds"));
+			} catch (NumberFormatException e) {
+				log.error("Could not parse duration ''", track.getDuration());
+			}
+		}
+		return null;
 	}
 
 }
