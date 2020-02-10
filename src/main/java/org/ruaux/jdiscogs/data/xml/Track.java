@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public @Data class Track {
 
 	private final static Pattern cdTrackPattern = Pattern.compile("^((?<disc>\\d+)[\\.\\-])?(?<track>\\d+)");
-	private final static Pattern vinylTrackPattern = Pattern.compile("^(?<side>[a-z])(?<track>\\d)?", Pattern.CASE_INSENSITIVE);
+	private final static Pattern vinylTrackPattern = Pattern.compile("^(?<side>[a-zΑ-Ω])(?<track>\\d+)?", Pattern.CASE_INSENSITIVE);
 	private final static Pattern durationPattern = Pattern.compile("^(?<minutes>\\d+)\\:(?<seconds>\\d+)");
 
 	@XmlElement(name = "position")
@@ -66,5 +66,11 @@ public @Data class Track {
 			return Integer.parseInt(matcher.group("minutes")) * 60 + Integer.parseInt(matcher.group("seconds"));
 		}
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		Track track = new Track();
+		track.setPosition("Α3");
+		System.out.println(track.getTrackNumber());
 	}
 }

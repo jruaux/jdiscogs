@@ -16,10 +16,6 @@ repositories {
 	mavenLocal()
 }
 
-bootJar {
-  enabled = false
-}
-
 jar {
   enabled = true
 }
