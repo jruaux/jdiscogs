@@ -11,7 +11,7 @@ public @Data class JDiscogsBatchProperties {
 	private String hashArrayDelimiter = ",";
 	private String dataUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_{entity}s.xml.gz";
 	private int batchSize = 50;
-	private LoadJob[] jobs = { LoadJob.MasterDocsIndex };
+	private LoadJob[] jobs = { LoadJob.Masters };
 	private int threads = 1;
 	private boolean skip = false;
 	private boolean noOp = false;

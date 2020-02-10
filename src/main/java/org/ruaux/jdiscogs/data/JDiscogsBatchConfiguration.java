@@ -3,7 +3,6 @@ package org.ruaux.jdiscogs.data;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.Arrays;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.data.xml.Master;
@@ -23,7 +22,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.SynchronizedItemStreamReader;
-import org.springframework.batch.item.support.builder.CompositeItemWriterBuilder;
 import org.springframework.batch.item.support.builder.SynchronizedItemStreamReaderBuilder;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -53,18 +51,13 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 	private StatefulRediSearchConnection<String, String> connection;
 	private ResourcelessTransactionManager transactionManager;
 	private JobRepository jobRepository;
-	private MasterRepository masterRepository;
-	private ReleaseRepository releaseRepository;
 
 	public JDiscogsBatchConfiguration(JDiscogsBatchProperties props,
 			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool,
-			StatefulRediSearchConnection<String, String> connection, MasterRepository masterRepository,
-			ReleaseRepository releaseRepository) {
+			StatefulRediSearchConnection<String, String> connection) {
 		this.props = props;
 		this.pool = pool;
 		this.connection = connection;
-		this.masterRepository = masterRepository;
-		this.releaseRepository = releaseRepository;
 	}
 
 	@Override
@@ -150,29 +143,15 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 			return new NoopWriter();
 		}
 		switch (job) {
-		case MasterDocs:
-			return new MasterWriter(masterRepository);
-		case MasterIndex:
-			return new MasterIndexWriter(props, pool, connection);
-		case ReleaseDocs:
-			return new ReleaseWriter(releaseRepository);
-		case ReleaseIndex:
-			return new ReleaseIndexWriter(props.getReleaseIndex(), pool, connection);
-		case ReleaseDocsIndex:
-			return new CompositeItemWriterBuilder<Release>()
-					.delegates(Arrays.asList(new ReleaseWriter(releaseRepository),
-							new ReleaseIndexWriter(props.getReleaseIndex(), pool, connection)))
-					.build();
+		case Releases:
+			return new ReleaseWriter(props, pool, connection);
 		default:
-			return new CompositeItemWriterBuilder<Master>().delegates(
-					Arrays.asList(new MasterWriter(masterRepository), new MasterIndexWriter(props, pool, connection)))
-					.build();
+			return new MasterWriter(props, pool, connection);
 		}
 	}
 
 	public enum LoadJob {
-		MasterDocs(Master.class), MasterIndex(Master.class), MasterDocsIndex(Master.class), ReleaseDocs(Release.class),
-		ReleaseIndex(Release.class), ReleaseDocsIndex(Release.class);
+		Masters(Master.class), Releases(Release.class);
 
 		private Class<?> clazz;
 
