@@ -1,17 +1,24 @@
 package org.ruaux.jdiscogs.data;
 
+import static org.ruaux.jdiscogs.data.Fields.ARTIST;
+import static org.ruaux.jdiscogs.data.Fields.FORMAT;
+import static org.ruaux.jdiscogs.data.Fields.MAIN_RELEASE;
+import static org.ruaux.jdiscogs.data.Fields.MASTER;
+import static org.ruaux.jdiscogs.data.Fields.TITLE;
+import static org.ruaux.jdiscogs.data.Fields.TRACKS;
+import static org.ruaux.jdiscogs.data.Fields.TRACK_DURATIONS;
+import static org.ruaux.jdiscogs.data.Fields.TRACK_NUMBERS;
+import static org.ruaux.jdiscogs.data.Fields.TRACK_TITLES;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.data.xml.Release;
-import org.ruaux.jdiscogs.data.xml.Track;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
@@ -23,21 +30,11 @@ import com.redislabs.lettusearch.search.api.SearchCommands;
 import com.redislabs.lettusearch.search.field.Field;
 
 import io.lettuce.core.RedisFuture;
-import lombok.Builder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Release> {
 
-	public static final String FIELD_TITLE = "title";
-	public static final String FIELD_ARTIST = "artist";
-	public static final String FIELD_FORMAT = "format";
-	public static final String FIELD_MASTER = "master";
-	public static final String FIELD_MAIN_RELEASE = "mainRelease";
-	public static final String FIELD_TRACKS = "tracks";
-	public static final String FIELD_TRACK_NUMBERS = "trackNumbers";
-	public static final String FIELD_TRACK_DURATIONS = "trackDurations";
 	private JDiscogsBatchProperties props;
 	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
 	private StatefulRediSearchConnection<String, String> connection;
@@ -60,8 +57,8 @@ public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Relea
 			log.debug("Could not drop index {}", index, e);
 		}
 		log.info("Creating index {}", index);
-		commands.create(index, Schema.builder().field(Field.text(FIELD_ARTIST).sortable(true))
-				.field(Field.text(FIELD_TITLE).sortable(true)).build());
+		commands.create(index, Schema.builder().field(Field.text(ARTIST).sortable(true))
+				.field(Field.text(TITLE).sortable(true)).build());
 	}
 
 	@Override
@@ -74,25 +71,28 @@ public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Relea
 			for (Release release : items) {
 				Map<String, String> fields = new HashMap<>();
 				if (release.getArtists() != null && !release.getArtists().getArtists().isEmpty()) {
-					fields.put(FIELD_ARTIST, release.getArtists().getArtists().get(0).getName());
+					fields.put(ARTIST, release.getArtists().getArtists().get(0).getName());
 				}
-				fields.put(FIELD_TITLE, release.getTitle());
+				fields.put(TITLE, release.getTitle());
 				if (release.getFormats() != null && !release.getFormats().getFormats().isEmpty()) {
-					fields.put(FIELD_FORMAT, release.getFormats().getFormats().get(0).getName());
+					fields.put(FORMAT, release.getFormats().getFormats().get(0).getName());
 				}
 				if (release.getMasterId() != null) {
-					fields.put(FIELD_MASTER, release.getMasterId().getMasterId());
-					fields.put(FIELD_MAIN_RELEASE,
+					fields.put(MASTER, release.getMasterId().getMasterId());
+					fields.put(MAIN_RELEASE,
 							String.valueOf(Boolean.TRUE.equals(release.getMasterId().getMainRelease())));
 				}
 				if (release.getTrackList() != null && !release.getTrackList().getTracks().isEmpty()) {
-					fields.put(FIELD_TRACKS, String.valueOf(release.getTrackList().getTracks().size()));
+					fields.put(TRACKS, String.valueOf(release.getTrackList().getTracks().size()));
+					String titles = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks()
+							.stream().map(t -> t.getTitle()).collect(Collectors.toList()));
+					fields.put(TRACK_TITLES, titles);
 					String positions = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks()
 							.stream().map(t -> t.getPosition()).collect(Collectors.toList()));
-					fields.put(FIELD_TRACK_NUMBERS, positions);
-					String durations = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks().stream()
-									.map(t -> t.getDuration()).collect(Collectors.toList()));
-					fields.put(FIELD_TRACK_DURATIONS, durations);
+					fields.put(TRACK_NUMBERS, positions);
+					String durations = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks()
+							.stream().map(t -> t.getDuration()).collect(Collectors.toList()));
+					fields.put(TRACK_DURATIONS, durations);
 				}
 				futures.add(commands.add(props.getReleaseIndex(), release.getId(), 1, fields));
 			}
@@ -109,61 +109,6 @@ public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Relea
 				}
 			}
 		}
-	}
-
-	private final static Pattern cdTrackPattern = Pattern.compile("^((?<disc>\\d+)[\\.\\-])?(?<track>\\d+)");
-	private final static Pattern vinylTrackPattern = Pattern.compile("^(?<side>[a-zΑ-Ω\\wа-яА-Я])(?<track>\\d+)?",
-			Pattern.CASE_INSENSITIVE);
-	private final static Pattern durationPattern = Pattern.compile("^(?<minutes>\\d+)\\:(?<seconds>\\d+)");
-
-	@Builder
-	public static @Data class TrackNumber {
-		private Integer discNumber;
-		private Integer trackNumber;
-		private String side;
-	}
-
-	public TrackNumber getTrackNumber(Track track) {
-		String position = track.getPosition();
-		if (position != null && !position.isBlank()) {
-			Matcher cdMatcher = cdTrackPattern.matcher(position.trim());
-			if (cdMatcher.find()) {
-				String disc = cdMatcher.group("disc");
-				try {
-					int trackNumber = Integer.parseInt(cdMatcher.group("track"));
-					Integer discNumber = disc == null ? null : Integer.parseInt(disc);
-					return TrackNumber.builder().discNumber(discNumber).trackNumber(trackNumber).build();
-				} catch (NumberFormatException e) {
-					log.error("Could not parse cd track position {}", position);
-				}
-			} else {
-				Matcher vinylMatcher = vinylTrackPattern.matcher(position.trim());
-				if (vinylMatcher.find()) {
-					String trackNumberString = vinylMatcher.group("track");
-					try {
-						Integer trackNumber = trackNumberString == null ? null : Integer.parseInt(trackNumberString);
-						return TrackNumber.builder().side(vinylMatcher.group("side")).trackNumber(trackNumber).build();
-					} catch (NumberFormatException e) {
-						log.error("Could not parse vinyl track position {}", position);
-					}
-				} else {
-					log.error("Could not match track position to CD or Vinyl formats '{}'", position);
-				}
-			}
-		}
-		return null;
-	}
-
-	public Integer getDurationInSeconds(Track track) {
-		Matcher matcher = durationPattern.matcher(track.getDuration().trim());
-		if (matcher.matches()) {
-			try {
-				return Integer.parseInt(matcher.group("minutes")) * 60 + Integer.parseInt(matcher.group("seconds"));
-			} catch (NumberFormatException e) {
-				log.error("Could not parse duration ''", track.getDuration());
-			}
-		}
-		return null;
 	}
 
 }

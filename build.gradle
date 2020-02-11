@@ -8,7 +8,14 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.27.0'
     id 'net.researchgate.release' version '2.8.1'
     id 'com.github.breadmoirai.github-release' version '2.2.10'
-    
+}
+
+bootJar {
+  enabled = false
+}
+
+jar {
+  enabled = true
 }
 
 repositories {
@@ -25,7 +32,7 @@ dependencies {
 	}
 	implementation 'org.springframework:spring-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
-	implementation 'com.redislabs:spring-redisearch:1.12.8'
+	api 'com.redislabs:spring-redisearch:1.12.8'
 	implementation 'org.glassfish.jaxb:jaxb-runtime'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
