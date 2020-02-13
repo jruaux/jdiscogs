@@ -9,8 +9,9 @@ public class Fields {
 	public static final String MASTER = "master";
 	public static final String MAIN_RELEASE = "mainRelease";
 	public static final String TRACKS = "tracks";
-	public static final String TRACK_NUMBERS = "trackNumbers";
-	public static final String TRACK_DURATIONS = "trackDurations";
-	public static final String TRACK_TITLES = "trackTitles";
+	public static final String TRACK_POSITION = "trackNumber";
+	public static final String TRACK_DURATION = "trackDuration";
+	public static final String TRACK_TITLE = "trackTitle";
+	public static final String TRACK_ARTIST = "trackArtist";
 
 }

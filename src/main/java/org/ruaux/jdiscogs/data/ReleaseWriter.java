@@ -6,19 +6,20 @@ import static org.ruaux.jdiscogs.data.Fields.MAIN_RELEASE;
 import static org.ruaux.jdiscogs.data.Fields.MASTER;
 import static org.ruaux.jdiscogs.data.Fields.TITLE;
 import static org.ruaux.jdiscogs.data.Fields.TRACKS;
-import static org.ruaux.jdiscogs.data.Fields.TRACK_DURATIONS;
-import static org.ruaux.jdiscogs.data.Fields.TRACK_NUMBERS;
-import static org.ruaux.jdiscogs.data.Fields.TRACK_TITLES;
+import static org.ruaux.jdiscogs.data.Fields.TRACK_ARTIST;
+import static org.ruaux.jdiscogs.data.Fields.TRACK_DURATION;
+import static org.ruaux.jdiscogs.data.Fields.TRACK_POSITION;
+import static org.ruaux.jdiscogs.data.Fields.TRACK_TITLE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.ruaux.jdiscogs.data.xml.Release;
+import org.ruaux.jdiscogs.data.xml.Track;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
@@ -83,16 +84,18 @@ public class ReleaseWriter extends ItemStreamSupport implements ItemWriter<Relea
 							String.valueOf(Boolean.TRUE.equals(release.getMasterId().getMainRelease())));
 				}
 				if (release.getTrackList() != null && !release.getTrackList().getTracks().isEmpty()) {
-					fields.put(TRACKS, String.valueOf(release.getTrackList().getTracks().size()));
-					String titles = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks()
-							.stream().map(t -> t.getTitle()).collect(Collectors.toList()));
-					fields.put(TRACK_TITLES, titles);
-					String positions = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks()
-							.stream().map(t -> t.getPosition()).collect(Collectors.toList()));
-					fields.put(TRACK_NUMBERS, positions);
-					String durations = String.join(props.getHashArrayDelimiter(), release.getTrackList().getTracks()
-							.stream().map(t -> t.getDuration()).collect(Collectors.toList()));
-					fields.put(TRACK_DURATIONS, durations);
+					List<Track> tracks = release.getTrackList().getTracks();
+					fields.put(TRACKS, String.valueOf(tracks.size()));
+					for (int index = 0; index < tracks.size(); index++) {
+						String suffix = "[" + index + "]";
+						Track track = tracks.get(index);
+						fields.put(TRACK_TITLE + suffix, track.getTitle());
+						fields.put(TRACK_POSITION + suffix, track.getPosition());
+						fields.put(TRACK_DURATION + suffix, track.getDuration());
+						if (track.getArtists() != null && !track.getArtists().getArtists().isEmpty()) {
+							fields.put(TRACK_ARTIST + suffix, track.getArtists().getArtists().get(0).getName());
+						}
+					}
 				}
 				futures.add(commands.add(props.getReleaseIndex(), release.getId(), 1, fields));
 			}

@@ -1,6 +1,5 @@
 package org.ruaux.jdiscogs.data;
 
-import org.ruaux.jdiscogs.data.JDiscogsBatchConfiguration.LoadJob;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
@@ -11,9 +10,8 @@ public @Data class JDiscogsBatchProperties {
 	private String hashArrayDelimiter = ",";
 	private String dataUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_{entity}s.xml.gz";
 	private int batchSize = 50;
-	private LoadJob[] jobs = { LoadJob.Masters };
 	private int threads = 1;
-	private boolean skip = false;
+	private boolean forceLoad = false;
 	private boolean noOp = false;
 	private String releaseIndex = "releases";
 	private String masterIndex = "masters";

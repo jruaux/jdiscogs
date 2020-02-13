@@ -1,6 +1,7 @@
 package org.ruaux.jdiscogs;
 
 import org.ruaux.jdiscogs.data.JDiscogsBatchConfiguration;
+import org.ruaux.jdiscogs.data.JDiscogsBatchConfiguration.LoadJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -19,7 +20,7 @@ public class JDiscogsApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		batch.runJobs();
+		batch.run(LoadJob.Masters, LoadJob.Releases);
 	}
 
 }

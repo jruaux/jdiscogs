@@ -119,21 +119,20 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 		return jobBuilderFactory.get(job + "-job").start(builder.build()).build();
 	}
 
-	public void runJobs() throws Exception {
-		if (props.isSkip()) {
-			return;
-		}
-		for (LoadJob job : props.getJobs()) {
-			String status = connection.sync().hget(JOBS_KEY, job.name());
-			if (!VALUE_DONE.equals(status)) {
-				SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-				jobLauncher.setJobRepository(jobRepository);
-				jobLauncher.setTaskExecutor(new SyncTaskExecutor());
-				jobLauncher.afterPropertiesSet();
-				JobExecution execution = jobLauncher.run(job(job, writer(job)), new JobParameters());
-				if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
-					connection.sync().hset(JOBS_KEY, job.name(), VALUE_DONE);
-				}
+	public void run(LoadJob... jobs) throws Exception {
+		for (LoadJob job : jobs) {
+			String name = job.name();
+			String status = connection.sync().hget(JOBS_KEY, name);
+			if (VALUE_DONE.equals(status) && !props.isForceLoad()) {
+				continue;
+			}
+			SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+			jobLauncher.setJobRepository(jobRepository);
+			jobLauncher.setTaskExecutor(new SyncTaskExecutor());
+			jobLauncher.afterPropertiesSet();
+			JobExecution execution = jobLauncher.run(job(job, writer(job)), new JobParameters());
+			if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
+				connection.sync().hset(JOBS_KEY, name, VALUE_DONE);
 			}
 		}
 	}
