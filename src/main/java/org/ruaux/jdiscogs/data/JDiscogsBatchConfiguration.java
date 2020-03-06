@@ -33,7 +33,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
@@ -41,23 +40,21 @@ import com.redislabs.lettusearch.StatefulRediSearchConnection;
 @Configuration
 @EnableConfigurationProperties(JDiscogsBatchProperties.class)
 @EnableBatchProcessing
-@EnableRedisRepositories
 public class JDiscogsBatchConfiguration implements InitializingBean {
 
 	private static final String JOBS_KEY = JDiscogsBatchConfiguration.class.getPackage().getName() + ".jobs";
 	private static final String VALUE_DONE = "done";
 	private JDiscogsBatchProperties props;
-	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
-	private StatefulRediSearchConnection<String, String> connection;
 	private ResourcelessTransactionManager transactionManager;
 	private JobRepository jobRepository;
+	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
+	private ReleaseCodec codec;
 
 	public JDiscogsBatchConfiguration(JDiscogsBatchProperties props,
-			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool,
-			StatefulRediSearchConnection<String, String> connection) {
+			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool, ReleaseCodec codec) {
 		this.props = props;
 		this.pool = pool;
-		this.connection = connection;
+		this.codec = codec;
 	}
 
 	@Override
@@ -122,17 +119,19 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 	public void run(LoadJob... jobs) throws Exception {
 		for (LoadJob job : jobs) {
 			String name = job.name();
-			String status = connection.sync().hget(JOBS_KEY, name);
-			if (VALUE_DONE.equals(status) && !props.isForceLoad()) {
-				continue;
-			}
-			SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-			jobLauncher.setJobRepository(jobRepository);
-			jobLauncher.setTaskExecutor(new SyncTaskExecutor());
-			jobLauncher.afterPropertiesSet();
-			JobExecution execution = jobLauncher.run(job(job, writer(job)), new JobParameters());
-			if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
-				connection.sync().hset(JOBS_KEY, name, VALUE_DONE);
+			try (StatefulRediSearchConnection<String, String> connection = pool.borrowObject()) {
+				String status = connection.sync().hget(JOBS_KEY, name);
+				if (VALUE_DONE.equals(status) && !props.isForceLoad()) {
+					continue;
+				}
+				SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+				jobLauncher.setJobRepository(jobRepository);
+				jobLauncher.setTaskExecutor(new SyncTaskExecutor());
+				jobLauncher.afterPropertiesSet();
+				JobExecution execution = jobLauncher.run(job(job, writer(job)), new JobParameters());
+				if (execution.getExitStatus().equals(ExitStatus.COMPLETED)) {
+					connection.sync().hset(JOBS_KEY, name, VALUE_DONE);
+				}
 			}
 		}
 	}
@@ -143,9 +142,9 @@ public class JDiscogsBatchConfiguration implements InitializingBean {
 		}
 		switch (job) {
 		case Releases:
-			return new ReleaseWriter(props, pool, connection);
+			return new ReleaseWriter(props, pool, codec);
 		default:
-			return new MasterWriter(props, pool, connection);
+			return new MasterWriter(props, pool);
 		}
 	}
 

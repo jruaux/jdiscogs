@@ -1,27 +1,25 @@
 package org.ruaux.jdiscogs.data.xml;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
 
-@XmlRootElement(name = "label")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public @Data class Label {
+public @Data class SubTrackList {
 
-	@XmlAttribute(name = "id")
-	private String id;
-	@XmlAttribute(name = "catno")
-	private String catno;
-	@XmlAttribute(name = "name")
-	private String name;
+	@XmlElement(name = "track")
+	@Singular
+	private List<Track> tracks;
 
 }

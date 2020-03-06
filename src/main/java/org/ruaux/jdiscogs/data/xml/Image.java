@@ -5,12 +5,17 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
 @XmlRootElement(name = "image")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Image {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public @Data class Image {
 
 	public static final String TYPE_PRIMARY = "primary";
 	@XmlAttribute(name = "height")

@@ -5,12 +5,17 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
 @XmlRootElement(name = "artist")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Artist {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public @Data class Artist {
 
 	@XmlElement(name = "id")
 	private String id;

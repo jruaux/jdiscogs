@@ -1,7 +1,8 @@
 package org.ruaux.jdiscogs.data.xml;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -11,13 +12,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.springframework.data.redis.core.RedisHash;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
 @XmlRootElement(name = "release")
 @XmlAccessorType(XmlAccessType.FIELD)
-@RedisHash("release")
-public class Release {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@RedisHash
+public @Data class Release {
+
+	private static final Pattern POSITION_PATTERN = Pattern.compile("^([A-Z]|(\\d+[\\-\\:]))?\\d+$");
 
 	@XmlAttribute(name = "id")
 	private String id;
@@ -50,16 +58,43 @@ public class Release {
 	@XmlElement(name = "master_id")
 	private MasterId masterId;
 	@XmlElement(name = "tracklist")
-	private TrackList trackList = new TrackList();
+	private TrackList trackList;
 	@XmlElement(name = "identifiers")
 	private Identifiers identifiers;
 	@XmlElement(name = "companies")
 	private Companies companies;
 
-	public List<Track> tracks() {
-		return trackList.getTracks().stream()
-				.filter(track -> track.getPosition() != null && !track.getPosition().isEmpty())
-				.collect(Collectors.toList());
+	public List<Track> getTracks() {
+		return getTracks(trackList.getTracks());
+	}
+
+	private List<Track> getTracks(List<Track> tracks) {
+		List<Track> actualTracks = new ArrayList<>();
+		for (Track track : tracks) {
+			if (track.getSubTrackList() == null || track.getSubTrackList().getTracks().isEmpty()) {
+				if (POSITION_PATTERN.matcher(track.getPosition()).matches()) {
+					actualTracks.add(track);
+				}
+			} else {
+				actualTracks.addAll(getTracks(track.getSubTrackList().getTracks()));
+			}
+		}
+		return actualTracks;
+	}
+
+	public String getArtist() {
+		if (artists == null || artists.getArtists() == null || artists.getArtists().isEmpty()) {
+			return null;
+		}
+		return artists.getArtists().get(0).getName();
+	}
+
+	public String getFormat() {
+		if (formats == null || formats.getFormats() == null || formats.getFormats().isEmpty()) {
+			return null;
+		}
+		return formats.getFormats().get(0).getName();
+
 	}
 
 }

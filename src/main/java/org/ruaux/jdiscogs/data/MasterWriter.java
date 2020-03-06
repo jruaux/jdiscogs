@@ -30,39 +30,40 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MasterWriter extends ItemStreamSupport implements ItemWriter<Master> {
 
-	public static final String FIELD_ID = "id";
-	public static final String FIELD_ARTIST = "artist";
-	public static final String FIELD_ARTISTID = "artistId";
-	public static final String FIELD_GENRES = "getGenres";
-	public static final String FIELD_TITLE = "title";
-	public static final String FIELD_YEAR = "year";
+	public static final String ARTIST = "artist";
+	public static final String ARTIST_ID = "artistId";
+	public static final String GENRES = "getGenres";
+	public static final String TITLE = "title";
+	public static final String YEAR = "year";
 
 	private JDiscogsBatchProperties props;
 	private GenericObjectPool<StatefulRediSearchConnection<String, String>> pool;
-	private StatefulRediSearchConnection<String, String> connection;
 
 	public MasterWriter(JDiscogsBatchProperties props,
-			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool,
-			StatefulRediSearchConnection<String, String> connection) {
+			GenericObjectPool<StatefulRediSearchConnection<String, String>> pool) {
 		this.props = props;
 		this.pool = pool;
-		this.connection = connection;
 	}
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		SearchCommands<String, String> commands = connection.sync();
-		try {
-			commands.drop(props.getMasterIndex());
+		String index = props.getMasterIndex();
+		try (StatefulRediSearchConnection<String, String> connection = pool.borrowObject()) {
+			SearchCommands<String, String> commands = connection.sync();
+			try {
+				commands.drop(index);
+			} catch (Exception e) {
+				log.debug("Could not drop index {}", index, e);
+			}
+			log.info("Creating index {}", index);
+			Schema schema = Schema.builder().field(Field.text(ARTIST).sortable(true))
+					.field(Field.tag(ARTIST_ID).sortable(true)).field(Field.tag(GENRES).sortable(true))
+					.field(Field.text(TITLE).matcher(PhoneticMatcher.English).sortable(true))
+					.field(Field.numeric(YEAR).sortable(true)).build();
+			commands.create(index, schema);
 		} catch (Exception e) {
-			log.debug("Could not drop index {}", props.getMasterIndex(), e);
+			log.error("Could not create index {}", index, e);
 		}
-		log.info("Creating index {}", props.getMasterIndex());
-		Schema schema = Schema.builder().field(Field.text(FIELD_ARTIST).sortable(true))
-				.field(Field.tag(FIELD_ARTISTID).sortable(true)).field(Field.tag(FIELD_GENRES).sortable(true))
-				.field(Field.text(FIELD_TITLE).matcher(PhoneticMatcher.English).sortable(true))
-				.field(Field.numeric(FIELD_YEAR).sortable(true)).build();
-		commands.create(props.getMasterIndex(), schema);
 	}
 
 	@Override
@@ -99,8 +100,8 @@ public class MasterWriter extends ItemStreamSupport implements ItemWriter<Master
 				if (master.getArtists() != null && !master.getArtists().getArtists().isEmpty()) {
 					Artist artist = master.getArtists().getArtists().get(0);
 					if (artist != null) {
-						fields.put(FIELD_ARTIST, artist.getName());
-						fields.put(FIELD_ARTISTID, artist.getId());
+						fields.put(ARTIST, artist.getName());
+						fields.put(ARTIST_ID, artist.getId());
 						futures.add(commands.sugadd(props.getArtistSuggestionIndex(), artist.getName(), 1, true,
 								artist.getId()));
 					}
@@ -112,9 +113,9 @@ public class MasterWriter extends ItemStreamSupport implements ItemWriter<Master
 				if (master.getStyles() != null && master.getStyles().getStyles() != null) {
 					genres.addAll(master.getStyles().getStyles());
 				}
-				fields.put(FIELD_GENRES, String.join(props.getHashArrayDelimiter(), sanitize(genres)));
-				fields.put(FIELD_TITLE, master.getTitle());
-				fields.put(FIELD_YEAR, master.getYear());
+				fields.put(GENRES, String.join(props.getHashArrayDelimiter(), sanitize(genres)));
+				fields.put(TITLE, master.getTitle());
+				fields.put(YEAR, master.getYear());
 				futures.add(commands.add(props.getMasterIndex(), master.getId(), 1, fields));
 			}
 			commands.flushCommands();

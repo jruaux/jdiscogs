@@ -5,11 +5,16 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class MasterId {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public @Data class MasterId {
 
 	@XmlValue
 	private String masterId;

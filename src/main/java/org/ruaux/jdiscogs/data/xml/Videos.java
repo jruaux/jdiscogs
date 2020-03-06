@@ -1,19 +1,25 @@
 package org.ruaux.jdiscogs.data.xml;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Singular;
 
-@Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Videos {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public @Data class Videos {
 
 	@XmlElement(name = "video")
-	private List<Video> videos = new ArrayList<>();
+	@Singular
+	private List<Video> videos;
 
 }

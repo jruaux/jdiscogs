@@ -6,12 +6,17 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
 @XmlRootElement(name = "video")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Video {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public @Data class Video {
 
 	@XmlAttribute(name = "duration")
 	private Integer duration;

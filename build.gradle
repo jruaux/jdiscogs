@@ -31,9 +31,11 @@ dependencies {
 		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jdbc'
 	}
 	implementation 'org.springframework:spring-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
-	api 'com.redislabs:spring-redisearch:1.12.8'
-	implementation 'org.glassfish.jaxb:jaxb-runtime'
+	api 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+	api 'com.redislabs:spring-redisearch:1.13.0'
+	api 'org.glassfish.jaxb:jaxb-runtime'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.2'
+	implementation 'com.fasterxml.woodstox:woodstox-core:5.1.0'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}

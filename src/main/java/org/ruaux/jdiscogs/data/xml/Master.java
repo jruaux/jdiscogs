@@ -6,13 +6,14 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.springframework.data.redis.core.RedisHash;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @XmlRootElement(name = "master")
 @XmlAccessorType(XmlAccessType.FIELD)
-@RedisHash("master")
+@NoArgsConstructor
+@AllArgsConstructor
 public @Data class Master {
 
 	@XmlAttribute(name = "id")
@@ -34,7 +35,7 @@ public @Data class Master {
 	@XmlElement(name = "year")
 	private String year;
 	@XmlElement(name = "videos")
-	private Videos videos = new Videos();
+	private Videos videos;
 
 	public Image getPrimaryImage() {
 		if (images == null) {
