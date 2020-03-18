@@ -1,13 +1,13 @@
 plugins {
-	id 'org.springframework.boot' version '2.2.4.RELEASE'
+	id 'org.springframework.boot' version '2.2.5.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
     id 'java-library'
     id 'maven-publish'
     id 'com.jfrog.bintray' version '1.8.4'
-    id 'com.github.ben-manes.versions' version '0.27.0'
+    id 'com.github.ben-manes.versions' version '0.28.0'
     id 'net.researchgate.release' version '2.8.1'
-    id 'com.github.breadmoirai.github-release' version '2.2.10'
+    id 'com.github.breadmoirai.github-release' version '2.2.12'
 }
 
 bootJar {
@@ -19,6 +19,7 @@ jar {
 }
 
 repositories {
+	jcenter()
 	mavenCentral()
 	mavenLocal()
 }
@@ -34,12 +35,9 @@ dependencies {
 	api 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 	api 'com.redislabs:spring-redisearch:1.13.0'
 	api 'org.glassfish.jaxb:jaxb-runtime'
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.2'
-	implementation 'com.fasterxml.woodstox:woodstox-core:5.1.0'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
-	implementation 'com.thoughtworks.xstream:xstream:1.4.11.1'
 }
 
 test {
@@ -124,7 +122,8 @@ publishing {
 
 group = 'org.ruaux'
 description = 'JDiscogs'
-sourceCompatibility = '1.8'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 task printVersion {
     doLast {

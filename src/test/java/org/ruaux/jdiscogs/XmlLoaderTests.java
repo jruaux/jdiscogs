@@ -2,10 +2,8 @@ package org.ruaux.jdiscogs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,10 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.redislabs.springredisearch.RediSearchAutoConfiguration;
 
 @ExtendWith(SpringExtension.class)
@@ -60,14 +54,6 @@ public class XmlLoaderTests {
 		List<Track> subTracks = track.getSubTrackList().getTracks();
 		assertEquals(4, subTracks.size());
 
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Test
-	public void testJackson() throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper xmlmapper = new XmlMapper();
-		Map map = xmlmapper.readValue(getResourceAsStream("releases.xml"), Map.class);
-		System.out.println(map);
 	}
 
 }
