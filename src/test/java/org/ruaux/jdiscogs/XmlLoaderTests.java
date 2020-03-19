@@ -11,10 +11,10 @@ import javax.xml.bind.Unmarshaller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.ruaux.jdiscogs.data.JDiscogsBatchConfiguration;
 import org.ruaux.jdiscogs.data.xml.Release;
 import org.ruaux.jdiscogs.data.xml.Track;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -22,8 +22,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.redislabs.springredisearch.RediSearchAutoConfiguration;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { JDiscogsBatchConfiguration.class, RedisAutoConfiguration.class,
+@SpringBootTest(classes = { JDiscogsAutoConfiguration.class, RedisAutoConfiguration.class,
 		RediSearchAutoConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebClient
 public class XmlLoaderTests {
 
 	@Test
