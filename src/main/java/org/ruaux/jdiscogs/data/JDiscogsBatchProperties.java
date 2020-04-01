@@ -10,6 +10,7 @@ import java.net.URL;
 @ConfigurationProperties(prefix = "discogs")
 public @Data class JDiscogsBatchProperties {
 
+
 	private String hashArrayDelimiter = ",";
 	private String releasesUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_releases.xml.gz";
 	private String mastersUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_masters.xml.gz";
@@ -26,5 +27,4 @@ public @Data class JDiscogsBatchProperties {
 	private Range imageHeight = Range.builder().min(400).max(600).build();
 	private Range imageWidth = Range.builder().min(400).max(600).build();
 	private Range imageRatio = Range.builder().min(.95).max(1.05).build();
-
 }
