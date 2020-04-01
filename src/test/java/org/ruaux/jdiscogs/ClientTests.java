@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JDiscogsApiProperties.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-public class JDiscogsClientTests {
+public class ClientTests {
 
 	@Autowired
 	private JDiscogsApiProperties props;

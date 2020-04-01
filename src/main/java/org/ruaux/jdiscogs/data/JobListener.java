@@ -31,11 +31,7 @@ public class JobListener extends ItemListenerSupport<Object, Object> {
             long seconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
             if (seconds > 0) {
                 long itemsPerSecond = count / seconds;
-                if (log.isDebugEnabled()) {
-                    log.debug("Wrote {} items ({} items/sec)", count, itemsPerSecond);
-                } else {
-                    log.info("Wrote {} {} ({}/sec)", formatter.format(count), name, formatter.format(itemsPerSecond));
-                }
+                log.info("Wrote {} {} items ({}/sec)", formatter.format(count), name, formatter.format(itemsPerSecond));
                 lastPrint = System.currentTimeMillis();
             }
         }

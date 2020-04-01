@@ -3,12 +3,16 @@ package org.ruaux.jdiscogs.data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
+import org.springframework.core.io.Resource;
+
+import java.net.URL;
 
 @ConfigurationProperties(prefix = "discogs")
 public @Data class JDiscogsBatchProperties {
 
 	private String hashArrayDelimiter = ",";
-	private String dataUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_{entity}.xml.gz";
+	private String releasesUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_releases.xml.gz";
+	private String mastersUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_masters.xml.gz";
 	private int batchSize = 50;
 	private int threads = 1;
 	private boolean forceLoad = false;

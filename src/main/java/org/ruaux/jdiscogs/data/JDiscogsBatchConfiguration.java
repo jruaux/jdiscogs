@@ -9,6 +9,7 @@ import com.redislabs.lettusearch.index.field.TagField;
 import com.redislabs.lettusearch.index.field.TextField;
 import com.redislabs.lettusearch.search.Document;
 import com.redislabs.springredisearch.RediSearchAutoConfiguration;
+import lombok.extern.slf4j.Slf4j;
 import org.ruaux.jdiscogs.data.model.Master;
 import org.ruaux.jdiscogs.data.model.Release;
 import org.springframework.batch.core.ItemWriteListener;
@@ -18,7 +19,6 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
@@ -48,9 +48,10 @@ import java.net.URI;
 
 import static org.ruaux.jdiscogs.data.Fields.*;
 
+@Slf4j
 @Configuration
-@EnableConfigurationProperties(JDiscogsBatchProperties.class)
 @EnableBatchProcessing
+@EnableConfigurationProperties(JDiscogsBatchProperties.class)
 @Import({RediSearchAutoConfiguration.class, XmlCodec.class})
 public class JDiscogsBatchConfiguration {
 
@@ -69,23 +70,13 @@ public class JDiscogsBatchConfiguration {
     }
 
     @Bean
-    Resource releasesResource() throws IOException {
-        return resource("releases");
+    ItemReader<Release> releaseItemReader() throws IOException {
+        return reader(Release.class, resource(props.getReleasesUrl()), "release");
     }
 
     @Bean
-    Resource mastersResource() throws IOException {
-        return resource("masters");
-    }
-
-    @Bean
-    ItemReader<Release> releaseItemReader(Resource releasesResource) {
-        return reader(Release.class, releasesResource, "release");
-    }
-
-    @Bean
-    ItemReader<Master> masterItemReader(Resource mastersResource) {
-        return reader(Master.class, mastersResource, "master");
+    ItemReader<Master> masterItemReader() throws IOException {
+        return reader(Master.class, resource(props.getMastersUrl()), "master");
     }
 
     @Bean
@@ -108,7 +99,7 @@ public class JDiscogsBatchConfiguration {
     private <T> ItemReader<T> reader(Class<T> entityClass, Resource resource, String root) {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setClassesToBeBound(entityClass);
-        return synchronizedReader(new StaxEventItemReaderBuilder<T>().name(root + "-reader")
+        return synchronizedReader(new StaxEventItemReaderBuilder<T>().name(root + "Reader")
                 .addFragmentRootElements(root).resource(resource).unmarshaller(marshaller).build());
     }
 
@@ -116,8 +107,8 @@ public class JDiscogsBatchConfiguration {
         return new SynchronizedItemStreamReaderBuilder<T>().delegate(reader).build();
     }
 
-    private Resource resource(String entity) throws IOException {
-        URI uri = URI.create(props.getDataUrl().replace("{entity}", entity));
+    private Resource resource(String url) throws IOException {
+        URI uri = URI.create(url);
         Resource resource = getResource(uri);
         if (uri.getPath().endsWith(".gz")) {
             return new GZIPResource(resource);
@@ -153,7 +144,7 @@ public class JDiscogsBatchConfiguration {
     }
 
     private IndexDropStep indexDropStep(String index) {
-        return IndexDropStep.builder().ignoreErrors(true).jobRepository(jobRepository).name(index + "-index-drop-step").connection(connection).index(index).build();
+        return IndexDropStep.builder().ignoreErrors(true).jobRepository(jobRepository).name(index + "IndexDropStep").connection(connection).index(index).build();
     }
 
 
@@ -168,41 +159,40 @@ public class JDiscogsBatchConfiguration {
     }
 
     private IndexCreateStep indexCreateStep(String index, Schema schema) {
-        return IndexCreateStep.builder().jobRepository(jobRepository).name(index + "-index-create-step").connection(connection).index(index)
+        return IndexCreateStep.builder().jobRepository(jobRepository).name(index + "IndexCreateStep").connection(connection).index(index)
                 .schema(schema).build();
     }
 
     @Bean
     Job releaseLoadJob(IndexLoadDecider releaseIndexLoadDecider, IndexDropStep releaseIndexDropStep, IndexCreateStep releaseIndexCreateStep, TaskletStep releaseLoadStep) {
-        return job("release-load-job", releaseIndexLoadDecider, releaseIndexDropStep, releaseIndexCreateStep, releaseLoadStep);
+        return job("release", releaseIndexLoadDecider, releaseIndexDropStep, releaseIndexCreateStep, releaseLoadStep);
     }
 
     @Bean
     Job masterLoadJob(IndexLoadDecider masterIndexLoadDecider, IndexDropStep masterIndexDropStep, IndexCreateStep masterIndexCreateStep, TaskletStep masterLoadStep) {
-        return job("master-load-job", masterIndexLoadDecider, masterIndexDropStep, masterIndexCreateStep, masterLoadStep);
+        return job("master", masterIndexLoadDecider, masterIndexDropStep, masterIndexCreateStep, masterLoadStep);
     }
 
     private Job job(String name, IndexLoadDecider decider, IndexDropStep indexDropStep, IndexCreateStep indexCreateStep, TaskletStep loadStep) {
-        Flow flow = new FlowBuilder<Flow>("loadFlow")
-                .start(decider)
-                .on(IndexLoadDecider.YES)
-                .to(indexDropStep).next(indexCreateStep).next(loadStep)
-                .end();
-        return jobBuilderFactory.get(name).incrementer(new RunIdIncrementer()).start(flow).end().build();
+        TaskletStep skipStep = stepBuilderFactory.get(name + "NoFlow").tasklet(SkipStep.builder().name(name + " load job").build()).build();
+        Flow flow = new FlowBuilder<Flow>(name + "Flow").start(decider)
+                .on(IndexLoadDecider.PROCEED).to(indexDropStep).next(indexCreateStep).next(loadStep)
+                .from(decider).on(IndexLoadDecider.SKIP).to(skipStep).end();
+        return jobBuilderFactory.get(name + "Job").start(flow).end().build();
     }
 
     @Bean
     TaskletStep releaseLoadStep(ItemReader<Release> releaseItemReader, ItemProcessor<Release, Document<String, String>> releaseProcessor, ItemWriter<Document<String, String>> releaseWriter) {
-        return loadStep(stepBuilderFactory, "releases", releaseItemReader, releaseProcessor, releaseWriter);
+        return loadStep("release", stepBuilderFactory, releaseItemReader, releaseProcessor, releaseWriter);
     }
 
     @Bean
     TaskletStep masterLoadStep(ItemReader<Master> masterItemReader, ItemProcessor<Master, Document<String, String>> masterProcessor, ItemWriter<Document<String, String>> masterWriter) {
-        return loadStep(stepBuilderFactory, "masters", masterItemReader, masterProcessor, masterWriter);
+        return loadStep("master", stepBuilderFactory, masterItemReader, masterProcessor, masterWriter);
     }
 
-    private <T> TaskletStep loadStep(StepBuilderFactory stepBuilderFactory, String name, ItemReader<T> reader, ItemProcessor<T, Document<String, String>> processor, ItemWriter<Document<String, String>> writer) {
-        return stepBuilderFactory.get(name + "-load-step").<T, Document<String, String>>chunk(props.getBatchSize())
+    private <T> TaskletStep loadStep(String name, StepBuilderFactory stepBuilderFactory, ItemReader<T> reader, ItemProcessor<T, Document<String, String>> processor, ItemWriter<Document<String, String>> writer) {
+        return stepBuilderFactory.get(name + "LoadStep").<T, Document<String, String>>chunk(props.getBatchSize())
                 .reader(reader).processor(processor).writer(writer)
                 .listener((ItemWriteListener<?>) JobListener.builder().name(name).build()).taskExecutor(jobTaskExecutor())
                 .throttleLimit(props.getThreads()).build();

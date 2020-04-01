@@ -14,8 +14,8 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 @Builder
 public class IndexLoadDecider implements JobExecutionDecider {
 
-    public static final String YES = "YES";
-    public static final String NO = "NO";
+    public static final String PROCEED = "PROCEED";
+    public static final String SKIP = "SKIP";
 
     @Setter
     private StatefulRediSearchConnection<?, ?> connection;
@@ -27,9 +27,9 @@ public class IndexLoadDecider implements JobExecutionDecider {
     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
         try {
             IndexInfo info = RediSearchUtils.getInfo(connection.sync().ftInfo(index));
-            return new FlowExecutionStatus(range.accept(info.getNumDocs()) ? YES : NO);
+            return new FlowExecutionStatus(range.accept(info.getNumDocs()) ? SKIP : PROCEED);
         } catch (RedisCommandExecutionException e) {
-            return new FlowExecutionStatus(YES);
+            return new FlowExecutionStatus(PROCEED);
         }
     }
 
