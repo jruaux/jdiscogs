@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data.xml;
+package org.ruaux.jdiscogs.data.model;
 
 import java.util.List;
 
@@ -16,10 +16,10 @@ import lombok.Singular;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public @Data class Genres {
+public @Data class Images {
 
-	@XmlElement(name = "genre")
+	@XmlElement(name = "image")
 	@Singular
-	private List<String> genres;
+	private List<Image> images;
 
 }

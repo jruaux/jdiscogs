@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data.xml;
+package org.ruaux.jdiscogs.data.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -10,18 +10,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@XmlRootElement(name = "label")
+@XmlRootElement(name = "identifier")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public @Data class Label {
+public @Data class Identifier {
 
-	@XmlAttribute(name = "id")
-	private String id;
-	@XmlAttribute(name = "catno")
-	private String catno;
-	@XmlAttribute(name = "name")
-	private String name;
+	@XmlAttribute(name = "description")
+	private String description;
+	@XmlAttribute(name = "type")
+	private String type;
+	@XmlAttribute(name = "value")
+	private String value;
 
 }

@@ -11,8 +11,8 @@ import javax.xml.bind.Unmarshaller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.ruaux.jdiscogs.data.xml.Release;
-import org.ruaux.jdiscogs.data.xml.Track;
+import org.ruaux.jdiscogs.data.model.Release;
+import org.ruaux.jdiscogs.data.model.Track;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;

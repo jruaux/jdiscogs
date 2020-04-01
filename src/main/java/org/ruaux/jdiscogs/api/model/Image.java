@@ -11,6 +11,6 @@ public class Image {
 	private int width;
 	
 	public boolean isPrimary() {
-		return org.ruaux.jdiscogs.data.xml.Image.TYPE_PRIMARY.equals(type);
+		return org.ruaux.jdiscogs.data.model.Image.TYPE_PRIMARY.equals(type);
 	}
 }

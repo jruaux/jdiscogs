@@ -8,19 +8,19 @@ import lombok.Data;
 public @Data class JDiscogsBatchProperties {
 
 	private String hashArrayDelimiter = ",";
-	private String dataUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_{entity}s.xml.gz";
+	private String dataUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_{entity}.xml.gz";
 	private int batchSize = 50;
 	private int threads = 1;
 	private boolean forceLoad = false;
 	private boolean noOp = false;
 	private String releaseIndex = "releases";
+	private Range releaseItemCount = Range.builder().min(10000000).max(Double.MAX_VALUE).build();
+	private Range masterItemCount = Range.builder().min(1000000).max(Double.MAX_VALUE).build();
 	private String masterIndex = "masters";
 	private String artistSuggestionIndex = "artists";
-	private double imageRatioMin = .9;
-	private double imageRatioMax = 1.1;
 	private int minImages = 2;
-	private Range imageHeight = new Range(400, 600);
-	private Range imageWidth = new Range(400, 600);
-	private Range imageRatio = new Range(.95, 1.05);
+	private Range imageHeight = Range.builder().min(400).max(600).build();
+	private Range imageWidth = Range.builder().min(400).max(600).build();
+	private Range imageRatio = Range.builder().min(.95).max(1.05).build();
 
 }

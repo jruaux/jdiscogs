@@ -1,25 +1,24 @@
-package org.ruaux.jdiscogs.data.xml;
-
-import java.util.List;
+package org.ruaux.jdiscogs.data.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public @Data class Images {
+public @Data class MasterId {
 
-	@XmlElement(name = "image")
-	@Singular
-	private List<Image> images;
+	@XmlValue
+	private String masterId;
+	@XmlAttribute(name = "is_main_release")
+	private Boolean mainRelease;
 
 }

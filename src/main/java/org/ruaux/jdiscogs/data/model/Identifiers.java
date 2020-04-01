@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data.xml;
+package org.ruaux.jdiscogs.data.model;
 
 import java.util.List;
 
@@ -16,10 +16,10 @@ import lombok.Singular;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public @Data class SubTrackList {
+public @Data class Identifiers {
 
-	@XmlElement(name = "track")
+	@XmlElement(name = "identifier")
 	@Singular
-	private List<Track> tracks;
+	private List<Identifier> identifiers;
 
 }

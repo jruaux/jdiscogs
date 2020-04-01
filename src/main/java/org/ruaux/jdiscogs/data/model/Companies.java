@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data.xml;
+package org.ruaux.jdiscogs.data.model;
 
 import java.util.List;
 
@@ -12,14 +12,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@XmlAccessorType(XmlAccessType.FIELD)
-public @Data class Artists {
+public @Data class Companies {
 
-	@XmlElement(name = "artist")
+	@XmlElement(name = "company")
 	@Singular
-	private List<Artist> artists;
+	private List<Company> companies;
 
 }

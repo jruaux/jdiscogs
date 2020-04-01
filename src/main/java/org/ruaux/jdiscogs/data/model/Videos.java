@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data.xml;
+package org.ruaux.jdiscogs.data.model;
 
 import java.util.List;
 
@@ -16,10 +16,10 @@ import lombok.Singular;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public @Data class Identifiers {
+public @Data class Videos {
 
-	@XmlElement(name = "identifier")
+	@XmlElement(name = "video")
 	@Singular
-	private List<Identifier> identifiers;
+	private List<Video> videos;
 
 }

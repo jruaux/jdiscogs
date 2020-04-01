@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data.xml;
+package org.ruaux.jdiscogs.data.model;
 
 import java.util.List;
 
@@ -16,10 +16,10 @@ import lombok.Singular;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public @Data class Styles {
+public @Data class Formats {
 
-	@XmlElement(name = "style")
+	@XmlElement(name = "format")
 	@Singular
-	private List<String> styles;
+	private List<Format> formats;
 
 }

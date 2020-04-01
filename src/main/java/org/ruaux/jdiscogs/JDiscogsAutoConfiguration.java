@@ -1,10 +1,12 @@
 package org.ruaux.jdiscogs;
 
+import com.redislabs.springredisearch.RediSearchAutoConfiguration;
 import org.ruaux.jdiscogs.api.DiscogsClient;
 import org.ruaux.jdiscogs.api.JDiscogsApiProperties;
 import org.ruaux.jdiscogs.data.JDiscogsBatchConfiguration;
-import org.ruaux.jdiscogs.data.ReleaseCodec;
+import org.ruaux.jdiscogs.data.XmlCodec;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +15,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JDiscogsApiProperties.class)
-@Import({ JDiscogsBatchConfiguration.class, ReleaseCodec.class })
+@Import({ JDiscogsBatchConfiguration.class, RestTemplateAutoConfiguration.class})
 public class JDiscogsAutoConfiguration {
 
 	@Bean
