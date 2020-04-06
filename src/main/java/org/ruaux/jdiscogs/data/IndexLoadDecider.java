@@ -6,11 +6,13 @@ import com.redislabs.lettusearch.index.IndexInfo;
 import io.lettuce.core.RedisCommandExecutionException;
 import lombok.Builder;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 
+@Slf4j
 @Builder
 public class IndexLoadDecider implements JobExecutionDecider {
 
@@ -18,16 +20,18 @@ public class IndexLoadDecider implements JobExecutionDecider {
     public static final String SKIP = "SKIP";
 
     @Setter
-    private StatefulRediSearchConnection<?, ?> connection;
+    private StatefulRediSearchConnection<String, ?> connection;
     @Setter
     private String index;
     @Setter
-    private Range range;
+    private long minItemCount;
 
     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
         try {
             IndexInfo info = RediSearchUtils.getInfo(connection.sync().ftInfo(index));
-            return new FlowExecutionStatus(range.accept(info.getNumDocs()) ? SKIP : PROCEED);
+            boolean withinRange = info.getNumDocs()>=minItemCount;
+            log.info("Index {}: numDocs={} minItemCount={}", index, info.getNumDocs(), minItemCount);
+            return new FlowExecutionStatus(withinRange ? SKIP : PROCEED);
         } catch (RedisCommandExecutionException e) {
             return new FlowExecutionStatus(PROCEED);
         }

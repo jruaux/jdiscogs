@@ -19,12 +19,12 @@ public @Data class JDiscogsBatchProperties {
 	private boolean forceLoad = false;
 	private boolean noOp = false;
 	private String releaseIndex = "releases";
-	private Range releaseItemCount = Range.builder().min(10000000).max(Double.MAX_VALUE).build();
-	private Range masterItemCount = Range.builder().min(1000000).max(Double.MAX_VALUE).build();
+	private int minReleaseItemCount = 10000000;
+	private int minMasterItemCount = 1000000;
 	private String masterIndex = "masters";
 	private String artistSuggestionIndex = "artists";
 	private int minImages = 2;
-	private Range imageHeight = Range.builder().min(400).max(600).build();
-	private Range imageWidth = Range.builder().min(400).max(600).build();
-	private Range imageRatio = Range.builder().min(.95).max(1.05).build();
+	private int minImageHeight = 400;
+	private int minImageWidth = 400;
+	private double imageRatioTolerance = .05;
 }

@@ -63,9 +63,7 @@ public class MasterProcessor implements ItemProcessor<Master, Document<String, S
 		if (image == null) {
 			return false;
 		}
-		return withinRange(image.getHeight(), props.getImageHeight())
-				&& withinRange(image.getWidth(), props.getImageWidth())
-				&& withinRange(image.getRatio(), props.getImageRatio());
+		return image.getHeight()>=props.getMinImageHeight() && image.getWidth()>=props.getMinImageWidth() && Math.abs(1-image.getRatio())<=props.getImageRatioTolerance();
 	}
 
 	private boolean withinRange(Number value, Range range) {

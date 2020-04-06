@@ -3,6 +3,7 @@ package org.ruaux.jdiscogs;
 import com.redislabs.lettusearch.RediSearchUtils;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import com.redislabs.lettusearch.index.IndexInfo;
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +25,11 @@ public class DataLoadTests {
 	private StatefulRediSearchConnection<String,String> connection;
 	@Autowired
 	private JDiscogsBatchProperties props;
+
+	@Before
+	public void cleanup() {
+		connection.sync().flushall();
+	}
 
 	@Test
 	public void testMasterLoadJob() {

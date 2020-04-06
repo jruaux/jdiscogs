@@ -34,9 +34,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
     implementation 'org.springframework:spring-web'
-    api 'com.redislabs:spring-redisearch:1.13.3'
+    api 'com.redislabs:spring-redisearch:2.1.0'
     api 'org.glassfish.jaxb:jaxb-runtime'
-    implementation 'com.redislabs:spring-batch-redisearch:1.0.0'
+    implementation 'com.redislabs:spring-batch-redisearch:2.1.0'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

@@ -125,55 +125,55 @@ public class JDiscogsBatchConfiguration {
 
     @Bean
     IndexLoadDecider releaseIndexLoadDecider() {
-        return IndexLoadDecider.builder().connection(connection).index(props.getReleaseIndex()).range(props.getReleaseItemCount()).build();
+        return IndexLoadDecider.builder().connection(connection).index(props.getReleaseIndex()).minItemCount(props.getMinReleaseItemCount()).build();
     }
 
     @Bean
     IndexLoadDecider masterIndexLoadDecider() {
-        return IndexLoadDecider.builder().connection(connection).index(props.getMasterIndex()).range(props.getMasterItemCount()).build();
+        return IndexLoadDecider.builder().connection(connection).index(props.getMasterIndex()).minItemCount(props.getMinMasterItemCount()).build();
     }
 
     @Bean
-    IndexDropStep releaseIndexDropStep() {
+    IndexDropStep<String> releaseIndexDropStep() {
         return indexDropStep(props.getReleaseIndex());
     }
 
     @Bean
-    IndexDropStep masterIndexDropStep() {
+    IndexDropStep<String> masterIndexDropStep() {
         return indexDropStep(props.getMasterIndex());
     }
 
-    private IndexDropStep indexDropStep(String index) {
-        return IndexDropStep.builder().ignoreErrors(true).jobRepository(jobRepository).name(index + "IndexDropStep").connection(connection).index(index).build();
+    private IndexDropStep<String> indexDropStep(String index) {
+        return IndexDropStep.<String>builder().ignoreErrors(true).jobRepository(jobRepository).name(index + "IndexDropStep").connection(connection).index(index).build();
     }
 
 
     @Bean
-    IndexCreateStep releaseIndexCreateStep(Schema releaseSchema) {
+    IndexCreateStep<String> releaseIndexCreateStep(Schema releaseSchema) {
         return indexCreateStep(props.getReleaseIndex(), releaseSchema);
     }
 
     @Bean
-    IndexCreateStep masterIndexCreateStep(Schema masterSchema) {
+    IndexCreateStep<String> masterIndexCreateStep(Schema masterSchema) {
         return indexCreateStep(props.getMasterIndex(), masterSchema);
     }
 
-    private IndexCreateStep indexCreateStep(String index, Schema schema) {
-        return IndexCreateStep.builder().jobRepository(jobRepository).name(index + "IndexCreateStep").connection(connection).index(index)
+    private IndexCreateStep<String> indexCreateStep(String index, Schema schema) {
+        return IndexCreateStep.<String>builder().jobRepository(jobRepository).name(index + "IndexCreateStep").connection(connection).index(index)
                 .schema(schema).build();
     }
 
     @Bean
-    Job releaseLoadJob(IndexLoadDecider releaseIndexLoadDecider, IndexDropStep releaseIndexDropStep, IndexCreateStep releaseIndexCreateStep, TaskletStep releaseLoadStep) {
+    Job releaseLoadJob(IndexLoadDecider releaseIndexLoadDecider, IndexDropStep<String> releaseIndexDropStep, IndexCreateStep<String> releaseIndexCreateStep, TaskletStep releaseLoadStep) {
         return job("release", releaseIndexLoadDecider, releaseIndexDropStep, releaseIndexCreateStep, releaseLoadStep);
     }
 
     @Bean
-    Job masterLoadJob(IndexLoadDecider masterIndexLoadDecider, IndexDropStep masterIndexDropStep, IndexCreateStep masterIndexCreateStep, TaskletStep masterLoadStep) {
+    Job masterLoadJob(IndexLoadDecider masterIndexLoadDecider, IndexDropStep<String> masterIndexDropStep, IndexCreateStep<String> masterIndexCreateStep, TaskletStep masterLoadStep) {
         return job("master", masterIndexLoadDecider, masterIndexDropStep, masterIndexCreateStep, masterLoadStep);
     }
 
-    private Job job(String name, IndexLoadDecider decider, IndexDropStep indexDropStep, IndexCreateStep indexCreateStep, TaskletStep loadStep) {
+    private Job job(String name, IndexLoadDecider decider, IndexDropStep<String> indexDropStep, IndexCreateStep<String> indexCreateStep, TaskletStep loadStep) {
         TaskletStep skipStep = stepBuilderFactory.get(name + "NoFlow").tasklet(SkipStep.builder().name(name + " load job").build()).build();
         Flow flow = new FlowBuilder<Flow>(name + "Flow").start(decider)
                 .on(IndexLoadDecider.PROCEED).to(indexDropStep).next(indexCreateStep).next(loadStep)
