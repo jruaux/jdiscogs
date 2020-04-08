@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @RedisHash
 public @Data class Release {
 
-	private static final Pattern POSITION_PATTERN = Pattern.compile("^([A-Z]|(\\d+[\\-\\:]))?\\d+$");
+	private static final Pattern POSITION_PATTERN = Pattern.compile("^([A-Z]|(\\d+[\\-.:]))?\\d+\\.?$");
 
 	@XmlAttribute(name = "id")
 	private String id;
