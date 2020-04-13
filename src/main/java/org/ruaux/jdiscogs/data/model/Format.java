@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public @Data class Format {
 
+	private final static String CD = "CD";
+
 	@XmlAttribute(name = "name")
 	private String name;
 	@XmlAttribute(name = "qty")
@@ -26,5 +28,11 @@ public @Data class Format {
 	private String text;
 	@XmlElement(name = "descriptions")
 	private Descriptions descriptions;
+
+	public boolean isCd() {
+		return CD.equalsIgnoreCase(name);
+	}
+
+
 
 }

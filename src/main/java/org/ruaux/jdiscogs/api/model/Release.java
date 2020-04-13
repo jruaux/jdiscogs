@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class Release {
 
+	private Long id;
 	private String status;
 	private List<Video> videos;
 	private List<String> series;
@@ -17,7 +18,6 @@ public class Release {
 	private List<Artist> artists;
 	private List<Image> images;
 	private Integer formatQuantity;
-	private Long id;
 	private String artistsSort;
 	private List<String> genres;
 	private String thumb;
