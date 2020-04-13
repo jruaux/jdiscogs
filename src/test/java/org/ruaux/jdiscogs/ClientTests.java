@@ -4,10 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.ruaux.jdiscogs.api.DiscogsClient;
-import org.ruaux.jdiscogs.api.JDiscogsApiProperties;
-import org.ruaux.jdiscogs.api.model.Master;
-import org.ruaux.jdiscogs.api.model.Release;
+import org.ruaux.jdiscogs.model.Master;
+import org.ruaux.jdiscogs.model.Release;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -15,11 +13,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = JDiscogsApiProperties.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = JDiscogsProperties.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ClientTests {
 
 	@Autowired
-	private JDiscogsApiProperties props;
+	private JDiscogsProperties props;
 	@Autowired
 	private TestRestTemplate restTemplate;
 
@@ -61,7 +59,7 @@ public class ClientTests {
 		assertEquals("Jazz-Funk", release.getStyles().get(1));
 		assertEquals("Pop Rock", release.getStyles().get(2));
 		assertEquals(1, release.getFormats().size());
-		assertEquals("9", release.getFormats().get(0).getQty());
+		assertEquals(9, release.getFormats().get(0).getQty());
 		assertEquals("FLAC", release.getFormats().get(0).getDescriptions().get(0));
 		assertEquals("Album", release.getFormats().get(0).getDescriptions().get(1));
 		assertEquals("Reissue", release.getFormats().get(0).getDescriptions().get(2));

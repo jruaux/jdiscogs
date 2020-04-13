@@ -1,49 +1,41 @@
 package org.ruaux.jdiscogs.data;
 
+import org.ruaux.jdiscogs.model.Master;
+import org.ruaux.jdiscogs.model.Release;
+import org.springframework.oxm.xstream.XStreamMarshaller;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import org.ruaux.jdiscogs.data.model.Master;
-import org.ruaux.jdiscogs.data.model.Release;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
-
 @Component
-public class XmlCodec implements InitializingBean {
+public class XmlCodec {
 
-	private Marshaller marshaller;
-	private Unmarshaller unmarshaller;
+    private final XStreamMarshaller marshaller;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		JAXBContext context = JAXBContext.newInstance(Release.class, Master.class);
-		this.unmarshaller = context.createUnmarshaller();
-		this.marshaller = context.createMarshaller();
-	}
+    public XmlCodec(XStreamMarshaller marshaller) {
+        this.marshaller = marshaller;
+    }
 
-	public String getXml(Master master) throws JAXBException {
-		StringWriter writer = new StringWriter();
-		marshaller.marshal(master, writer);
-		return writer.toString();
-	}
+    public String getXml(Master master) throws IOException {
+        StringWriter writer = new StringWriter();
+        marshaller.marshalWriter(master, writer);
+        return writer.toString();
+    }
 
-	public String getXml(Release release) throws JAXBException {
-		StringWriter writer = new StringWriter();
-		marshaller.marshal(release, writer);
-		return writer.toString();
-	}
+    public String getXml(Release release) throws IOException {
+        StringWriter writer = new StringWriter();
+        marshaller.marshalWriter(release, writer);
+        return writer.toString();
+    }
 
-	public Master getMaster(String xml) throws JAXBException {
-		return (Master) unmarshaller.unmarshal(new StringReader(xml));
-	}
+    public Master getMaster(String xml) throws IOException {
+        return (Master) marshaller.unmarshalReader(new StringReader(xml));
+    }
 
-	public Release getRelease(String xml) throws JAXBException {
-		return (Release) unmarshaller.unmarshal(new StringReader(xml));
-	}
+    public Release getRelease(String xml) throws IOException {
+        return (Release) marshaller.unmarshalReader(new StringReader(xml));
+    }
 
 }

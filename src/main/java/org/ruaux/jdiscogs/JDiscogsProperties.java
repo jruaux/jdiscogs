@@ -1,21 +1,19 @@
-package org.ruaux.jdiscogs.data;
+package org.ruaux.jdiscogs;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
-import org.springframework.core.io.Resource;
-
-import java.net.URL;
 
 @ConfigurationProperties(prefix = "discogs")
-public @Data class JDiscogsBatchProperties {
+public @Data class JDiscogsProperties {
 
-
+	private String apiUrl = "https://api.discogs.com/{entity}/{id}";
+	private String token;
+	private String userAgent = JDiscogsProperties.class.getPackage().getName() + ".useragent";
 	private String hashArrayDelimiter = ",";
 	private String releasesUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_releases.xml.gz";
 	private String mastersUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_masters.xml.gz";
 	private int batchSize = 50;
-	private int threads = 1;
 	private boolean forceLoad = false;
 	private boolean noOp = false;
 	private String releaseIndex = "releases";
@@ -27,4 +25,5 @@ public @Data class JDiscogsBatchProperties {
 	private int minImageHeight = 400;
 	private int minImageWidth = 400;
 	private double imageRatioTolerance = .05;
+
 }

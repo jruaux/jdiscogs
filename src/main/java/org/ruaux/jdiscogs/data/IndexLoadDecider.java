@@ -29,7 +29,7 @@ public class IndexLoadDecider implements JobExecutionDecider {
     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
         try {
             IndexInfo info = RediSearchUtils.getInfo(connection.sync().ftInfo(index));
-            boolean withinRange = info.getNumDocs()>=minItemCount;
+            boolean withinRange = info.getNumDocs() >= minItemCount;
             log.info("Index {}: numDocs={} minItemCount={}", index, info.getNumDocs(), minItemCount);
             return new FlowExecutionStatus(withinRange ? SKIP : PROCEED);
         } catch (RedisCommandExecutionException e) {

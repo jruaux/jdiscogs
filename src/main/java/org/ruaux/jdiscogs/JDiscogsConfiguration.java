@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data;
+package org.ruaux.jdiscogs;
 
 import com.redislabs.lettusearch.RediSearchClient;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
@@ -9,9 +9,10 @@ import com.redislabs.lettusearch.index.field.TagField;
 import com.redislabs.lettusearch.index.field.TextField;
 import com.redislabs.lettusearch.search.Document;
 import com.redislabs.springredisearch.RediSearchAutoConfiguration;
+import com.thoughtworks.xstream.XStream;
 import lombok.extern.slf4j.Slf4j;
-import org.ruaux.jdiscogs.data.model.Master;
-import org.ruaux.jdiscogs.data.model.Release;
+import org.ruaux.jdiscogs.data.*;
+import org.ruaux.jdiscogs.model.*;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -31,37 +32,40 @@ import org.springframework.batch.item.support.builder.SynchronizedItemStreamRead
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.batch.step.redisearch.IndexCreateStep;
 import org.springframework.batch.step.redisearch.IndexDropStep;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.oxm.xstream.XStreamMarshaller;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.ruaux.jdiscogs.data.Fields.*;
 
 @Slf4j
-@Configuration
+@Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(JDiscogsProperties.class)
+@Import({RestTemplateAutoConfiguration.class, RediSearchAutoConfiguration.class, ReleaseProcessor.class, MasterProcessor.class, TextSanitizer.class, XmlCodec.class})
 @EnableBatchProcessing
-@EnableConfigurationProperties(JDiscogsBatchProperties.class)
-@Import({RediSearchAutoConfiguration.class, XmlCodec.class})
-public class JDiscogsBatchConfiguration {
+public class JDiscogsConfiguration {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final JobRepository jobRepository;
-    private JDiscogsBatchProperties props;
-    private StatefulRediSearchConnection<String, String> connection;
+    private final JDiscogsProperties props;
+    private final StatefulRediSearchConnection<String, String> connection;
 
-    public JDiscogsBatchConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, JobRepository jobRepository, JDiscogsBatchProperties props, StatefulRediSearchConnection<String, String> connection) {
+    public JDiscogsConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, JobRepository jobRepository, JDiscogsProperties props, StatefulRediSearchConnection<String, String> connection) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.jobRepository = jobRepository;
@@ -70,13 +74,40 @@ public class JDiscogsBatchConfiguration {
     }
 
     @Bean
-    ItemReader<Release> releaseItemReader() throws IOException {
-        return reader(Release.class, resource(props.getReleasesUrl()), "release");
+    @ConditionalOnMissingBean(name = "discogsClient")
+    public DiscogsClient discogsClient(JDiscogsProperties props, RestTemplateBuilder restTemplateBuilder) {
+        DiscogsClient client = new DiscogsClient();
+        client.setProps(props);
+        client.setRestTemplate(restTemplateBuilder.build());
+        return client;
     }
 
     @Bean
-    ItemReader<Master> masterItemReader() throws IOException {
-        return reader(Master.class, resource(props.getMastersUrl()), "master");
+    Job releaseLoadJob(IndexLoadDecider releaseIndexLoadDecider, IndexDropStep<String> releaseIndexDropStep, IndexCreateStep<String> releaseIndexCreateStep, TaskletStep releaseLoadStep) {
+        return job("release", releaseIndexLoadDecider, releaseIndexDropStep, releaseIndexCreateStep, releaseLoadStep);
+    }
+
+    @Bean
+    Job masterLoadJob(IndexLoadDecider masterIndexLoadDecider, IndexDropStep<String> masterIndexDropStep, IndexCreateStep<String> masterIndexCreateStep, TaskletStep masterLoadStep) {
+        return job("master", masterIndexLoadDecider, masterIndexDropStep, masterIndexCreateStep, masterLoadStep);
+    }
+
+    private Job job(String name, IndexLoadDecider decider, IndexDropStep<String> indexDropStep, IndexCreateStep<String> indexCreateStep, TaskletStep loadStep) {
+        TaskletStep skipStep = stepBuilderFactory.get(name + "NoFlow").tasklet(SkipStep.builder().name(name + " load job").build()).build();
+        Flow flow = new FlowBuilder<Flow>(name + "Flow").start(decider)
+                .on(IndexLoadDecider.PROCEED).to(indexDropStep).next(indexCreateStep).next(loadStep)
+                .from(decider).on(IndexLoadDecider.SKIP).to(skipStep).end();
+        return jobBuilderFactory.get(name + "Job").start(flow).end().build();
+    }
+
+    @Bean
+    ItemReader<Release> releaseItemReader(XStreamMarshaller marshaller) throws IOException {
+        return reader(marshaller, resource(props.getReleasesUrl()), "release");
+    }
+
+    @Bean
+    ItemReader<Master> masterItemReader(XStreamMarshaller marshaller) throws IOException {
+        return reader(marshaller, resource(props.getMastersUrl()), "master");
     }
 
     @Bean
@@ -95,10 +126,35 @@ public class JDiscogsBatchConfiguration {
                 .field(NumericField.builder().name(YEAR).sortable(true).build()).build();
     }
 
+    @Bean
+    public XStreamMarshaller xmlMarshaller() {
+        XStreamMarshaller marshaller = new XStreamMarshaller();
+        com.thoughtworks.xstream.XStream xStream = marshaller.getXStream();
+        XStream.setupDefaultSecurity(xStream);
+        xStream.allowTypes(new Class[]{Release.class, Master.class});
+        Map<String, Class<?>> aliases = new HashMap<>();
+        aliases.put("release", Release.class);
+        aliases.put("master", Master.class);
+        aliases.put("image", Image.class);
+        aliases.put("artist", Artist.class);
+        aliases.put("label", Entity.class);
+        aliases.put("format", Format.class);
+        aliases.put("description", String.class);
+        aliases.put("genre", String.class);
+        aliases.put("style", String.class);
+        aliases.put("track", Track.class);
+        aliases.put("identifier", Identifier.class);
+        aliases.put("video", Video.class);
+        aliases.put("company", Entity.class);
+        marshaller.setAliases(aliases);
+        Map<String, Class<?>> attributes = new HashMap<>();
+        attributes.put("id", Long.class);
+        marshaller.setUseAttributeFor(attributes);
+        return marshaller;
+    }
 
-    private <T> ItemReader<T> reader(Class<T> entityClass, Resource resource, String root) {
-        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setClassesToBeBound(entityClass);
+
+    private <T> ItemReader<T> reader(XStreamMarshaller marshaller, org.springframework.core.io.Resource resource, String root) {
         return synchronizedReader(new StaxEventItemReaderBuilder<T>().name(root + "Reader")
                 .addFragmentRootElements(root).resource(resource).unmarshaller(marshaller).build());
     }
@@ -107,9 +163,9 @@ public class JDiscogsBatchConfiguration {
         return new SynchronizedItemStreamReaderBuilder<T>().delegate(reader).build();
     }
 
-    private Resource resource(String url) throws IOException {
+    private org.springframework.core.io.Resource resource(String url) throws IOException {
         URI uri = URI.create(url);
-        Resource resource = getResource(uri);
+        org.springframework.core.io.Resource resource = getResource(uri);
         if (uri.getPath().endsWith(".gz")) {
             return new GZIPResource(resource);
         }
@@ -147,7 +203,6 @@ public class JDiscogsBatchConfiguration {
         return IndexDropStep.<String>builder().ignoreErrors(true).jobRepository(jobRepository).name(index + "IndexDropStep").connection(connection).index(index).build();
     }
 
-
     @Bean
     IndexCreateStep<String> releaseIndexCreateStep(Schema releaseSchema) {
         return indexCreateStep(props.getReleaseIndex(), releaseSchema);
@@ -164,48 +219,17 @@ public class JDiscogsBatchConfiguration {
     }
 
     @Bean
-    Job releaseLoadJob(IndexLoadDecider releaseIndexLoadDecider, IndexDropStep<String> releaseIndexDropStep, IndexCreateStep<String> releaseIndexCreateStep, TaskletStep releaseLoadStep) {
-        return job("release", releaseIndexLoadDecider, releaseIndexDropStep, releaseIndexCreateStep, releaseLoadStep);
+    TaskletStep releaseLoadStep(ItemReader<Release> reader, ReleaseProcessor processor, ItemWriter<Document<String, String>> releaseWriter) {
+        return loadStep("release", stepBuilderFactory, reader, processor, releaseWriter);
     }
 
     @Bean
-    Job masterLoadJob(IndexLoadDecider masterIndexLoadDecider, IndexDropStep<String> masterIndexDropStep, IndexCreateStep<String> masterIndexCreateStep, TaskletStep masterLoadStep) {
-        return job("master", masterIndexLoadDecider, masterIndexDropStep, masterIndexCreateStep, masterLoadStep);
-    }
-
-    private Job job(String name, IndexLoadDecider decider, IndexDropStep<String> indexDropStep, IndexCreateStep<String> indexCreateStep, TaskletStep loadStep) {
-        TaskletStep skipStep = stepBuilderFactory.get(name + "NoFlow").tasklet(SkipStep.builder().name(name + " load job").build()).build();
-        Flow flow = new FlowBuilder<Flow>(name + "Flow").start(decider)
-                .on(IndexLoadDecider.PROCEED).to(indexDropStep).next(indexCreateStep).next(loadStep)
-                .from(decider).on(IndexLoadDecider.SKIP).to(skipStep).end();
-        return jobBuilderFactory.get(name + "Job").start(flow).end().build();
-    }
-
-    @Bean
-    TaskletStep releaseLoadStep(ItemReader<Release> releaseItemReader, ItemProcessor<Release, Document<String, String>> releaseProcessor, ItemWriter<Document<String, String>> releaseWriter) {
-        return loadStep("release", stepBuilderFactory, releaseItemReader, releaseProcessor, releaseWriter);
-    }
-
-    @Bean
-    TaskletStep masterLoadStep(ItemReader<Master> masterItemReader, ItemProcessor<Master, Document<String, String>> masterProcessor, ItemWriter<Document<String, String>> masterWriter) {
-        return loadStep("master", stepBuilderFactory, masterItemReader, masterProcessor, masterWriter);
+    TaskletStep masterLoadStep(ItemReader<Master> reader, MasterProcessor processor, ItemWriter<Document<String, String>> masterWriter) {
+        return loadStep("master", stepBuilderFactory, reader, processor, masterWriter);
     }
 
     private <T> TaskletStep loadStep(String name, StepBuilderFactory stepBuilderFactory, ItemReader<T> reader, ItemProcessor<T, Document<String, String>> processor, ItemWriter<Document<String, String>> writer) {
-        return stepBuilderFactory.get(name + "LoadStep").<T, Document<String, String>>chunk(props.getBatchSize())
-                .reader(reader).processor(processor).writer(writer)
-                .listener((ItemWriteListener<?>) JobListener.builder().name(name).build()).taskExecutor(jobTaskExecutor())
-                .throttleLimit(props.getThreads()).build();
-    }
-
-    @Bean
-    ReleaseProcessor releaseProcessor(XmlCodec codec) {
-        return ReleaseProcessor.builder().codec(codec).build();
-    }
-
-    @Bean
-    MasterProcessor masterProcessor(XmlCodec codec) {
-        return MasterProcessor.builder().codec(codec).props(props).build();
+        return stepBuilderFactory.get(name + "LoadStep").<T, Document<String, String>>chunk(props.getBatchSize()).reader(reader).processor(processor).writer(writer).listener((ItemWriteListener<?>) JobListener.builder().name(name).build()).build();
     }
 
     @Bean
@@ -223,13 +247,6 @@ public class JDiscogsBatchConfiguration {
             return new NoopWriter<>();
         }
         return DocumentItemWriter.<String, String>builder().connection(client.connect()).index(index).build();
-    }
-
-    @Bean
-    TaskExecutor jobTaskExecutor() {
-        SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-        taskExecutor.setConcurrencyLimit(props.getThreads());
-        return taskExecutor;
     }
 
 }

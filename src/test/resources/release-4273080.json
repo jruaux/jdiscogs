@@ -1,0 +1,1330 @@
+{
+  "status": "Accepted",
+  "series": [
+    {
+      "name": "2 On 1 (5)",
+      "entity_type": "2",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/1433304",
+      "id": 1433304,
+      "entity_type_name": "Series"
+    }
+  ],
+  "labels": [
+    {
+      "name": "Motown",
+      "entity_type": "1",
+      "catno": "984 194-2",
+      "resource_url": "https://api.discogs.com/labels/1723",
+      "id": 1723,
+      "entity_type_name": "Label"
+    }
+  ],
+  "community": {
+    "status": "Accepted",
+    "rating": {
+      "count": 10,
+      "average": 3.9
+    },
+    "want": 9,
+    "contributors": [
+      {
+        "username": "Popschmecker",
+        "resource_url": "https://api.discogs.com/users/Popschmecker"
+      },
+      {
+        "username": "William-Lee",
+        "resource_url": "https://api.discogs.com/users/William-Lee"
+      },
+      {
+        "username": "Ascona",
+        "resource_url": "https://api.discogs.com/users/Ascona"
+      },
+      {
+        "username": "Mistuwill",
+        "resource_url": "https://api.discogs.com/users/Mistuwill"
+      },
+      {
+        "username": "SneakyPeteRecs",
+        "resource_url": "https://api.discogs.com/users/SneakyPeteRecs"
+      },
+      {
+        "username": "Tropicsounds",
+        "resource_url": "https://api.discogs.com/users/Tropicsounds"
+      }
+    ],
+    "have": 65,
+    "submitter": {
+      "username": "Popschmecker",
+      "resource_url": "https://api.discogs.com/users/Popschmecker"
+    },
+    "data_quality": "Needs Vote"
+  },
+  "year": 2006,
+  "images": [
+    {
+      "uri": "",
+      "height": 533,
+      "width": 600,
+      "resource_url": "",
+      "type": "primary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 539,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 262,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 266,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 599,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 600,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 300,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 298,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    },
+    {
+      "uri": "",
+      "height": 299,
+      "width": 600,
+      "resource_url": "",
+      "type": "secondary",
+      "uri150": ""
+    }
+  ],
+  "format_quantity": 1,
+  "id": 4273080,
+  "artists_sort": "Gladys Knight And The Pips",
+  "genres": [
+    "Funk / Soul",
+    "Pop"
+  ],
+  "thumb": "",
+  "num_for_sale": 3,
+  "title": "If I Were Your Woman + Standing Ovation",
+  "artists": [
+    {
+      "join": "",
+      "name": "Gladys Knight And The Pips",
+      "anv": "",
+      "tracks": "",
+      "role": "",
+      "resource_url": "https://api.discogs.com/artists/30135",
+      "id": 30135
+    }
+  ],
+  "date_changed": "2019-02-13T20:00:12-08:00",
+  "lowest_price": 12.0,
+  "styles": [
+    "Soul",
+    "Vocal"
+  ],
+  "released_formatted": "14 Nov 2006",
+  "formats": [
+    {
+      "qty": "1",
+      "descriptions": [
+        "Compilation",
+        "Remastered"
+      ],
+      "name": "CD"
+    }
+  ],
+  "estimated_weight": 85,
+  "released": "2006-11-14",
+  "date_added": "2013-02-08T13:00:10-08:00",
+  "extraartists": [
+    {
+      "join": "",
+      "name": "Lindsay Skilling",
+      "anv": "",
+      "tracks": "",
+      "role": "A&R",
+      "resource_url": "https://api.discogs.com/artists/1835066",
+      "id": 1835066
+    },
+    {
+      "join": "",
+      "name": "Daryl Easlea",
+      "anv": "",
+      "tracks": "",
+      "role": "Coordinator [Project Coordinator U.K]",
+      "resource_url": "https://api.discogs.com/artists/472637",
+      "id": 472637
+    },
+    {
+      "join": "",
+      "name": "Harry Weinger",
+      "anv": "",
+      "tracks": "",
+      "role": "Coordinator [Project Coordinator U.S.]",
+      "resource_url": "https://api.discogs.com/artists/252577",
+      "id": 252577
+    },
+    {
+      "join": "",
+      "name": "Bold Graphic Design",
+      "anv": "",
+      "tracks": "",
+      "role": "Design [Packaging Design]",
+      "resource_url": "https://api.discogs.com/artists/3141016",
+      "id": 3141016
+    },
+    {
+      "join": "",
+      "name": "Gladys Knight",
+      "anv": "",
+      "tracks": "",
+      "role": "Lead Vocals",
+      "resource_url": "https://api.discogs.com/artists/135244",
+      "id": 135244
+    },
+    {
+      "join": "",
+      "name": "Norman Whitfield",
+      "anv": "",
+      "tracks": "1 to 3, 7, 9, 11, 23",
+      "role": "Producer",
+      "resource_url": "https://api.discogs.com/artists/101822",
+      "id": 101822
+    },
+    {
+      "join": "",
+      "name": "Andy Skurow",
+      "anv": "",
+      "tracks": "",
+      "role": "Research, Compilation Producer [Production], Other [Annotations]",
+      "resource_url": "https://api.discogs.com/artists/1998501",
+      "id": 1998501
+    },
+    {
+      "join": "",
+      "name": "Lois Wilson",
+      "anv": "",
+      "tracks": "",
+      "role": "Sleeve Notes",
+      "resource_url": "https://api.discogs.com/artists/739489",
+      "id": 739489
+    },
+    {
+      "join": "",
+      "name": "Bubba Knight",
+      "anv": "Merald \"Bubba\" Knight",
+      "tracks": "",
+      "role": "Vocals [Group Vocals]",
+      "resource_url": "https://api.discogs.com/artists/317127",
+      "id": 317127
+    },
+    {
+      "join": "",
+      "name": "Edward Patten",
+      "anv": "",
+      "tracks": "",
+      "role": "Vocals [Group Vocals]",
+      "resource_url": "https://api.discogs.com/artists/317124",
+      "id": 317124
+    },
+    {
+      "join": "",
+      "name": "William Guest",
+      "anv": "",
+      "tracks": "",
+      "role": "Vocals [Group Vocals]",
+      "resource_url": "https://api.discogs.com/artists/368603",
+      "id": 368603
+    }
+  ],
+  "tracklist": [
+    {
+      "duration": "",
+      "position": "",
+      "type_": "heading",
+      "title": "If I Were Your Woman (1971)"
+    },
+    {
+      "duration": "",
+      "position": "1",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Gloria Jones",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/97835",
+          "id": 97835
+        },
+        {
+          "join": "",
+          "name": "Pam Sawyer",
+          "anv": "Pamela Sawyer",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/360451",
+          "id": 360451
+        }
+      ],
+      "title": "If I Were Your Woman"
+    },
+    {
+      "duration": "",
+      "position": "2",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Dave Mason",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/267654",
+          "id": 267654
+        }
+      ],
+      "title": "Feeling Alright"
+    },
+    {
+      "duration": "",
+      "position": "3",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Bacharach And David",
+          "anv": "Burt Bachcarach/Hal David",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/142502",
+          "id": 142502
+        }
+      ],
+      "title": "One Less Bell To Answer"
+    },
+    {
+      "duration": "",
+      "position": "4",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Lennon-McCartney",
+          "anv": "John Lennon/Paul McCartney",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/779927",
+          "id": 779927
+        }
+      ],
+      "title": "Let It Be"
+    },
+    {
+      "duration": "",
+      "position": "5",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Bubba Knight",
+          "anv": "Merald Knight Jr.",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/317127",
+          "id": 317127
+        },
+        {
+          "join": "",
+          "name": "Gladys Knight",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/135244",
+          "id": 135244
+        },
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Katherine Schaffner",
+          "anv": "Catherine Schaffner",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/1142693",
+          "id": 1142693
+        },
+        {
+          "join": "",
+          "name": "William Guest",
+          "anv": "William Franklin Guest",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/368603",
+          "id": 368603
+        }
+      ],
+      "title": "I Don't Want To Do Wrong"
+    },
+    {
+      "duration": "",
+      "position": "6",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Joe Hinton",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/212320",
+          "id": 212320
+        },
+        {
+          "join": "",
+          "name": "Joe Hinton",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/212320",
+          "id": 212320
+        },
+        {
+          "join": "",
+          "name": "Louvain Demps",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/653115",
+          "id": 653115
+        },
+        {
+          "join": "",
+          "name": "Marilyn Stewart (2)",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/2480263",
+          "id": 2480263
+        }
+      ],
+      "title": "One Step Away"
+    },
+    {
+      "duration": "",
+      "position": "7",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Patricia Foster",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/1174462",
+          "id": 1174462
+        }
+      ],
+      "title": "Here I Am Again"
+    },
+    {
+      "duration": "",
+      "position": "8",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Joe Hinton",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/212320",
+          "id": 212320
+        },
+        {
+          "join": "",
+          "name": "Joe Hinton",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/212320",
+          "id": 212320
+        },
+        {
+          "join": "",
+          "name": "Pam Sawyer",
+          "anv": "Pamela Sawyer",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/360451",
+          "id": 360451
+        }
+      ],
+      "title": "How Can You Say That Ain't Love"
+    },
+    {
+      "duration": "",
+      "position": "9",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Marty Coleman",
+          "anv": "Martin Coleman",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/687459",
+          "id": 687459
+        }
+      ],
+      "title": "Is There A Place (In His Heart For Me)"
+    },
+    {
+      "duration": "",
+      "position": "10",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Sly Stone",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/142451",
+          "id": 142451
+        }
+      ],
+      "title": "Everybody Is A Star"
+    },
+    {
+      "duration": "",
+      "position": "11",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Pam Sawyer",
+          "anv": "Pamela Sawyer",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/360451",
+          "id": 360451
+        }
+      ],
+      "title": "Signed Gladys"
+    },
+    {
+      "duration": "",
+      "position": "12",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Joe Hinton",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/212320",
+          "id": 212320
+        },
+        {
+          "join": "",
+          "name": "Janie Bradford",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/635088",
+          "id": 635088
+        },
+        {
+          "join": "",
+          "name": "Joe Hinton",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/212320",
+          "id": 212320
+        }
+      ],
+      "title": "Your Love's Been So Good For Me"
+    },
+    {
+      "duration": "",
+      "position": "",
+      "type_": "heading",
+      "title": "Standing Ovation (1971)"
+    },
+    {
+      "duration": "",
+      "position": "13",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        }
+      ],
+      "title": "Make Me The Woman That You Go Home To"
+    },
+    {
+      "duration": "",
+      "position": "14",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "David Jones Jr.",
+          "anv": "David Jones",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/666964",
+          "id": 666964
+        },
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Wade Brown Jr.",
+          "anv": "Wade Brown",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/666967",
+          "id": 666967
+        }
+      ],
+      "title": "Can You Give Me Love With A Guarantee"
+    },
+    {
+      "duration": "",
+      "position": "15",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "James Taylor (2)",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/262944",
+          "id": 262944
+        }
+      ],
+      "title": "Fire And Rain"
+    },
+    {
+      "duration": "",
+      "position": "16",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Gloria Jones",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/97835",
+          "id": 97835
+        },
+        {
+          "join": "",
+          "name": "Pam Sawyer",
+          "anv": "Pamela Sawyer",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/360451",
+          "id": 360451
+        }
+      ],
+      "title": "Master Of Mind"
+    },
+    {
+      "duration": "",
+      "position": "",
+      "type_": "heading",
+      "title": "Medley:"
+    },
+    {
+      "duration": "",
+      "position": "17a",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Bob Russell",
+          "anv": "B. Russell",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/449216",
+          "id": 449216
+        },
+        {
+          "join": "",
+          "name": "Bobby Scott",
+          "anv": "B. Scott",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/301101",
+          "id": 301101
+        }
+      ],
+      "title": "He Ain't Heavy, He's My Brother"
+    },
+    {
+      "duration": "",
+      "position": "17b",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Paul Simon",
+          "anv": "P. Simon",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/106474",
+          "id": 106474
+        }
+      ],
+      "title": "Bridge Over Troubled Water"
+    },
+    {
+      "duration": "",
+      "position": "",
+      "type_": "heading",
+      "title": "-"
+    },
+    {
+      "duration": "",
+      "position": "18",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Smokey Robinson",
+          "anv": "William 'Smokey' Robinson",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/86094",
+          "id": 86094
+        }
+      ],
+      "title": "It Takes A Whole Lotta Man For A Woman Like Me"
+    },
+    {
+      "duration": "",
+      "position": "19",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Kris Kristofferson",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/303575",
+          "id": 303575
+        }
+      ],
+      "title": "Help Me Make It Through The Night"
+    },
+    {
+      "duration": "",
+      "position": "20",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Lennon-McCartney",
+          "anv": "Paul McCartney/John Lennon",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/779927",
+          "id": 779927
+        }
+      ],
+      "title": "The Long And Winding Road"
+    },
+    {
+      "duration": "",
+      "position": "21",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Clay McMurray",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/362096",
+          "id": 362096
+        },
+        {
+          "join": "",
+          "name": "Pam Sawyer",
+          "anv": "Pamela Sawyer",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/360451",
+          "id": 360451
+        }
+      ],
+      "title": "If You Gonna Leave (Just Leave)"
+    },
+    {
+      "duration": "",
+      "position": "22",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Johnny Bristol",
+          "anv": "",
+          "tracks": "",
+          "role": "Producer",
+          "resource_url": "https://api.discogs.com/artists/85762",
+          "id": 85762
+        },
+        {
+          "join": "",
+          "name": "Gloria Jones",
+          "anv": "",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/97835",
+          "id": 97835
+        },
+        {
+          "join": "",
+          "name": "Pam Sawyer",
+          "anv": "Pamela Sawyer",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/360451",
+          "id": 360451
+        }
+      ],
+      "title": "No One Could Love You More"
+    },
+    {
+      "duration": "",
+      "position": "",
+      "type_": "heading",
+      "title": "Bonus Track"
+    },
+    {
+      "duration": "",
+      "position": "23",
+      "type_": "track",
+      "extraartists": [
+        {
+          "join": "",
+          "name": "Paul Riser",
+          "anv": "",
+          "tracks": "",
+          "role": "Arranged By",
+          "resource_url": "https://api.discogs.com/artists/267899",
+          "id": 267899
+        },
+        {
+          "join": "",
+          "name": "Whitfield-Strong",
+          "anv": "Barrett Strong/Norman Whitfield",
+          "tracks": "",
+          "role": "Written-By",
+          "resource_url": "https://api.discogs.com/artists/780701",
+          "id": 780701
+        }
+      ],
+      "title": "You Need Love Like I Do (Don't You)"
+    }
+  ],
+  "notes": "Digipak\n\nDigitally remastered from the original analogue Motown album masters at Universal Mastering Studios-East (USA)\n\nJobete Music Co. Inc. (1, 5, 7, 8, 13, 14, 17a, 18, 21, 22, 23), Island Music Ltd. (2), Blue Seas Music inc./Jac Music Co. Inc. (3), Sony ATV Music Publishing Ltd (4), Copyright Control (6, 11, 12), Jobete Music (UK) Ltd. (9, 16), Stone Flower Music (10), EMI Blackwood Music Inc./Country Road Music Inc./BMI/100.00%/Fox (15), Paul Simon Music (17b), EMI Songs Ltd. (19), Maclen Music Ltd./Northern Songs Ltd. (20)",
+  "identifiers": [
+    {
+      "type": "Barcode",
+      "description": "Scanned",
+      "value": "602498419427"
+    },
+    {
+      "type": "Barcode",
+      "description": "Text",
+      "value": "6 02498 41942 7"
+    },
+    {
+      "type": "Rights Society",
+      "value": "BIEM/SABAM"
+    },
+    {
+      "type": "Label Code",
+      "value": "LC5064"
+    },
+    {
+      "type": "Matrix / Runout",
+      "description": "Variant 1",
+      "value": "06024  984 194-2  03 \u203b 51804888"
+    },
+    {
+      "type": "Mastering SID Code",
+      "description": "Variant 1",
+      "value": "IFPI 0116"
+    },
+    {
+      "type": "Matrix / Runout",
+      "description": "Variant 2",
+      "value": "06024 984 194-2 01 P 51804888 [4 Universal logos] Made in Germany by EDCA"
+    },
+    {
+      "type": "Mould SID Code",
+      "description": "Variant 2",
+      "value": "IFPI 0138"
+    },
+    {
+      "type": "ASIN",
+      "value": "B000JCES8Y"
+    }
+  ],
+  "companies": [
+    {
+      "name": "Universal Music Operations",
+      "entity_type": "4",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/220118",
+      "id": 220118,
+      "entity_type_name": "Record Company"
+    },
+    {
+      "name": "Motown Record Company, L.P.",
+      "entity_type": "4",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/266901",
+      "id": 266901,
+      "entity_type_name": "Record Company"
+    },
+    {
+      "name": "Universal Music Catalogue",
+      "entity_type": "4",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/97701",
+      "id": 97701,
+      "entity_type_name": "Record Company"
+    },
+    {
+      "name": "Universal Island Records Ltd.",
+      "entity_type": "13",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/91232",
+      "id": 91232,
+      "entity_type_name": "Phonographic Copyright (p)"
+    },
+    {
+      "name": "Motown Records",
+      "entity_type": "13",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/61002",
+      "id": 61002,
+      "entity_type_name": "Phonographic Copyright (p)"
+    },
+    {
+      "name": "UMG Recordings, Inc.",
+      "entity_type": "13",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/272782",
+      "id": 272782,
+      "entity_type_name": "Phonographic Copyright (p)"
+    },
+    {
+      "name": "Universal Island Records Ltd.",
+      "entity_type": "14",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/91232",
+      "id": 91232,
+      "entity_type_name": "Copyright (c)"
+    },
+    {
+      "name": "Universal Mastering Studios",
+      "entity_type": "35",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/264299",
+      "id": 264299,
+      "entity_type_name": "Remastered At"
+    },
+    {
+      "name": "EDC, Germany",
+      "entity_type": "10",
+      "catno": "51804888",
+      "resource_url": "https://api.discogs.com/labels/384133",
+      "id": 384133,
+      "entity_type_name": "Manufactured By"
+    },
+    {
+      "name": "Van De Steeg",
+      "entity_type": "19",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/265448",
+      "id": 265448,
+      "entity_type_name": "Printed By"
+    },
+    {
+      "name": "Jobete Music Co., Inc.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/99115",
+      "id": 99115,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Island Music Ltd.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/109278",
+      "id": 109278,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Blue Seas Music, Inc.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/319156",
+      "id": 319156,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "JAC Music Co., Inc.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/350142",
+      "id": 350142,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Sony/ATV Music Publishing Ltd.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/295503",
+      "id": 295503,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Copyright Control",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/48207",
+      "id": 48207,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Jobete Music (UK) Ltd.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/172308",
+      "id": 172308,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Stone Flower Music",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/294367",
+      "id": 294367,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "EMI Blackwood Music Inc.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/269235",
+      "id": 269235,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Country Road Music, Inc.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/404249",
+      "id": 404249,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "100.000%",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/322837",
+      "id": 322837,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Fox Music",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/30018",
+      "id": 30018,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Paul Simon Music",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/313899",
+      "id": 313899,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "EMI Songs Ltd.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/269108",
+      "id": 269108,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Maclen Music Ltd.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/572934",
+      "id": 572934,
+      "entity_type_name": "Published By"
+    },
+    {
+      "name": "Northern Songs Ltd.",
+      "entity_type": "21",
+      "catno": "",
+      "resource_url": "https://api.discogs.com/labels/264498",
+      "id": 264498,
+      "entity_type_name": "Published By"
+    }
+  ],
+  "uri": "https://www.discogs.com/Gladys-Knight-And-The-Pips-If-I-Were-Your-Woman-Standing-Ovation/release/4273080",
+  "country": "Europe",
+  "resource_url": "https://api.discogs.com/releases/4273080",
+  "data_quality": "Needs Vote"
+}

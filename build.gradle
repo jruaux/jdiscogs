@@ -1,12 +1,13 @@
 plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
-    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.jfrog.bintray' version '1.8.5'
     id 'org.springframework.boot' version '2.2.6.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
     id 'java-library'
     id 'maven-publish'
     id 'net.researchgate.release' version '2.8.1'
+    id 'idea'
 }
 
 group = 'org.ruaux'
@@ -18,6 +19,12 @@ repositories {
     jcenter()
     mavenCentral()
     mavenLocal()
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+    }
 }
 
 bootJar {
@@ -36,6 +43,7 @@ dependencies {
     implementation 'org.springframework:spring-web'
     api 'com.redislabs:spring-redisearch:2.1.0'
     api 'org.glassfish.jaxb:jaxb-runtime'
+    implementation 'com.thoughtworks.xstream:xstream:1.4.12'
     implementation 'com.redislabs:spring-batch-redisearch:2.1.0'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
