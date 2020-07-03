@@ -35,9 +35,6 @@ public class JDiscogsIntegrationTests {
         }
     }
 
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
-
     @Autowired
     JDiscogsProperties props;
 
