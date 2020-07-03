@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<release id="4273080" status="Accepted">
+    <title>If I Were Your Woman + Standing Ovation</title>
+    <country>Europe</country>
+    <released>2006-11-14</released>
+    <notes>Digipak
+
+        Digitally remastered from the original analogue Motown album masters at Universal Mastering Studios-East (USA)
+
+        Jobete Music Co. Inc. (1, 5, 7, 8, 13, 14, 17a, 18, 21, 22, 23), Island Music Ltd. (2), Blue Seas Music inc./Jac
+        Music Co. Inc. (3), Sony ATV Music Publishing Ltd (4), Copyright Control (6, 11, 12), Jobete Music (UK) Ltd. (9,
+        16), Stone Flower Music (10), EMI Blackwood Music Inc./Country Road Music Inc./BMI/100.00%/Fox (15), Paul Simon
+        Music (17b), EMI Songs Ltd. (19), Maclen Music Ltd./Northern Songs Ltd. (20)
+    </notes>
+    <data_quality>Needs Vote</data_quality>
+    <images>
+        <image height="533" type="primary" width="600" uri="" uri150=""/>
+        <image height="539" type="secondary" width="600" uri="" uri150=""/>
+        <image height="262" type="secondary" width="600" uri="" uri150=""/>
+        <image height="266" type="secondary" width="600" uri="" uri150=""/>
+        <image height="599" type="secondary" width="600" uri="" uri150=""/>
+        <image height="600" type="secondary" width="600" uri="" uri150=""/>
+        <image height="300" type="secondary" width="600" uri="" uri150=""/>
+        <image height="298" type="secondary" width="600" uri="" uri150=""/>
+        <image height="299" type="secondary" width="600" uri="" uri150=""/>
+    </images>
+    <artists>
+        <artist>
+            <id>30135</id>
+            <join></join>
+            <name>Gladys Knight And The Pips</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role></role>
+        </artist>
+    </artists>
+    <labels>
+        <label id="1723" name="Motown" catno="984 194-2"/>
+    </labels>
+    <extraartists>
+        <artist>
+            <id>1835066</id>
+            <join></join>
+            <name>Lindsay Skilling</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>A&amp;R</role>
+        </artist>
+        <artist>
+            <id>472637</id>
+            <join></join>
+            <name>Daryl Easlea</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Coordinator [Project Coordinator U.K]</role>
+        </artist>
+        <artist>
+            <id>252577</id>
+            <join></join>
+            <name>Harry Weinger</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Coordinator [Project Coordinator U.S.]</role>
+        </artist>
+        <artist>
+            <id>3141016</id>
+            <join></join>
+            <name>Bold Graphic Design</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Design [Packaging Design]</role>
+        </artist>
+        <artist>
+            <id>135244</id>
+            <join></join>
+            <name>Gladys Knight</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Lead Vocals</role>
+        </artist>
+        <artist>
+            <id>101822</id>
+            <join></join>
+            <name>Norman Whitfield</name>
+            <anv></anv>
+            <tracks>1 to 3, 7, 9, 11, 23</tracks>
+            <role>Producer</role>
+        </artist>
+        <artist>
+            <id>1998501</id>
+            <join></join>
+            <name>Andy Skurow</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Research, Compilation Producer [Production], Other [Annotations]</role>
+        </artist>
+        <artist>
+            <id>739489</id>
+            <join></join>
+            <name>Lois Wilson</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Sleeve Notes</role>
+        </artist>
+        <artist>
+            <id>317127</id>
+            <join></join>
+            <name>Bubba Knight</name>
+            <anv>Merald "Bubba" Knight</anv>
+            <tracks></tracks>
+            <role>Vocals [Group Vocals]</role>
+        </artist>
+        <artist>
+            <id>317124</id>
+            <join></join>
+            <name>Edward Patten</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Vocals [Group Vocals]</role>
+        </artist>
+        <artist>
+            <id>368603</id>
+            <join></join>
+            <name>William Guest</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Vocals [Group Vocals]</role>
+        </artist>
+    </extraartists>
+    <formats>
+        <format name="CD" qty="1" text="">
+            <descriptions>
+                <description>Compilation</description>
+                <description>Remastered</description>
+            </descriptions>
+        </format>
+    </formats>
+    <genres>
+        <genre>Funk / Soul</genre>
+        <genre>Pop</genre>
+    </genres>
+    <styles>
+        <style>Soul</style>
+        <style>Vocal</style>
+    </styles>
+    <tracklist>
+        <track>
+            <position></position>
+            <title>If I Were Your Woman (1971)</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>1</position>
+            <title>If I Were Your Woman</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>2</position>
+            <title>Feeling Alright</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>3</position>
+            <title>One Less Bell To Answer</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>4</position>
+            <title>Let It Be</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>5</position>
+            <title>I Don't Want To Do Wrong</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>6</position>
+            <title>One Step Away</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>7</position>
+            <title>Here I Am Again</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>8</position>
+            <title>How Can You Say That Ain't Love</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>9</position>
+            <title>Is There A Place (In His Heart For Me)</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>10</position>
+            <title>Everybody Is A Star</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>11</position>
+            <title>Signed Gladys</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>12</position>
+            <title>Your Love's Been So Good For Me</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position></position>
+            <title>Standing Ovation (1971)</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>13</position>
+            <title>Make Me The Woman That You Go Home To</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>14</position>
+            <title>Can You Give Me Love With A Guarantee</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>15</position>
+            <title>Fire And Rain</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>16</position>
+            <title>Master Of Mind</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position></position>
+            <title>Medley:</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>17a</position>
+            <title>He Ain't Heavy, He's My Brother</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>17b</position>
+            <title>Bridge Over Troubled Water</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position></position>
+            <title>-</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>18</position>
+            <title>It Takes A Whole Lotta Man For A Woman Like Me</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>19</position>
+            <title>Help Me Make It Through The Night</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>20</position>
+            <title>The Long And Winding Road</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>21</position>
+            <title>If You Gonna Leave (Just Leave)</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>22</position>
+            <title>No One Could Love You More</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position></position>
+            <title>Bonus Track</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>23</position>
+            <title>You Need Love Like I Do (Don't You)</title>
+            <duration></duration>
+        </track>
+    </tracklist>
+    <identifiers>
+        <identifier description="Scanned" type="Barcode" value="602498419427"/>
+        <identifier description="Text" type="Barcode" value="6 02498 41942 7"/>
+        <identifier type="Rights Society" value="BIEM/SABAM"/>
+        <identifier type="Label Code" value="LC5064"/>
+        <identifier description="Variant 1" type="Matrix / Runout" value="06024  984 194-2  03 ※ 51804888"/>
+        <identifier description="Variant 1" type="Mastering SID Code" value="IFPI 0116"/>
+        <identifier description="Variant 2" type="Matrix / Runout"
+                    value="06024 984 194-2 01 P 51804888 [4 Universal logos] Made in Germany by EDCA"/>
+        <identifier description="Variant 2" type="Mould SID Code" value="IFPI 0138"/>
+        <identifier type="ASIN" value="B000JCES8Y"/>
+    </identifiers>
+    <companies>
+        <company>
+            <id>220118</id>
+            <name>Universal Music Operations</name>
+            <catno></catno>
+            <entity_type>4</entity_type>
+            <entity_type_name>Record Company</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/220118</resource_url>
+        </company>
+        <company>
+            <id>266901</id>
+            <name>Motown Record Company, L.P.</name>
+            <catno></catno>
+            <entity_type>4</entity_type>
+            <entity_type_name>Record Company</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/266901</resource_url>
+        </company>
+        <company>
+            <id>97701</id>
+            <name>Universal Music Catalogue</name>
+            <catno></catno>
+            <entity_type>4</entity_type>
+            <entity_type_name>Record Company</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/97701</resource_url>
+        </company>
+        <company>
+            <id>91232</id>
+            <name>Universal Island Records Ltd.</name>
+            <catno></catno>
+            <entity_type>13</entity_type>
+            <entity_type_name>Phonographic Copyright (p)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/91232</resource_url>
+        </company>
+        <company>
+            <id>61002</id>
+            <name>Motown Records</name>
+            <catno></catno>
+            <entity_type>13</entity_type>
+            <entity_type_name>Phonographic Copyright (p)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/61002</resource_url>
+        </company>
+        <company>
+            <id>272782</id>
+            <name>UMG Recordings, Inc.</name>
+            <catno></catno>
+            <entity_type>13</entity_type>
+            <entity_type_name>Phonographic Copyright (p)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/272782</resource_url>
+        </company>
+        <company>
+            <id>91232</id>
+            <name>Universal Island Records Ltd.</name>
+            <catno></catno>
+            <entity_type>14</entity_type>
+            <entity_type_name>Copyright (c)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/91232</resource_url>
+        </company>
+        <company>
+            <id>264299</id>
+            <name>Universal Mastering Studios</name>
+            <catno></catno>
+            <entity_type>35</entity_type>
+            <entity_type_name>Remastered At</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/264299</resource_url>
+        </company>
+        <company>
+            <id>384133</id>
+            <name>EDC, Germany</name>
+            <catno>51804888</catno>
+            <entity_type>10</entity_type>
+            <entity_type_name>Manufactured By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/384133</resource_url>
+        </company>
+        <company>
+            <id>265448</id>
+            <name>Van De Steeg</name>
+            <catno></catno>
+            <entity_type>19</entity_type>
+            <entity_type_name>Printed By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/265448</resource_url>
+        </company>
+        <company>
+            <id>99115</id>
+            <name>Jobete Music Co., Inc.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/99115</resource_url>
+        </company>
+        <company>
+            <id>109278</id>
+            <name>Island Music Ltd.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/109278</resource_url>
+        </company>
+        <company>
+            <id>319156</id>
+            <name>Blue Seas Music, Inc.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/319156</resource_url>
+        </company>
+        <company>
+            <id>350142</id>
+            <name>JAC Music Co., Inc.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/350142</resource_url>
+        </company>
+        <company>
+            <id>295503</id>
+            <name>Sony/ATV Music Publishing Ltd.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/295503</resource_url>
+        </company>
+        <company>
+            <id>48207</id>
+            <name>Copyright Control</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/48207</resource_url>
+        </company>
+        <company>
+            <id>172308</id>
+            <name>Jobete Music (UK) Ltd.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/172308</resource_url>
+        </company>
+        <company>
+            <id>294367</id>
+            <name>Stone Flower Music</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/294367</resource_url>
+        </company>
+        <company>
+            <id>269235</id>
+            <name>EMI Blackwood Music Inc.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/269235</resource_url>
+        </company>
+        <company>
+            <id>404249</id>
+            <name>Country Road Music, Inc.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/404249</resource_url>
+        </company>
+        <company>
+            <id>322837</id>
+            <name>100.000%</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/322837</resource_url>
+        </company>
+        <company>
+            <id>30018</id>
+            <name>Fox Music</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/30018</resource_url>
+        </company>
+        <company>
+            <id>313899</id>
+            <name>Paul Simon Music</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/313899</resource_url>
+        </company>
+        <company>
+            <id>269108</id>
+            <name>EMI Songs Ltd.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/269108</resource_url>
+        </company>
+        <company>
+            <id>572934</id>
+            <name>Maclen Music Ltd.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/572934</resource_url>
+        </company>
+        <company>
+            <id>264498</id>
+            <name>Northern Songs Ltd.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/264498</resource_url>
+        </company>
+    </companies>
+</release>

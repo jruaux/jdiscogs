@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class JobListener extends ItemListenerSupport<Object, Object> {
 
-    private NumberFormat formatter = NumberFormat.getIntegerInstance();
-    private @Setter
-    String name;
+    private final NumberFormat formatter = NumberFormat.getIntegerInstance();
+    private final long startTime = System.currentTimeMillis();
+    @Setter
+    private String name;
     private long count = 0;
-    private long startTime = System.currentTimeMillis();
     private long lastPrint;
 
     @Builder

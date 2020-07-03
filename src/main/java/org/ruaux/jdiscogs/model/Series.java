@@ -1,25 +1,25 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "artist")
-public class Artist {
+public class Series {
 
     private Long id;
-    private String resource_url;
-    private String join;
     private String name;
-    private String anv;
-    private String tracks;
-    private String role;
+    private String catno;
+    private String entity_type;
+    private String entity_type_name;
+    private String resource_url;
 
 }

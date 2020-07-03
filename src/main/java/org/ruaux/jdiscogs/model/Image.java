@@ -1,27 +1,34 @@
 package org.ruaux.jdiscogs.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-public class Image extends Resource {
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@XmlRootElement(name = "image")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Image {
 
     public static final String TYPE_PRIMARY = "primary";
 
-    @Getter
-    @Setter
-    private String uri;
-    @Getter
-    @Setter
+    @XmlAttribute
     private Integer height;
-    @Getter
-    @Setter
-    private Integer width;
-    @Getter
-    @Setter
+    @XmlAttribute
     private String type;
-    @Getter
-    @Setter
+    @XmlAttribute
+    private Integer width;
+    @XmlAttribute
+    private String uri;
+    @XmlAttribute
     private String uri150;
 
     public boolean isPrimary() {

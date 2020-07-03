@@ -1,73 +1,53 @@
 package org.ruaux.jdiscogs.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
-public class Master extends IdResource {
+@Data
+@XmlRootElement(name = "master")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Master {
 
-	@Getter
-	@Setter
-	private List<String> styles;
-	@Getter
-	@Setter
-	private List<String> genres;
-	@Getter
-	@Setter
-	private Long num_for_sale;
-	@Getter
-	@Setter
-	private String title;
-	@Getter
-	@Setter
-	private Long most_recent_release;
-	@Getter
-	@Setter
-	private String most_recent_release_url;
-	@Getter
-	@Setter
-	private Long main_release;
-	@Getter
-	@Setter
-	private String main_release_url;
-	@Getter
-	@Setter
-	private String uri;
-	@Getter
-	@Setter
-	private List<Artist> artists;
-	@Getter
-	@Setter
-	private String versions_url;
-	@Getter
-	@Setter
-	private String data_quality;
-	@Getter
-	@Setter
-	private Long year;
-	@Getter
-	@Setter
-	private List<Image> images;
-	@Getter
-	@Setter
-	private Double lowest_price;
-	@Getter
-	@Setter
-	private List<Track> tracklist;
-	@Getter
-	@Setter
-	private List<Video> videos;
-	@Getter
-	@Setter
-	private String notes;
+    @XmlAttribute
+    private Long id;
+    private String title;
+    private String notes;
+    private String data_quality;
+    private Long num_for_sale;
+    private Long most_recent_release;
+    private String most_recent_release_url;
+    private Long main_release;
+    private String main_release_url;
+    private String uri;
+    private String versions_url;
+    private Long year;
+    private Double lowest_price;
+    @XmlElement(name = "image")
+    @XmlElementWrapper(name = "images")
+    private List<Image> images;
+    @XmlElement(name = "artist")
+    @XmlElementWrapper(name = "artists")
+    private List<Artist> artists;
+    @XmlElement(name = "genre")
+    @XmlElementWrapper(name = "genres")
+    private List<String> genres;
+    @XmlElement(name = "style")
+    @XmlElementWrapper(name = "styles")
+    private List<String> styles;
+    @XmlElement(name = "track")
+    @XmlElementWrapper(name = "tracklist")
+    private List<Track> tracklist;
+    @XmlElement(name = "video")
+    @XmlElementWrapper(name = "videos")
+    private List<Video> videos;
 
-	public Image getPrimaryImage() {
-		if (images==null) {
-			return null;
-		}
-		return images.stream().filter(image -> image.isPrimary()).findFirst().orElse(null);
-	}
+    public Image getPrimaryImage() {
+        if (images == null) {
+            return null;
+        }
+        return images.stream().filter(Image::isPrimary).findFirst().orElse(null);
+    }
 
 }

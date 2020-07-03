@@ -1,169 +1,121 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.expression.spel.ast.Identifier;
+import lombok.Data;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class Release extends IdResource {
+@Data
+@XmlRootElement(name = "release")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Release {
 
-    @Getter
-    @Setter
+    private static final Pattern RELEASED_PATTERN = Pattern.compile("^(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})");
+
+    @XmlAttribute
+    private Long id;
+    @XmlAttribute
     private String status;
-    @Getter
-    @Setter
-    private List<Entity> series;
-    @Getter
-    @Setter
-    private List<Entity> labels;
-    @Getter
-    @Setter
-    private Community community;
-    @Setter
-    private Integer year;
-    @Getter
-    @Setter
-    private List<Image> images;
-    @Getter
-    @Setter
-    private Long format_quantity;
-    @Getter
-    @Setter
-    private List<Video> videos;
-    @Getter
-    @Setter
-    private String artists_sort;
-    @Getter
-    @Setter
-    private List<String> genres;
-    @Getter
-    @Setter
-    private String thumb;
-    @Getter
-    @Setter
-    private Long num_for_sale;
-    @Getter
-    @Setter
     private String title;
-    @Getter
-    @Setter
-    private List<Artist> artists;
-    @Getter
-    @Setter
-    private String date_changed;
-    @Getter
-    @Setter
-    private Float lowest_price;
-    @Getter
-    @Setter
-    private List<String> styles;
-    @Getter
-    @Setter
-    private Long master_id;
-    @Getter
-    @Setter
-    private String release_formatted;
-    @Getter
-    @Setter
-    private List<Format> formats;
-    @Getter
-    @Setter
-    private Integer estimated_weight;
-    @Getter
-    @Setter
-    private String released;
-    @Getter
-    @Setter
-    private String date_added;
-    @Getter
-    @Setter
-    private List<Artist> extraartists;
-    @Getter
-    @Setter
-    private List<Track> tracklist;
-    @Getter
-    @Setter
-    private String notes;
-    @Getter
-    @Setter
-    private List<Identifier> identifiers;
-    @Getter
-    @Setter
-    private List<Entity> companies;
-    @Getter
-    @Setter
-    private String master_url;
-    @Getter
-    @Setter
-    private String uri;
-    @Getter
-    @Setter
     private String country;
-    @Getter
-    @Setter
+    private String released;
+    private String notes;
     private String data_quality;
+    private MasterId master_id;
+    private Community community;
+    private Integer year;
+    private Long format_quantity;
+    private String artists_sort;
+    private String thumb;
+    private Long num_for_sale;
+    private String date_changed;
+    private Float lowest_price;
+    private String release_formatted;
+    private Integer estimated_weight;
+    private String date_added;
+    private String master_url;
+    private String uri;
+    @XmlElement(name = "image")
+    @XmlElementWrapper(name = "images")
+    private List<Image> images;
+    @XmlElement(name = "artist")
+    @XmlElementWrapper(name = "artists")
+    private List<Artist> artists;
+    @XmlElement(name = "label")
+    @XmlElementWrapper(name = "labels")
+    private List<Label> labels;
+    @XmlElement(name = "artist")
+    @XmlElementWrapper(name = "extraartists")
+    private List<Artist> extraartists;
+    @XmlElement(name = "format")
+    @XmlElementWrapper(name = "formats")
+    private List<Format> formats;
+    @XmlElement(name = "genre")
+    @XmlElementWrapper(name = "genres")
+    private List<String> genres;
+    @XmlElement(name = "style")
+    @XmlElementWrapper(name = "styles")
+    private List<String> styles;
+    @XmlElement(name = "track")
+    @XmlElementWrapper(name = "tracklist")
+    private List<Track> tracklist;
+    @XmlElement(name = "identifier")
+    @XmlElementWrapper(name = "identifiers")
+    private List<Identifier> identifiers;
+    @XmlElement(name = "video")
+    @XmlElementWrapper(name = "videos")
+    private List<Video> videos;
+    @XmlElement(name = "company")
+    @XmlElementWrapper(name = "companies")
+    private List<Company> companies;
+    @XmlElement(name = "series")
+    @XmlElementWrapper(name = "series")
+    private List<Series> series;
 
-
-    public List<Track> getTracks() {
-        return getTracks(tracklist);
-    }
-
-    private List<Track> getTracks(List<Track> tracks) {
-        List<Track> actualTracks = new ArrayList<>();
-        for (Track track : tracks) {
-            if (track.getSub_tracks().isEmpty()) {
-                actualTracks.add(track);
-            } else {
-                actualTracks.addAll(getTracks(track.getSub_tracks()));
+    public List<Track> normalizedTracks() {
+        if (tracklist == null) {
+            return null;
+        }
+        SortedMap<Track.Position, Track> map = new TreeMap<>();
+        for (Track track : tracklist) {
+            Track.Position position = track.position();
+            if (position != null) {
+                if (position.getSub() == null) {
+                    map.put(position, track.toBuilder().build());
+                } else {
+                    position = position.toBuilder().sub(null).build();
+                    Track compositeTrack = map.containsKey(position)?map.get(position):Track.builder().position(position.toString()).build();
+                    List<Track> sub_tracks = compositeTrack.getSub_tracks();
+                    if (sub_tracks == null) {
+                        sub_tracks = new ArrayList<>();
+                    }
+                    sub_tracks.add(track.toBuilder().build());
+                    compositeTrack.setSub_tracks(sub_tracks);
+                    map.put(position, compositeTrack);
+                }
             }
         }
-        return actualTracks;
+        return new ArrayList<>(map.values());
     }
 
-    public String getArtist() {
-        if (artists == null || artists.isEmpty()) {
-            return null;
-        }
-        return artists.get(0).getName();
-    }
-
-    public Format getFormat() {
-        if (formats == null || formats.isEmpty()) {
-            return null;
-        }
-        return formats.get(0);
-    }
-
-    public String getStyle() {
-        if (styles == null || styles.isEmpty()) {
-            return null;
-        }
-        return styles.get(0);
-    }
-
-    public String getGenre() {
-        if (genres == null || genres.isEmpty()) {
-            return null;
-        }
-        return genres.get(0);
-    }
-
-    public List<Track> getTracks(Integer disc) {
-        if (disc == null) {
-            return getTracks();
-        }
-        return getTracks().stream().filter(t -> disc.equals(t.getDisc())).collect(Collectors.toList());
-    }
-
-    public Integer getYear() {
+    public Integer year() {
         if (year == null) {
-            if (released.length() < 4) {
+            if (released == null) {
                 return null;
             }
-            return Integer.parseInt(released.substring(0, 4));
+            Matcher matcher = RELEASED_PATTERN.matcher(released);
+            if (matcher.matches()) {
+                String year = matcher.group("year");
+                if (year != null) {
+                    return Integer.parseInt(year);
+                }
+            }
+            return null;
         }
         return year;
     }

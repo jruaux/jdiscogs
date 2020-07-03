@@ -1,24 +1,27 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@XmlRootElement(name = "video")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Video {
 
-	@Getter
-	@Setter
+	@XmlAttribute
 	private Integer duration;
-	@Getter
-	@Setter
-	private Boolean embed;
-	@Getter
-	@Setter
-	private String title;
-	@Getter
-	@Setter
-	private String description;
-	@Getter
-	@Setter
+	@XmlAttribute
+	private boolean embed;
+	@XmlAttribute(name = "src")
 	private String uri;
+	private String title;
+	private String description;
 
 }

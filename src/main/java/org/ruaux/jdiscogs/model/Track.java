@@ -1,113 +1,183 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
+import javax.xml.bind.annotation.*;
+import java.time.Duration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-public class Track {
+@Data
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@XmlRootElement(name = "track")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Track implements Comparable<Track> {
 
-	private static final Pattern DURATION_PATTERN = Pattern.compile("^(?<minutes>\\d+):(?<seconds>\\d+)");
-	private static final Pattern POSITION_PATTERN = Pattern.compile("^((?<side>[A-Z])|((?<disc>\\d+)[\\-.:]))?(?<number>\\d+)(?<sub>[a-z])?\\.?$");
+    private static final Pattern POSITION_PATTERN = Pattern.compile("^((?<side>[A-Z])|((?<disc>\\d+)[\\-.:]))?(?<number>\\d+)(?<sub>[a-z])?");
+    private static final Pattern DURATION_PATTERN = Pattern.compile("^(?<minutes>\\d+):(?<seconds>\\d+)");
 
-	@Getter
-	@Setter
-	private String duration;
-	@Getter
-	@Setter
-	private String position;
-	@Getter
-	@Setter
-	private String type_;
-	@Getter
-	@Setter
-	private String title;
-	@Getter
-	@Setter
-	private List<Artist> extraartists;
-	@Getter
-	@Setter
-	private List<Artist> artists;
-	@Setter
-	private List<Track> sub_tracks;
+    private String position;
+    private String title;
+    private String duration;
+    private String type_;
+    @XmlElement(name = "artist")
+    @XmlElementWrapper(name = "artists")
+    private List<Artist> artists;
+    @XmlElement(name = "track")
+    @XmlElementWrapper(name = "sub_tracks")
+    private List<Track> sub_tracks;
 
-	public List<Track> getSub_tracks() {
-		if (sub_tracks==null || sub_tracks.isEmpty()) {
-			return Collections.emptyList();
-		}
-		if (getNumber() != null && (getSubPosition() == null || "a".equalsIgnoreCase(getSubPosition()))) {
-			return Collections.emptyList();
-		}
-		return sub_tracks;
-	}
+    @Data
+    @Builder(toBuilder = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Position implements Comparable<Position> {
+        private Integer number;
+        private Integer disc;
+        private Character side;
+        private Character sub;
 
-	public String getArtist() {
-		if (artists==null || artists.isEmpty()) {
-			return null;
-		}
-		return artists.get(0).getName();
-	}
+        @Override
+        public String toString() {
+            String result = "";
+            if (side != null) {
+                result += side;
+            }
+            if (disc != null) {
+                result += disc + "-";
+            }
+            if (number != null) {
+                result += number;
+            }
+            if (sub != null) {
+                result += sub;
+            }
+            return result;
+        }
 
-	public int getDurationInSeconds() {
-		Matcher matcher = DURATION_PATTERN.matcher(duration.trim());
-		if (matcher.matches()) {
-			try {
-				return Integer.parseInt(matcher.group("minutes")) * 60 + Integer.parseInt(matcher.group("seconds"));
-			} catch (NumberFormatException e) {
-				log.error("Could not parse duration '{}'", duration);
-			}
-		}
-		return 0;
-	}
 
-	private Matcher positionMatcher() {
-		return POSITION_PATTERN.matcher(position);
-	}
+        @Override
+        public int compareTo(Position position) {
+            if (disc == null) {
+                if (position.disc == null) {
+                    if (side == null) {
+                        if (position.side == null) {
+                            return compareTrackNumbers(position);
+                        }
+                        return -1;
+                    }
+                    if (position.side == null) {
+                        return 1;
+                    }
+                    int c = Integer.compare(side, position.side);
+                    if (c == 0) {
+                        return compareTrackNumbers(position);
+                    }
+                    return c;
+                }
+                return -1;
+            }
+            if (position.disc == null) {
+                return 1;
+            }
+            int c = Integer.compare(disc, position.disc);
+            if (c == 0) {
+                return compareTrackNumbers(position);
+            }
+            return c;
+        }
 
-	public String getSubPosition() {
-		Matcher matcher = positionMatcher();
-		if (matcher.matches()) {
-			return matcher.group("sub");
-		}
-		return null;
-	}
 
-	public Integer getDisc() {
-		Matcher matcher = positionMatcher();
-		if (matcher.matches()) {
-			String disc = matcher.group("disc");
-			if (disc != null) {
-				return Integer.parseInt(disc);
-			}
-		}
-		return null;
-	}
+        private int compareTrackNumbers(Position position) {
+            if (number == null) {
+                if (position.number == null) {
+                    return 0;
+                }
+                return -1;
+            }
+            if (position.number == null) {
+                return 1;
+            }
+            int c = Integer.compare(number, position.number);
+            if (c == 0) {
+                if (sub == null) {
+                    if (position.sub == null) {
+                        return 0;
+                    }
+                    return -1;
+                }
+                if (position.sub == null) {
+                    return 1;
+                }
+                return Character.compare(sub, position.sub);
+            }
+            return c;
+        }
+    }
 
-	public Character getSide() {
-		Matcher matcher = positionMatcher();
-		if (matcher.matches()) {
-			String side = matcher.group("side");
-			if (side != null) {
-				return side.charAt(0);
-			}
-		}
-		return null;
-	}
+    public Position position() {
+        if (position != null) {
+            Matcher matcher = POSITION_PATTERN.matcher(position);
+            if (matcher.matches()) {
+                Position position = new Position();
+                String number = matcher.group("number");
+                if (number != null) {
+                    position.setNumber(Integer.parseInt(number));
+                }
+                String sub = matcher.group("sub");
+                if (sub != null) {
+                    position.setSub(sub.charAt(0));
+                }
+                String disc = matcher.group("disc");
+                if (disc != null) {
+                    position.setDisc(Integer.parseInt(disc));
+                }
+                String side = matcher.group("side");
+                if (side != null) {
+                    position.setSide(side.charAt(0));
+                }
+                return position;
+            }
+        }
+        return null;
+    }
 
-	public Integer getNumber() {
-		Matcher matcher = positionMatcher();
-		if (matcher.matches()) {
-			String number = matcher.group("number");
-			if (number != null) {
-				return Integer.parseInt(number);
-			}
-		}
-		return null;
-	}
+    @Override
+    public int compareTo(Track track) {
+        Position p1 = position();
+        Position p2 = track.position();
+        if (p1 == null) {
+            if (p2 == null) {
+                return 0;
+            }
+            return -1;
+        }
+        if (p2 == null) {
+            return 1;
+        }
+        return p1.compareTo(p2);
+    }
+
+    public Duration duration() {
+        if (duration != null) {
+            Matcher matcher = DURATION_PATTERN.matcher(duration.trim());
+            if (matcher.matches()) {
+                int minutes = Integer.parseInt(matcher.group("minutes"));
+                int seconds = Integer.parseInt(matcher.group("seconds"));
+                Duration duration = Duration.ofMinutes(minutes);
+                return duration.plus(Duration.ofSeconds(seconds));
+            }
+        }
+        return null;
+    }
+
 
 }

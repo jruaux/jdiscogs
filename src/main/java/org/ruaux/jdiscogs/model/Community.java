@@ -3,30 +3,23 @@ package org.ruaux.jdiscogs.model;
 import java.util.List;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+
+@Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Community {
 
-	@Getter
-	@Setter
 	private String status;
-	@Getter
-	@Setter
 	private Rating rating;
-	@Getter
-	@Setter
 	private Long want;
-	@Getter
-	@Setter
+	@XmlElement(name="contributor")
+	@XmlElementWrapper(name="contributors")
 	private List<User> contributors;
-	@Getter
-	@Setter
 	private Long have;
-	@Getter
-	@Setter
 	private User submitter;
-	@Getter
-	@Setter
 	private String data_quality;
 }

@@ -5,19 +5,19 @@ import lombok.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "identifier")
+@AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Identifier {
+public class Label {
+
     @XmlAttribute
-    private String description;
+    private Long id;
     @XmlAttribute
-    private String type;
+    private String name;
     @XmlAttribute
-    private String value;
+    private String catno;
+
 }
