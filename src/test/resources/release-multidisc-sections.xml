@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<release id="13777199" status="Accepted">
+    <title>Great Pianists Of The 20th Century: Vladimir Horowitz I
+    </title>
+    <country>UK</country>
+    <released>1998</released>
+    <data_quality>Needs Vote</data_quality>
+    <images>
+        <image height="519" type="primary" width="600" uri="" uri150=""/>
+        <image height="531" type="secondary" width="600" uri="" uri150=""/>
+        <image height="542" type="secondary" width="600" uri="" uri150=""/>
+        <image height="520" type="secondary" width="600" uri="" uri150=""/>
+        <image height="559" type="secondary" width="600" uri="" uri150=""/>
+    </images>
+    <artists>
+        <artist>
+            <id>847818</id>
+            <join></join>
+            <name>Vladimir Horowitz</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role></role>
+        </artist>
+    </artists>
+    <labels>
+        <label id="7704" name="Philips" catno="456 838-2"/>
+    </labels>
+    <extraartists>
+        <artist>
+            <id>847818</id>
+            <join></join>
+            <name>Vladimir Horowitz</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Grand Piano</role>
+        </artist>
+    </extraartists>
+    <formats>
+        <format name="CD" qty="2" text="">
+            <descriptions>
+                <description>Compilation</description>
+            </descriptions>
+        </format>
+    </formats>
+    <genres>
+        <genre>Classical</genre>
+    </genres>
+    <styles>
+        <style>Classical</style>
+        <style>Romantic</style>
+    </styles>
+    <tracklist>
+        <track>
+            <position></position>
+            <title>CD 1</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>1</position>
+            <title>Toccata In C Major, Op. 7</title>
+            <duration>4:42</duration>
+        </track>
+        <track>
+            <position>2</position>
+            <title>Arabeske In C Major, Op. 18</title>
+            <duration>6:18</duration>
+        </track>
+        <track>
+            <position>3</position>
+            <title>Traumes Wirren (From "Fantasiest\xc3\xbccke", Op. 12)</title>
+            <duration>2:24</duration>
+        </track>
+        <track>
+            <position>4</position>
+            <title>Presto Appassionato (Rejected Finale Of Sonata No. 2, Op. 22)</title>
+            <duration>5:30</duration>
+        </track>
+        <track>
+            <position></position>
+            <title>Kreisleriana, Op. 16</title>
+            <duration></duration>
+            <sub_tracks>
+                <track>
+                    <position>5.1</position>
+                    <title>\xc3\x84u\xc3\x9ferst Bewegt</title>
+                    <duration>2:53</duration>
+                </track>
+                <track>
+                    <position>5.2</position>
+                    <title>Sehr Innig Und Nicht Zu Rasch</title>
+                    <duration>6:56</duration>
+                </track>
+                <track>
+                    <position>5.3</position>
+                    <title>Sehr Aufgeregt</title>
+                    <duration>5:00</duration>
+                </track>
+                <track>
+                    <position>5.4</position>
+                    <title>Sehr Aufgeregt</title>
+                    <duration>3:27</duration>
+                </track>
+                <track>
+                    <position>5.5</position>
+                    <title>Sehr Lebhaft</title>
+                    <duration>3:19</duration>
+                </track>
+                <track>
+                    <position>5.6</position>
+                    <title>Sehr Langsam</title>
+                    <duration>3:24</duration>
+                </track>
+                <track>
+                    <position>5.7</position>
+                    <title>Sehr Rasch</title>
+                    <duration>2:26</duration>
+                </track>
+                <track>
+                    <position>5.8</position>
+                    <title>Schnell Und Spielend</title>
+                    <duration>3:52</duration>
+                </track>
+            </sub_tracks>
+        </track>
+        <track>
+            <position></position>
+            <title>Humoreske In B Flat, Op. 20</title>
+            <duration></duration>
+            <sub_tracks>
+                <track>
+                    <position>6.1</position>
+                    <title>Einfach</title>
+                    <duration>1:59</duration>
+                </track>
+                <track>
+                    <position>6.2</position>
+                    <title>Sehr Rasch Und Leicht</title>
+                    <duration>3:03</duration>
+                </track>
+                <track>
+                    <position>6.3</position>
+                    <title>Noch Rascher</title>
+                    <duration>3:03</duration>
+                </track>
+                <track>
+                    <position>6.4</position>
+                    <title>Hastig</title>
+                    <duration>1:43</duration>
+                </track>
+                <track>
+                    <position>6.5</position>
+                    <title>Nach Und Nach Immer Lebhafter Und St\xc3\xa4rker</title>
+                    <duration>2:08</duration>
+                </track>
+                <track>
+                    <position>6.6</position>
+                    <title>Einfach Und Zart</title>
+                    <duration>1:51</duration>
+                </track>
+                <track>
+                    <position>6.7</position>
+                    <title>Intermezzo</title>
+                    <duration>2:44</duration>
+                </track>
+                <track>
+                    <position>6.8</position>
+                    <title>Innig</title>
+                    <duration>2:39</duration>
+                </track>
+                <track>
+                    <position>6.9</position>
+                    <title>Sehr Lebhaft</title>
+                    <duration>1:52</duration>
+                </track>
+                <track>
+                    <position>6.10</position>
+                    <title>Mit Einigem Pomp</title>
+                    <duration>1:28</duration>
+                </track>
+                <track>
+                    <position>6.11</position>
+                    <title>Zum Beschluss</title>
+                    <duration>5:11</duration>
+                </track>
+            </sub_tracks>
+        </track>
+        <track>
+            <position></position>
+            <title>CD 2</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position></position>
+            <title>"Concert Sans Orchetre" (Piano Sonata In F Minor, Op. 14)</title>
+            <duration></duration>
+            <sub_tracks>
+                <track>
+                    <position>1.1</position>
+                    <title>Allegro Brillante</title>
+                    <duration>8:05</duration>
+                </track>
+                <track>
+                    <position>1.2</position>
+                    <title>Scherzo. Molto Commodo</title>
+                    <duration>5:36</duration>
+                </track>
+                <track>
+                    <position>1.3</position>
+                    <title>Quasi Variazioni, Andantino de Clara Wieck</title>
+                    <duration>8:14</duration>
+                </track>
+                <track>
+                    <position>1.4</position>
+                    <title>Finale, Prestissimo Possibile</title>
+                    <duration>6:49</duration>
+                </track>
+            </sub_tracks>
+        </track>
+        <track>
+            <position>2</position>
+            <title>Novellette in F, Op. 21, No. 1</title>
+            <duration>5:51</duration>
+        </track>
+        <track>
+            <position></position>
+            <title>Fantasiest\xc3\xbccke, Op. 111</title>
+            <duration></duration>
+            <sub_tracks>
+                <track>
+                    <position>3.1</position>
+                    <title>Molto Vivce Ed Appassionatamente</title>
+                    <duration>2:23</duration>
+                </track>
+                <track>
+                    <position>3.2</position>
+                    <title>Piu Tosto Lento - Un Poco Piu Mosso - Tempo</title>
+                    <duration>4:42</duration>
+                </track>
+                <track>
+                    <position>3.3</position>
+                    <title>Con Forza, Assai Marcato</title>
+                    <duration>3:37</duration>
+                </track>
+            </sub_tracks>
+        </track>
+        <track>
+            <position></position>
+            <title>Kinderszenen, Op. 15</title>
+            <duration></duration>
+            <sub_tracks>
+                <track>
+                    <position>4.1</position>
+                    <title>Von Fremden L\xc3\xa4ndern Und Menschen</title>
+                    <duration>1:32</duration>
+                </track>
+                <track>
+                    <position>4.2</position>
+                    <title>Kuriose Geschichte</title>
+                    <duration>1:05</duration>
+                </track>
+                <track>
+                    <position>4.3</position>
+                    <title>Hasche-Mann</title>
+                    <duration>0:32</duration>
+                </track>
+                <track>
+                    <position>4.4</position>
+                    <title>Bittendes Kind</title>
+                    <duration>0:49</duration>
+                </track>
+                <track>
+                    <position>4.5</position>
+                    <title>Gl\xc3\xbcckes Genug</title>
+                    <duration>0:40</duration>
+                </track>
+                <track>
+                    <position>4.6</position>
+                    <title>Wichtige Begebenheit</title>
+                    <duration>0:51</duration>
+                </track>
+                <track>
+                    <position>4.7</position>
+                    <title>Tr\xc3\xa4umerei</title>
+                    <duration>2:34</duration>
+                </track>
+                <track>
+                    <position>4.8</position>
+                    <title>Am Kamin</title>
+                    <duration>1:20</duration>
+                </track>
+                <track>
+                    <position>4.9</position>
+                    <title>Ritter von Steckenpferd</title>
+                    <duration>0:40</duration>
+                </track>
+                <track>
+                    <position>4.10</position>
+                    <title>Fast Zu Ernst</title>
+                    <duration>1:28</duration>
+                </track>
+                <track>
+                    <position>4.11</position>
+                    <title>F\xc3\xbcrchtenmachen</title>
+                    <duration>1:39</duration>
+                </track>
+                <track>
+                    <position>4.12</position>
+                    <title>Kind Im Einschlummern</title>
+                    <duration>1:38</duration>
+                </track>
+                <track>
+                    <position>4.13</position>
+                    <title>Der Dichter Spricht</title>
+                    <duration>2:12</duration>
+                </track>
+            </sub_tracks>
+        </track>
+    </tracklist>
+    <identifiers>
+        <identifier type="Barcode" value="0 28945 68382 9"/>
+    </identifiers>
+    <companies/>
+</release>

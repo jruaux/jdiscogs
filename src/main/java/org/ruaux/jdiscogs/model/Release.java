@@ -3,10 +3,7 @@ package org.ruaux.jdiscogs.model;
 import lombok.Data;
 
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,8 +11,6 @@ import java.util.regex.Pattern;
 @XmlRootElement(name = "release")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Release {
-
-    private static final Pattern RELEASED_PATTERN = Pattern.compile("^(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})");
 
     @XmlAttribute
     private Long id;
@@ -76,48 +71,5 @@ public class Release {
     @XmlElement(name = "series")
     @XmlElementWrapper(name = "series")
     private List<Series> series;
-
-    public List<Track> normalizedTracks() {
-        if (tracklist == null) {
-            return null;
-        }
-        SortedMap<Track.Position, Track> map = new TreeMap<>();
-        for (Track track : tracklist) {
-            Track.Position position = track.position();
-            if (position != null) {
-                if (position.getSub() == null) {
-                    map.put(position, track.toBuilder().build());
-                } else {
-                    position = position.toBuilder().sub(null).build();
-                    Track compositeTrack = map.containsKey(position)?map.get(position):Track.builder().position(position.toString()).build();
-                    List<Track> sub_tracks = compositeTrack.getSub_tracks();
-                    if (sub_tracks == null) {
-                        sub_tracks = new ArrayList<>();
-                    }
-                    sub_tracks.add(track.toBuilder().build());
-                    compositeTrack.setSub_tracks(sub_tracks);
-                    map.put(position, compositeTrack);
-                }
-            }
-        }
-        return new ArrayList<>(map.values());
-    }
-
-    public Integer year() {
-        if (year == null) {
-            if (released == null) {
-                return null;
-            }
-            Matcher matcher = RELEASED_PATTERN.matcher(released);
-            if (matcher.matches()) {
-                String year = matcher.group("year");
-                if (year != null) {
-                    return Integer.parseInt(year);
-                }
-            }
-            return null;
-        }
-        return year;
-    }
 
 }

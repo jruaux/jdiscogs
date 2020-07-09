@@ -8,6 +8,10 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "discogs")
 public class JDiscogsProperties {
 
+	public static final String DEFAULT_RELEASE_INDEX = "releases";
+	public static final String DEFAULT_MASTER_INDEX = "masters";
+	public static final String DEFAULT_ARTIST_SUGGEST_INDEX = "artists";
+
 	private String apiUrl = "https://api.discogs.com/{entity}/{id}";
 	private String token;
 	private String userAgent = "jdiscogs.useragent";
@@ -18,11 +22,11 @@ public class JDiscogsProperties {
 	private int threads = 1;
 	private boolean forceLoad = false;
 	private boolean noOp = false;
-	private String releaseIndex = "releases";
+	private String releaseIndex = DEFAULT_RELEASE_INDEX;
 	private int minReleaseItemCount = 10000000;
 	private int minMasterItemCount = 1000000;
-	private String masterIndex = "masters";
-	private String artistSuggestionIndex = "artists";
+	private String masterIndex = DEFAULT_MASTER_INDEX;
+	private String artistSuggestionIndex = DEFAULT_ARTIST_SUGGEST_INDEX;
 	private int minImages = 2;
 	private int minImageHeight = 400;
 	private int minImageWidth = 400;

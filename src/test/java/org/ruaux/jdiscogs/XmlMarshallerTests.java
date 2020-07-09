@@ -70,11 +70,19 @@ public class XmlMarshallerTests {
     @Test
     public void testTracklist() throws JAXBException {
         Release release = release("release-4273080.xml");
-        List<Track> tracks = release.normalizedTracks();
+        ReleaseUtils releaseUtils = new ReleaseUtils();
+        releaseUtils.setTrackSeparator(" - ");
+        List<NormalizedTrack> tracks = releaseUtils.normalizedTracks(release);
         assertEquals(23, tracks.size());
-        assertEquals(2, tracks.get(16).getSub_tracks().size());
-        assertEquals("He Ain't Heavy, He's My Brother", tracks.get(16).getSub_tracks().get(0).getTitle());
-        assertEquals("Bridge Over Troubled Water", tracks.get(16).getSub_tracks().get(1).getTitle());
+        assertEquals("He Ain't Heavy, He's My Brother - Bridge Over Troubled Water", tracks.get(16).getTitle());
     }
+
+    @Test
+    public void testMultiDiscSections() throws JAXBException {
+        Release release = release("release-multidisc-sections.xml");
+        List<NormalizedTrack> tracks = new ReleaseUtils().normalizedTracks(release);
+        assertEquals(44, tracks.size());
+    }
+
 
 }
