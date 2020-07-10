@@ -9,6 +9,7 @@ import org.ruaux.jdiscogs.model.Track;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,11 +23,11 @@ public class ReleaseUtils {
     @Setter
     private String trackSeparator = DEFAULT_TRACK_SEPARATOR;
 
-    private Position position(String positionString) {
-        if (positionString == null) {
+    private static Position position(String string) {
+        if (string == null) {
             return null;
         }
-        Matcher matcher = POSITION_PATTERN.matcher(positionString);
+        Matcher matcher = POSITION_PATTERN.matcher(string);
         if (!matcher.matches()) {
             return null;
         }
@@ -50,11 +51,11 @@ public class ReleaseUtils {
         return position;
     }
 
-    private Duration duration(String durationString) {
-        if (durationString == null) {
+    public static Duration duration(String string) {
+        if (string == null) {
             return null;
         }
-        Matcher matcher = DURATION_PATTERN.matcher(durationString.trim());
+        Matcher matcher = DURATION_PATTERN.matcher(string.trim());
         if (!matcher.matches()) {
             return null;
         }
@@ -85,7 +86,9 @@ public class ReleaseUtils {
                 }
                 toRemove.add(track);
             } else {
-                track.getPosition().setDisc(disc);
+                if (disc != null) {
+                    track.getPosition().setDisc(disc);
+                }
                 if (track.getPosition().getSub() != null) {
                     NormalizedTrack firstSubTrack = firstSubTrack(tracks, track.getPosition());
                     if (firstSubTrack != track) {
@@ -99,27 +102,20 @@ public class ReleaseUtils {
         return tracks;
     }
 
-    private NormalizedTrack firstSubTrack(List<NormalizedTrack> tracks, Position position) {
+    public static NormalizedTrack firstSubTrack(List<NormalizedTrack> tracks, Position position) {
         for (NormalizedTrack track : tracks) {
-            if (track.getPosition() != null && equals(track.getPosition().getDisc(), position.getDisc()) && equals(track.getPosition().getNumber(), position.getNumber()) && equals(track.getPosition().getSide(), position.getSide())) {
+            if (track.getPosition() != null && Objects.equals(track.getPosition().getDisc(), position.getDisc()) && Objects.equals(track.getPosition().getNumber(), position.getNumber()) && Objects.equals(track.getPosition().getSide(), position.getSide())) {
                 return track;
             }
         }
         return null;
     }
 
-    private boolean equals(Object left, Object right) {
-        if (left == null) {
-            return right == null;
-        }
-        return left.equals(right);
-    }
-
-    private NormalizedTrack normalizedTrack(Track track) {
+    public static NormalizedTrack normalizedTrack(Track track) {
         return NormalizedTrack.builder().artists(track.getArtists()).duration(duration(track.getDuration())).position(position(track.getPosition())).title(track.getTitle()).build();
     }
 
-    private Integer year(Release release) {
+    public static Integer year(Release release) {
         if (release.getYear() != null) {
             return release.getYear();
         }

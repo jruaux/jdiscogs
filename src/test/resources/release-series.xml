@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<release id="175127" status="Accepted">
+    <title>Pulp Fusion</title>
+    <country>UK</country>
+    <series>
+        <series>
+            <name>Pulp Fusion</name>
+            <id>486989</id>
+        </series>
+    </series>
+    <released>1997
+    </released>
+    <notes>Funky Jazz Classics &amp; Original Breaks from the Tough Side &#13;
+        &#13;
+        This compilation:&#13;
+        xe2x84x97
+        1997 Harmless Recordings &#13;
+        xc2xa9 1997 Harmless Recordings &#13;
+        &#13;
+        Gatefold sleeve
+    </notes>
+    <data_quality>Needs Vote</data_quality>
+    <master_id isMainRelease="false">162093</master_id>
+    <images>
+        <image
+                height="600" type="primary" width="600" uri="" uri150=""/>
+    </images>
+    <artists>
+        <artist>
+            <id>194</id>
+            <join></join>
+            <name>Various</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role></role>
+        </artist>
+    </artists>
+    <labels>
+        <label id="1030" name="Harmless" catno="HURTLP 003"/>
+    </labels>
+    <extraartists>
+        <artist>
+            <id>338166</id>
+            <join></join>
+            <name>Peter Adarkwah</name>
+            <anv>Pete Adarkwah</anv>
+            <tracks></tracks>
+            <role>Concept By, Compiled By</role>
+        </artist>
+        <artist>
+            <id>625352</id>
+            <join></join>
+            <name>Ian McCann</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Liner Notes</role>
+        </artist>
+    </extraartists>
+    <formats>
+        <format name="Vinyl" qty="3" text="">
+            <descriptions>
+                <description>LP</description>
+                <description>Compilation</description>
+            </descriptions>
+        </format>
+    </formats>
+    <genres>
+        <genre>Jazz</genre>
+        <genre>Funk / Soul</genre>
+    </genres>
+    <styles>
+        <style>Funk</style>
+        <style>Jazz-Funk</style>
+        <style>Soul-Jazz</style>
+        <style>Latin Jazz</style>
+    </styles>
+    <tracklist>
+        <track>
+            <position>A1</position>
+            <title>Shifting Gears</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>11648</id>
+                    <join></join>
+                    <name>Johnny Hammond</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>A2</position>
+            <title>Chitterlings Con Carne</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>129346</id>
+                    <join></join>
+                    <name>Pucho &amp; His Latin Soul Brothers</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>B1</position>
+            <title>Don't It Drive You Crazy</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>86163</id>
+                    <join></join>
+                    <name>Pointer Sisters</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>B2</position>
+            <title>Inner City Blues</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>29967</id>
+                    <join></join>
+                    <name>Reuben Wilson</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>C1</position>
+            <title>First Come, First Serve</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>129347</id>
+                    <join></join>
+                    <name>Ramon Morris</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>C2</position>
+            <title>Melting Pot</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>129348</id>
+                    <join></join>
+                    <name>Booker T &amp; The MG's</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>D1</position>
+            <title>Every Time He Comes Around</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>61686</id>
+                    <join></join>
+                    <name>Minnie Riperton</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>D2</position>
+            <title>Burning Spear</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>35718</id>
+                    <join></join>
+                    <name>S.O.U.L.</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>E1</position>
+            <title>The Bump</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>47394</id>
+                    <join></join>
+                    <name>George Freeman</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>E2</position>
+            <title>Crab Apple</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>42195</id>
+                    <join></join>
+                    <name>Idris Muhammad</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>F1</position>
+            <title>Hang Up Your Hang Ups</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>3865</id>
+                    <join></join>
+                    <name>Herbie Hancock</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+        <track>
+            <position>F2</position>
+            <title>Afrodesia</title>
+            <duration></duration>
+            <artists>
+                <artist>
+                    <id>29961</id>
+                    <join></join>
+                    <name>Lonnie Smith</name>
+                    <anv></anv>
+                    <tracks></tracks>
+                    <role></role>
+                </artist>
+            </artists>
+        </track>
+    </tracklist>
+    <identifiers>
+        <identifier type="Barcode" value="5014797131033"/>
+    </identifiers>
+    <videos>
+        <video duration="317" embed="true" src="https://www.youtube.com/watch?v=A3VNOcjFVSQ">
+            <title>Johnny Hammond-Shifting Gears(1975)</title>
+            <description>Johnny Hammond-Shifting Gears(1975)</description>
+        </video>
+        <video duration="288" embed="true" src="https://www.youtube.com/watch?v=wRfeFaCHOdU">
+            <title>Reuben Wilson
+                - Inner City Blues (High Quality)
+            </title>
+            <description>Reuben Wilson - Inner City Blues (High Quality)</description>
+        </video>
+        <video
+                duration="370" embed="true" src="https://www.youtube.com/watch?v=gng36d8gH3I">
+            <title>The Pointer Sisters - Don't
+                It Drive You Crazy 1977
+            </title>
+            <description>The Pointer Sisters - Don't It Drive You Crazy 1977</description>
+        </video>
+        <video
+                duration="494" embed="true" src="https://www.youtube.com/watch?v=BW08GnKufQ8">
+            <title>Booker T. &amp; the MG's -
+                Melting Pot
+            </title>
+            <description>Booker T. &amp; the MG's - Melting Pot</description>
+        </video>
+        <video
+                duration="4323" embed="true" src="https://www.youtube.com/watch?v=rQCrT85tKFU">
+            <title>Pulp Fusion (1997) full
+                album
+            </title>
+            <description>Pulp Fusion (1997) full album</description>
+        </video>
+        <video
+                duration="235" embed="true" src="https://www.youtube.com/watch?v=ITqtp-3XudI">
+            <title>Minnie Riperton - Every Time
+                He Comes Around
+            </title>
+            <description>Minnie Riperton - Every Time He Comes Around</description>
+        </video>
+        <video
+                duration="472" embed="true" src="https://www.youtube.com/watch?v=M3N0n-1ZQW4">
+            <title>George Freeman - The Bump -
+                1972 [Soul-Jazz]
+            </title>
+            <description>George Freeman - The Bump - 1972 [Soul-Jazz]</description>
+        </video>
+    </videos>
+    <companies>
+        <company>
+            <id>318920</id>
+            <name>Harmless Recordings</name>
+            <catno></catno>
+            <entity_type>13</entity_type>
+            <entity_type_name>Phonographic Copyright (p)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/318920</resource_url>
+        </company>
+        <company>
+            <id>318920</id>
+            <name>Harmless Recordings</name>
+            <catno></catno>
+            <entity_type>14</entity_type>
+            <entity_type_name>Copyright (c)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/318920</resource_url>
+        </company>
+        <company>
+            <id>282554</id>
+            <name>Disc (3)</name>
+            <catno></catno>
+            <entity_type>9</entity_type>
+            <entity_type_name>Distributed By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/282554</resource_url>
+        </company>
+    </companies>
+</release>
