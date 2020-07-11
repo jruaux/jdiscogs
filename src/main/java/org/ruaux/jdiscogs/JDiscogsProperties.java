@@ -16,8 +16,8 @@ public class JDiscogsProperties {
 	private String token;
 	private String userAgent = "jdiscogs.useragent";
 	private String arraySeparator = ",";
-	private String releasesUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_releases.xml.gz";
-	private String mastersUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2019/discogs_20191201_masters.xml.gz";
+	private String releasesUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2020/discogs_20200703_releases.xml.gz";
+	private String mastersUrl = "https://discogs-data.s3-us-west-2.amazonaws.com/data/2020/discogs_20200703_masters.xml.gz";
 	private int batchSize = 50;
 	private int threads = 1;
 	private boolean forceLoad = false;

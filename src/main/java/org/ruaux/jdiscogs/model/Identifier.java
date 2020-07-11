@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "identifier")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Identifier {
+
     @XmlAttribute
     private String description;
     @XmlAttribute

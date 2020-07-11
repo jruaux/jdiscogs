@@ -2,6 +2,7 @@ package org.ruaux.jdiscogs.data;
 
 import com.redislabs.lettusearch.search.Document;
 import org.ruaux.jdiscogs.JDiscogsProperties;
+import org.ruaux.jdiscogs.ReleaseUtils;
 import org.ruaux.jdiscogs.model.Artist;
 import org.ruaux.jdiscogs.model.Image;
 import org.ruaux.jdiscogs.model.Master;
@@ -66,11 +67,11 @@ public class MasterProcessor implements ItemProcessor<Master, Document<String, S
     }
 
     private boolean hasImage(Master master) {
-        Image image = master.getPrimaryImage();
+        Image image = ReleaseUtils.primaryImage(master);
         if (image == null) {
             return false;
         }
-        return image.getHeight() >= props.getMinImageHeight() && image.getWidth() >= props.getMinImageWidth() && Math.abs(1 - image.getRatio()) <= props.getImageRatioTolerance();
+        return image.getHeight() >= props.getMinImageHeight() && image.getWidth() >= props.getMinImageWidth() && Math.abs(1 - ReleaseUtils.ratio(image)) <= props.getImageRatioTolerance();
     }
 
     private List<String> sanitize(Set<String> getGenres) {

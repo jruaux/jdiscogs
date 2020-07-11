@@ -43,11 +43,4 @@ public class Master {
     @XmlElementWrapper(name = "videos")
     private List<Video> videos;
 
-    public Image getPrimaryImage() {
-        if (images == null) {
-            return null;
-        }
-        return images.stream().filter(Image::isPrimary).findFirst().orElse(null);
-    }
-
 }

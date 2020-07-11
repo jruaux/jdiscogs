@@ -10,15 +10,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @XmlRootElement(name = "image")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Image {
-
-    public static final String TYPE_PRIMARY = "primary";
 
     @XmlAttribute
     private Integer height;
@@ -31,17 +29,4 @@ public class Image {
     @XmlAttribute
     private String uri150;
 
-    public boolean isPrimary() {
-        return TYPE_PRIMARY.equals(type);
-    }
-
-    public Double getRatio() {
-        if (height == null) {
-            return null;
-        }
-        if (width == null) {
-            return null;
-        }
-        return height.doubleValue() / width.doubleValue();
-    }
 }

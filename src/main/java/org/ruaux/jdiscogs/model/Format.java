@@ -16,9 +16,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Format {
 
-    public final static String CD = "CD";
-    public final static String VINYL = "Vinyl";
-
     @XmlAttribute
     private String name;
     @XmlAttribute
@@ -28,13 +25,5 @@ public class Format {
     @XmlElement(name="description")
     @XmlElementWrapper(name="descriptions")
     private List<String> descriptions;
-
-    public boolean isCd() {
-        return CD.equalsIgnoreCase(name);
-    }
-
-    public boolean isVinyl() {
-        return VINYL.equalsIgnoreCase(name);
-    }
 
 }

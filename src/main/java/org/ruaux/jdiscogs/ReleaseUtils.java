@@ -1,10 +1,6 @@
 package org.ruaux.jdiscogs;
 
-import lombok.Setter;
-import org.ruaux.jdiscogs.model.NormalizedTrack;
-import org.ruaux.jdiscogs.model.Position;
-import org.ruaux.jdiscogs.model.Release;
-import org.ruaux.jdiscogs.model.Track;
+import org.ruaux.jdiscogs.model.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -15,13 +11,37 @@ import java.util.regex.Pattern;
 
 public class ReleaseUtils {
 
+    private static final String TYPE_PRIMARY = "primary";
     private static final Pattern POSITION_PATTERN = Pattern.compile("^((?<side>[A-Z])|((?<disc>\\d+)[\\-.:]))?(?<number>\\d+)(?<sub>[a-z])?");
     private static final Pattern DURATION_PATTERN = Pattern.compile("^(?<minutes>\\d+):(?<seconds>\\d+)");
     private static final Pattern RELEASED_PATTERN = Pattern.compile("^(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})");
     private static final Pattern CD_PATTERN = Pattern.compile("(disc|disk|cd)\\s*(?<disc>\\d+).*", Pattern.CASE_INSENSITIVE);
-    public static final String DEFAULT_TRACK_SEPARATOR = " / ";
-    @Setter
-    private String trackSeparator = DEFAULT_TRACK_SEPARATOR;
+    public final static String CD = "CD";
+    public final static String VINYL = "Vinyl";
+
+    public static boolean isCd(Release release) {
+        if (release.getFormats() == null || release.getFormats().isEmpty()) {
+            return false;
+        }
+        return isCd(release.getFormats().get(0));
+    }
+
+    public static boolean isVinyl(Release release) {
+        if (release.getFormats() == null || release.getFormats().isEmpty()) {
+            return false;
+        }
+        return isVinyl(release.getFormats().get(0));
+    }
+
+    public static boolean isCd(Format format) {
+        return CD.equalsIgnoreCase(format.getName());
+    }
+
+    public static boolean isVinyl(Format format) {
+        return VINYL.equalsIgnoreCase(format.getName());
+    }
+
+    public static final String TRACK_SEPARATOR = " / ";
 
     private static Position position(String string) {
         if (string == null) {
@@ -64,7 +84,7 @@ public class ReleaseUtils {
         return Duration.ofMinutes(minutes).plus(Duration.ofSeconds(seconds));
     }
 
-    public List<NormalizedTrack> normalizedTracks(Release release) {
+    public static List<NormalizedTrack> normalizedTracks(Release release) {
         List<NormalizedTrack> tracks = new ArrayList<>();
         if (release.getTracklist() != null) {
             for (Track track : release.getTracklist()) {
@@ -78,24 +98,29 @@ public class ReleaseUtils {
         }
         List<NormalizedTrack> toRemove = new ArrayList<>();
         Integer disc = null;
+        int trackNumber = 1;
         for (NormalizedTrack track : tracks) {
             if (track.getPosition() == null) {
                 Matcher matcher = CD_PATTERN.matcher(track.getTitle());
                 if (matcher.matches()) {
                     disc = Integer.parseInt(matcher.group("disc"));
+                    trackNumber = 1;
                 }
                 toRemove.add(track);
             } else {
                 if (disc != null) {
                     track.getPosition().setDisc(disc);
+                    track.getPosition().setNumber(trackNumber);
                 }
                 if (track.getPosition().getSub() != null) {
                     NormalizedTrack firstSubTrack = firstSubTrack(tracks, track.getPosition());
                     if (firstSubTrack != track) {
-                        firstSubTrack.setTitle(firstSubTrack.getTitle() + trackSeparator + track.getTitle());
+                        assert firstSubTrack != null;
+                        firstSubTrack.setTitle(firstSubTrack.getTitle() + TRACK_SEPARATOR + track.getTitle());
                         toRemove.add(track);
                     }
                 }
+                trackNumber++;
             }
         }
         tracks.removeAll(toRemove);
@@ -128,4 +153,27 @@ public class ReleaseUtils {
         }
         return Integer.parseInt(matcher.group("year"));
     }
+
+    public static boolean isPrimary(Image image) {
+        return TYPE_PRIMARY.equals(image.getType());
+    }
+
+    public static Double ratio(Image image) {
+        if (image.getHeight() == null) {
+            return null;
+        }
+        if (image.getWidth() == null) {
+            return null;
+        }
+        return image.getHeight().doubleValue() / image.getWidth().doubleValue();
+    }
+
+    public static Image primaryImage(Master master) {
+        if (master.getImages() == null) {
+            return null;
+        }
+        return master.getImages().stream().filter(ReleaseUtils::isPrimary).findFirst().orElse(null);
+    }
+
+
 }

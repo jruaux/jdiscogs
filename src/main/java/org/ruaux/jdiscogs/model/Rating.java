@@ -1,16 +1,16 @@
 package org.ruaux.jdiscogs.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Rating {
 
-	@Getter
-	@Setter
-	private Long count;
-	@Getter
-	@Setter
-	private Double average;
+    private Long count;
+    private Double average;
 }
