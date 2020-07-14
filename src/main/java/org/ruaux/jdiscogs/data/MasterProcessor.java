@@ -57,7 +57,7 @@ public class MasterProcessor implements ItemProcessor<Master, Document<String, S
         Set<String> genres = new LinkedHashSet<>();
         genres.addAll(master.getGenres());
         genres.addAll(master.getStyles());
-        doc.put(GENRES, String.join(props.getArraySeparator(), sanitize(genres)));
+        doc.put(GENRES, String.join(props.getData().getSeparator(), sanitize(genres)));
         doc.put(TITLE, master.getTitle());
         doc.put(YEAR, String.valueOf(master.getYear()));
         StringWriter writer = new StringWriter();
@@ -71,7 +71,7 @@ public class MasterProcessor implements ItemProcessor<Master, Document<String, S
         if (image == null) {
             return false;
         }
-        return image.getHeight() >= props.getMinImageHeight() && image.getWidth() >= props.getMinImageWidth() && Math.abs(1 - ReleaseUtils.ratio(image)) <= props.getImageRatioTolerance();
+        return image.getHeight() >= props.getData().getMasters().getMinImageHeight() && image.getWidth() >= props.getData().getMasters().getMinImageWidth() && Math.abs(1 - ReleaseUtils.ratio(image)) <= props.getData().getMasters().getImageRatioTolerance();
     }
 
     private List<String> sanitize(Set<String> getGenres) {

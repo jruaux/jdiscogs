@@ -43,7 +43,7 @@ public class ReleaseProcessor implements ItemProcessor<Release, Document<String,
     @Override
     public Document<String, String> process(Release release) throws JAXBException {
         Document<String, String> doc = Document.builder().id(String.valueOf(release.getId())).score(1d).build();
-        doc.put(ARTIST, sanitizer.sanitize(release.getArtists().stream().map(Artist::getName).collect(Collectors.joining(props.getArraySeparator()))));
+        doc.put(ARTIST, sanitizer.sanitize(release.getArtists().stream().map(Artist::getName).collect(Collectors.joining(props.getData().getSeparator()))));
         doc.put(TITLE, sanitizer.sanitize(release.getTitle()));
         doc.put(ID, String.valueOf(release.getId()));
         StringWriter writer = new StringWriter();

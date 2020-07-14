@@ -9,7 +9,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.xml.bind.JAXBException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,22 +23,44 @@ public class XmlMarshallerTests {
     public void testRelease() throws JAXBException {
         Release release = release("release-1.xml");
         assertEquals(4, release.getImages().size());
-        assertEquals(Image.builder().height(600).type("primary").uri("").uri150("").width(600).build(), release.getImages().get(0));
+        Image image = release.getImages().get(0);
+        assertEquals(600, image.getHeight());
+        assertEquals("primary", image.getType());
+        assertEquals("", image.getUri());
+        assertEquals("", image.getUri150());
+        assertEquals(600, image.getWidth());
         assertEquals(1, release.getArtists().size());
-        assertEquals(Artist.builder().id(1L).name("The Persuader").anv("").join("").role("").tracks("").build(), release.getArtists().get(0));
+        Artist artist = release.getArtists().get(0);
+        assertEquals(1L, artist.getId());
+        assertEquals("The Persuader", artist.getName());
         assertEquals("Stockholm", release.getTitle());
-        assertEquals(Label.builder().catno("SK032").id(5L).name("Svek").build(), release.getLabels().get(0));
-        assertEquals(Artist.builder().id(239L).name("Jesper Dahlbäck").anv("").join("").role("Music By [All Tracks By]").tracks("").build(), release.getExtraartists().get(0));
-        assertEquals(Format.builder().name("Vinyl").qty(2).text("").descriptions(Arrays.asList("12\"", "33 ⅓ RPM")).build(), release.getFormats().get(0));
+        Label label = release.getLabels().get(0);
+        assertEquals("SK032", label.getCatno());
+        assertEquals(5L, label.getId());
+        assertEquals("Svek", label.getName());
+        Artist extraArtist = release.getExtraartists().get(0);
+        assertEquals(239L, extraArtist.getId());
+        assertEquals("Jesper Dahlbäck", extraArtist.getName());
+        assertEquals("Music By [All Tracks By]", extraArtist.getRole());
+        Format format = release.getFormats().get(0);
+        assertEquals("Vinyl", format.getName());
+        assertEquals(2, format.getQty());
+        assertEquals(Arrays.asList("12\"", "33 ⅓ RPM"), format.getDescriptions());
         assertEquals(Collections.singletonList("Electronic"), release.getGenres());
         assertEquals(Collections.singletonList("Deep House"), release.getStyles());
         assertEquals("Sweden", release.getCountry());
         assertEquals("1999-03-00", release.getReleased());
         assertEquals(1660109, release.getMaster_id().getId());
         assertEquals(6, release.getTracklist().size());
-        assertEquals(Track.builder().position("A").title("Östermalm").duration("4:45").build(), release.getTracklist().get(0));
+        Track track = release.getTracklist().get(0);
+        assertEquals("A", track.getPosition());
+        assertEquals("Östermalm", track.getTitle());
+        assertEquals("4:45", track.getDuration());
         assertEquals(5, release.getIdentifiers().size());
-        assertEquals(Identifier.builder().description("A-Side Runout").type("Matrix / Runout").value("MPO SK 032 A1").build(), release.getIdentifiers().get(0));
+        Identifier identifier = release.getIdentifiers().get(0);
+        assertEquals("A-Side Runout", identifier.getDescription());
+        assertEquals("Matrix / Runout", identifier.getType());
+        assertEquals("MPO SK 032 A1", identifier.getValue());
         assertEquals(6, release.getVideos().size());
         Video video = release.getVideos().get(0);
         assertEquals(296, video.getDuration());
@@ -44,7 +68,12 @@ public class XmlMarshallerTests {
         assertEquals("https://www.youtube.com/watch?v=MpmbntGDyNE", video.getUri());
         assertEquals("The Persuader - Östermalm", video.getTitle());
         assertEquals(2, release.getCompanies().size());
-        assertEquals(Company.builder().id(271046L).name("The Globe Studios").catno("").entity_type("23").entity_type_name("Recorded At").resource_url("https://api.discogs.com/labels/271046").build(), release.getCompanies().get(0));
+        Company company = release.getCompanies().get(0);
+        assertEquals(271046L, company.getId());
+        assertEquals("The Globe Studios", company.getName());
+        assertEquals("23", company.getEntity_type());
+        assertEquals("Recorded At", company.getEntity_type_name());
+        assertEquals("https://api.discogs.com/labels/271046", company.getResource_url());
     }
 
     private Release release(String resource) throws JAXBException {
@@ -79,7 +108,7 @@ public class XmlMarshallerTests {
     @Test
     public void testMultiDiscPositions() throws JAXBException {
         Release release = release("release-multidisc-positions.xml");
-        List<NormalizedTrack> tracks = new ReleaseUtils().normalizedTracks(release);
+        List<NormalizedTrack> tracks = ReleaseUtils.normalizedTracks(release);
         assertEquals(51, tracks.size());
         NormalizedTrack track17Disc3 = tracks.get(tracks.size() - 1);
         assertEquals(3, track17Disc3.getPosition().getDisc());
@@ -88,9 +117,10 @@ public class XmlMarshallerTests {
     @Test
     public void testMultiDiscSections() throws JAXBException {
         Release release = release("release-multidisc-sections.xml");
-        List<NormalizedTrack> tracks = new ReleaseUtils().normalizedTracks(release);
+        List<NormalizedTrack> tracks = ReleaseUtils.normalizedTracks(release);
         assertEquals(44, tracks.size());
-        assertEquals(Position.builder().disc(2).number(1).build(), tracks.get(23).getPosition());
+        assertEquals(2, tracks.get(23).getPosition().getDisc());
+        assertEquals(1, tracks.get(23).getPosition().getNumber());
     }
 
     @Test

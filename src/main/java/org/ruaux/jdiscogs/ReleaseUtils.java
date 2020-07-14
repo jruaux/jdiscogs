@@ -52,6 +52,7 @@ public class ReleaseUtils {
             return null;
         }
         Position position = new Position();
+        position.setString(string);
         String number = matcher.group("number");
         if (number != null) {
             position.setNumber(Integer.parseInt(number));
@@ -137,7 +138,12 @@ public class ReleaseUtils {
     }
 
     public static NormalizedTrack normalizedTrack(Track track) {
-        return NormalizedTrack.builder().artists(track.getArtists()).duration(duration(track.getDuration())).position(position(track.getPosition())).title(track.getTitle()).build();
+        NormalizedTrack normalizedTrack = new NormalizedTrack();
+        normalizedTrack.setArtists(track.getArtists());
+        normalizedTrack.setDuration(duration(track.getDuration()));
+        normalizedTrack.setPosition(position(track.getPosition()));
+        normalizedTrack.setTitle(track.getTitle());
+        return normalizedTrack;
     }
 
     public static Integer year(Release release) {

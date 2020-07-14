@@ -22,10 +22,7 @@ public class ClientTests {
 	private TestRestTemplate restTemplate;
 
 	private DiscogsClient client() {
-		DiscogsClient client = new DiscogsClient();
-		client.setProps(props);
-		client.setRestTemplate(restTemplate.getRestTemplate());
-		return client;
+		return new DiscogsClient(props.getApi(), restTemplate.getRestTemplate());
 	}
 
 	@Test

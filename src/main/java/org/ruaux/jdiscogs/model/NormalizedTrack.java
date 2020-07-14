@@ -1,13 +1,11 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.Duration;
 import java.util.List;
 
 @Data
-@Builder
 public class NormalizedTrack implements Comparable<NormalizedTrack> {
 
     private Position position;

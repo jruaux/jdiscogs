@@ -1,6 +1,5 @@
 package org.ruaux.jdiscogs;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.ruaux.jdiscogs.model.Master;
 import org.ruaux.jdiscogs.model.Release;
@@ -19,12 +18,17 @@ import java.util.Map;
 @Slf4j
 public class DiscogsClient {
 
-    private @Setter
-    JDiscogsProperties props;
-    private @Setter
-    RestTemplate restTemplate;
+    private static final String URL_TEMPLATE = "https://api.discogs.com/{entity}/{id}";
+
+    private final DiscogsApiOptions options;
+    private final RestTemplate restTemplate;
     private long rateLimitLastTime;
     private int rateLimitRemaining;
+
+    public DiscogsClient(DiscogsApiOptions options, RestTemplate restTemplate) {
+        this.options = options;
+        this.restTemplate = restTemplate;
+    }
 
     public Master getMaster(String masterId) {
         return getEntity("masters", Master.class, masterId);
@@ -44,11 +48,10 @@ public class DiscogsClient {
             Map<String, String> uriParams = new HashMap<>();
             uriParams.put("entity", entity);
             uriParams.put("id", id);
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(props.getApiUrl()).queryParam("token",
-                    props.getToken());
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(URL_TEMPLATE).queryParam("token", options.getToken());
             URI uri = builder.buildAndExpand(uriParams).toUri();
             HttpHeaders headers = new HttpHeaders();
-            headers.set("User-Agent", props.getUserAgent());
+            headers.set("User-Agent", options.getUserAgent());
             RequestEntity<Object> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, uri);
             ResponseEntity<T> response = restTemplate.exchange(requestEntity, entityClass);
             HttpHeaders responseHeaders = response.getHeaders();

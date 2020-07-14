@@ -51,14 +51,17 @@ import static org.ruaux.jdiscogs.data.Fields.*;
 @EnableBatchProcessing
 public class BatchConfiguration {
 
+    private final static Schema RELEASE_SCHEMA = Schema.builder().field(TextField.builder().name(ARTIST).sortable(true).build()).field(TagField.builder().name(ID).sortable(true).build()).field(TextField.builder().name(TITLE).sortable(true).build()).build();
+    private final static Schema MASTER_SCHEMA = Schema.builder().field(TextField.builder().name(ARTIST).sortable(true).build()).field(TagField.builder().name(ARTIST_ID).sortable(true).build()).field(TagField.builder().name(GENRES).sortable(true).build()).field(TextField.builder().name(TITLE).matcher(PhoneticMatcher.English).sortable(true).build()).field(NumericField.builder().name(YEAR).sortable(true).build()).build();
+
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final JobRepository jobRepository;
     private final JDiscogsProperties props;
     private final RedisURI redisURI;
-    private final GenericObjectPoolConfig<StatefulRediSearchConnection<String,String>> poolConfig;
+    private final GenericObjectPoolConfig<StatefulRediSearchConnection<String, String>> poolConfig;
 
-    public BatchConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, JobRepository jobRepository, JDiscogsProperties props, RedisURI redisURI, GenericObjectPoolConfig<StatefulRediSearchConnection<String,String>> poolConfig) {
+    public BatchConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, JobRepository jobRepository, JDiscogsProperties props, RedisURI redisURI, GenericObjectPoolConfig<StatefulRediSearchConnection<String, String>> poolConfig) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.jobRepository = jobRepository;
@@ -69,15 +72,13 @@ public class BatchConfiguration {
 
     @Bean
     Job releases(TaskletStep releaseLoadStep) throws Exception {
-        Schema schema = Schema.builder().field(TextField.builder().name(ARTIST).sortable(true).build()).field(TagField.builder().name(ID).sortable(true).build()).field(TextField.builder().name(TITLE).sortable(true).build()).build();
-        IndexCreateStep<String, String> indexCreateStep = indexCreateStep(props.getReleaseIndex(), schema);
+        IndexCreateStep<String, String> indexCreateStep = indexCreateStep(props.getData().getReleases().getIndex(), RELEASE_SCHEMA);
         return job("releases", indexCreateStep, releaseLoadStep);
     }
 
     @Bean
     Job masters(TaskletStep masterLoadStep) throws Exception {
-        Schema schema = Schema.builder().field(TextField.builder().name(ARTIST).sortable(true).build()).field(TagField.builder().name(ARTIST_ID).sortable(true).build()).field(TagField.builder().name(GENRES).sortable(true).build()).field(TextField.builder().name(TITLE).matcher(PhoneticMatcher.English).sortable(true).build()).field(NumericField.builder().name(YEAR).sortable(true).build()).build();
-        IndexCreateStep<String, String> indexCreateStep = indexCreateStep(props.getMasterIndex(), schema);
+        IndexCreateStep<String, String> indexCreateStep = indexCreateStep(props.getData().getMasters().getIndex(), MASTER_SCHEMA);
         return job("masters", indexCreateStep, masterLoadStep);
     }
 
@@ -88,7 +89,7 @@ public class BatchConfiguration {
 
     private TaskExecutor taskExecutor() {
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-        taskExecutor.setConcurrencyLimit(props.getThreads());
+        taskExecutor.setConcurrencyLimit(props.getData().getThreads());
         return taskExecutor;
     }
 
@@ -125,25 +126,25 @@ public class BatchConfiguration {
 
     @Bean
     TaskletStep releaseLoadStep(ReleaseProcessor releaseProcessor, Jaxb2Marshaller marshaller) throws IOException {
-        ItemReader<Release> reader = reader(resource(props.getReleasesUrl()), "release", marshaller);
-        ItemWriter<Document<String, String>> writer = writer(props.getReleaseIndex());
+        ItemReader<Release> reader = reader(resource(props.getData().getReleases().getUrl()), "release", marshaller);
+        ItemWriter<Document<String, String>> writer = writer(props.getData().getReleases().getIndex());
         return loadStep("release", reader, releaseProcessor, writer);
     }
 
     @Bean
     TaskletStep masterLoadStep(MasterProcessor masterProcessor, Jaxb2Marshaller marshaller) throws IOException {
-        ItemReader<Master> reader = reader(resource(props.getMastersUrl()), "master", marshaller);
-        ItemWriter<Document<String, String>> writer = writer(props.getMasterIndex());
+        ItemReader<Master> reader = reader(resource(props.getData().getMasters().getUrl()), "master", marshaller);
+        ItemWriter<Document<String, String>> writer = writer(props.getData().getMasters().getIndex());
         return loadStep("master", reader, masterProcessor, writer);
     }
 
     private <T> TaskletStep loadStep(String name, ItemReader<T> reader, ItemProcessor<T, Document<String, String>> processor, ItemWriter<Document<String, String>> writer) {
-        return stepBuilderFactory.get(name + "LoadStep").<T, Document<String, String>>chunk(props.getBatchSize()).reader(reader).processor(processor).writer(writer).listener((ItemWriteListener<?>) JobListener.builder().name(name).build()).
-                taskExecutor(taskExecutor()).throttleLimit(props.getThreads()).build();
+        return stepBuilderFactory.get(name + "LoadStep").<T, Document<String, String>>chunk(props.getData().getBatch()).reader(reader).processor(processor).writer(writer).listener((ItemWriteListener<?>) JobListener.builder().name(name).build()).
+                taskExecutor(taskExecutor()).throttleLimit(props.getData().getThreads()).build();
     }
 
     ItemWriter<Document<String, String>> writer(String index) {
-        if (props.isNoOp()) {
+        if (props.getData().isNoOp()) {
             return new NoopWriter<>();
         }
         return RediSearchItemWriter.builder().redisURI(redisURI).poolConfig(poolConfig).index(index).build();

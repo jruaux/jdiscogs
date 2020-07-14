@@ -17,7 +17,7 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Slf4j
 @EnableConfigurationProperties(JDiscogsProperties.class)
-@Import({BatchConfiguration.class, ClientConfiguration.class, RestTemplateAutoConfiguration.class, RediSearchAutoConfiguration.class, ReleaseProcessor.class, MasterProcessor.class, TextSanitizer.class})
+@Import({BatchConfiguration.class, DiscogsClientConfiguration.class, RestTemplateAutoConfiguration.class, RediSearchAutoConfiguration.class, ReleaseProcessor.class, MasterProcessor.class, TextSanitizer.class})
 public class JDiscogsAutoConfiguration {
 
     @Bean

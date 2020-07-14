@@ -1,6 +1,6 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.*;
+import lombok.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -8,9 +8,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @XmlRootElement(name = "video")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Video {

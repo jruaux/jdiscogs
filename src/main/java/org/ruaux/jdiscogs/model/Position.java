@@ -1,15 +1,11 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Position implements Comparable<Position> {
+
+    private String string;
     private Integer number;
     private Integer disc;
     private Character side;
@@ -17,20 +13,7 @@ public class Position implements Comparable<Position> {
 
     @Override
     public String toString() {
-        String result = "";
-        if (side != null) {
-            result += side;
-        }
-        if (disc != null) {
-            result += disc + "-";
-        }
-        if (number != null) {
-            result += number;
-        }
-        if (sub != null) {
-            result += sub;
-        }
-        return result;
+        return string;
     }
 
 

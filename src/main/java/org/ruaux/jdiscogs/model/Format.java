@@ -1,17 +1,11 @@
 package org.ruaux.jdiscogs.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.*;
 import java.util.List;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @XmlRootElement(name = "format")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Format {

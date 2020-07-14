@@ -1,0 +1,65 @@
+= JDiscogs
+// Settings
+:idprefix:
+:idseparator: -
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+ifndef::env-github[:icons: font]
+// URIs
+:project-repo: jruaux/jdiscogs
+:repo-url: https://github.com/{project-repo}
+// GitHub customization
+ifdef::env-github[]
+:badges:
+:tag: master
+:!toc-title:
+:tip-caption: :bulb:
+:note-caption: :paperclip:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+JDiscogs is a Java client for Discogs API and data dumps.
+
+== Discogs.com API
+
+JDiscogs includes a client that wraps the https://www.discogs.com/developers[Discogs API].
+
+Client configuration in a Spring context can be done via these application properties:
+
+* `discogs.api.token` : a discogs.com token to be used for interaction with the API
+* `discogs.api.user-agent` : user-agent to use when interacting with the discogs.com API (default: `jdiscogs.useragent`)
+
+The client can also be configured programmatically using `DiscogsApiOptions`.
+
+== Discogs Data Dumps
+
+Discogs.com provides monthly https://data.discogs.com[data dumps]. JDiscogs can be used to load _Release_ and _Master_ data into https://oss.redislabs.com/redisearch/index.html[RediSearch].
+
+The data load is done by two Spring Batch jobs that can be configured through application properties:
+
+* `spring.batch.job.names` : selectively enable `releases` or `masters` load jobs, e.g. `spring.batch.job.names=masters` (default: `spring.batch.job.names=releases,masters`).
+* `discogs.data.batch` : number of entries to pipeline (default: 50)
+* `discogs.data.threads` : number of threads to use for the load jobs (default: 1)
+* `discogs.data.no-op` : enable read-only for load jobs. Useful for testing load performance (default: false)
+* `discogs.data.releases.url` : URL of release data dump (default: https://discogs-data.s3-us-west-2.amazonaws.com/data/2020/discogs_20200703_releases.xml.gz)
+* `discogs.data.releases.index` : RediSearch index to store releases
+* `discogs.data.masters.url` : URL of master data dump (default: https://discogs-data.s3-us-west-2.amazonaws.com/data/2020/discogs_20200703_masters.xml.gz)
+* `discogs.data.masters.index` : RediSearch index to store masters
+
+=== Master Schema
+
+* `id` : tag sortable
+* `title` : text phonetic dm:en sortable
+* `artist` : text sortable
+* `artistId` : tag sortable
+* `genres` : tag sortable
+* `year` : numeric sortable
+
+=== Release Schema
+
+* `id` : tag sortable
+* `title` : text sortable
+* `artist` : text sortable
+
+
