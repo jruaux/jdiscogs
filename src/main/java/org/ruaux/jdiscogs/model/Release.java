@@ -3,9 +3,7 @@ package org.ruaux.jdiscogs.model;
 import lombok.Data;
 
 import javax.xml.bind.annotation.*;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 @Data
 @XmlRootElement(name = "release")

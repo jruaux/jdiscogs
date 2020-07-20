@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ReleaseUtils {
 
+    public static final String LIST_SEPARATOR = " / ";
     private static final String TYPE_PRIMARY = "primary";
     private static final Pattern POSITION_PATTERN = Pattern.compile("^((?<side>[A-Z])|((?<disc>\\d+)[\\-.:]))?(?<number>\\d+)(?<sub>[a-z])?");
     private static final Pattern DURATION_PATTERN = Pattern.compile("^(?<minutes>\\d+):(?<seconds>\\d+)");
@@ -41,58 +43,34 @@ public class ReleaseUtils {
         return VINYL.equalsIgnoreCase(format.getName());
     }
 
-    public static final String TRACK_SEPARATOR = " / ";
-
-    private static Position position(String string) {
-        if (string == null) {
+    public static String artist(Track track) {
+        if (track.getArtists() == null) {
             return null;
         }
-        Matcher matcher = POSITION_PATTERN.matcher(string);
-        if (!matcher.matches()) {
-            return null;
-        }
-        Position position = new Position();
-        position.setString(string);
-        String number = matcher.group("number");
-        if (number != null) {
-            position.setNumber(Integer.parseInt(number));
-        }
-        String sub = matcher.group("sub");
-        if (sub != null) {
-            position.setSub(sub.charAt(0));
-        }
-        String disc = matcher.group("disc");
-        if (disc != null) {
-            position.setDisc(Integer.parseInt(disc));
-        }
-        String side = matcher.group("side");
-        if (side != null) {
-            position.setSide(side.charAt(0));
-        }
-        return position;
+        return track.getArtists().stream().map(Artist::getName).collect(Collectors.joining(LIST_SEPARATOR));
     }
 
-    public static Duration duration(String string) {
-        if (string == null) {
+    private static Long duration(Track track) {
+        if (track.getDuration() == null) {
             return null;
         }
-        Matcher matcher = DURATION_PATTERN.matcher(string.trim());
+        Matcher matcher = DURATION_PATTERN.matcher(track.getDuration().trim());
         if (!matcher.matches()) {
             return null;
         }
         int minutes = Integer.parseInt(matcher.group("minutes"));
         int seconds = Integer.parseInt(matcher.group("seconds"));
-        return Duration.ofMinutes(minutes).plus(Duration.ofSeconds(seconds));
+        return Duration.ofMinutes(minutes).plus(Duration.ofSeconds(seconds)).getSeconds();
     }
 
     public static List<NormalizedTrack> normalizedTracks(Release release) {
         List<NormalizedTrack> tracks = new ArrayList<>();
         if (release.getTracklist() != null) {
             for (Track track : release.getTracklist()) {
-                tracks.add(normalizedTrack(track));
+                tracks.add(normalize(track));
                 if (track.getSub_tracks() != null) {
                     for (Track subTrack : track.getSub_tracks()) {
-                        tracks.add(normalizedTrack(subTrack));
+                        tracks.add(normalize(subTrack));
                     }
                 }
             }
@@ -101,7 +79,7 @@ public class ReleaseUtils {
         Integer disc = null;
         int trackNumber = 1;
         for (NormalizedTrack track : tracks) {
-            if (track.getPosition() == null) {
+            if (track.getPosition() == null || track.getPosition().isEmpty()) {
                 Matcher matcher = CD_PATTERN.matcher(track.getTitle());
                 if (matcher.matches()) {
                     disc = Integer.parseInt(matcher.group("disc"));
@@ -109,17 +87,29 @@ public class ReleaseUtils {
                 }
                 toRemove.add(track);
             } else {
-                if (disc != null) {
-                    track.getPosition().setDisc(disc);
-                    track.getPosition().setNumber(trackNumber);
-                }
-                if (track.getPosition().getSub() != null) {
-                    NormalizedTrack firstSubTrack = firstSubTrack(tracks, track.getPosition());
-                    if (firstSubTrack != track) {
-                        assert firstSubTrack != null;
-                        firstSubTrack.setTitle(firstSubTrack.getTitle() + TRACK_SEPARATOR + track.getTitle());
-                        toRemove.add(track);
+                Matcher matcher = POSITION_PATTERN.matcher(track.getPosition());
+                if (matcher.matches()) {
+                    String discString = matcher.group("disc");
+                    if (discString != null) {
+                        track.setDisc(Integer.parseInt(discString));
                     }
+                    String numberString = matcher.group("number");
+                    if (numberString != null) {
+                        track.setNumber(Integer.parseInt(numberString));
+                    }
+                    String subString = matcher.group("sub");
+                    if (subString != null && !subString.isEmpty()) {
+                        NormalizedTrack firstSubTrack = firstSubTrack(tracks, track);
+                        if (firstSubTrack != track) {
+                            assert firstSubTrack != null;
+                            firstSubTrack.setTitle(firstSubTrack.getTitle() + LIST_SEPARATOR + track.getTitle());
+                            toRemove.add(track);
+                        }
+                    }
+                }
+                if (disc != null) {
+                    track.setDisc(disc);
+                    track.setNumber(trackNumber);
                 }
                 trackNumber++;
             }
@@ -128,22 +118,17 @@ public class ReleaseUtils {
         return tracks;
     }
 
-    public static NormalizedTrack firstSubTrack(List<NormalizedTrack> tracks, Position position) {
+    private static NormalizedTrack normalize(Track track) {
+        return NormalizedTrack.builder().artist(artist(track)).duration(duration(track)).title(track.getTitle()).position(track.getPosition()).build();
+    }
+
+    public static NormalizedTrack firstSubTrack(List<NormalizedTrack> tracks, NormalizedTrack subTrack) {
         for (NormalizedTrack track : tracks) {
-            if (track.getPosition() != null && Objects.equals(track.getPosition().getDisc(), position.getDisc()) && Objects.equals(track.getPosition().getNumber(), position.getNumber()) && Objects.equals(track.getPosition().getSide(), position.getSide())) {
+            if (track.getPosition() != null && Objects.equals(track.getDisc(), subTrack.getDisc()) && Objects.equals(track.getNumber(), subTrack.getNumber())) {
                 return track;
             }
         }
         return null;
-    }
-
-    public static NormalizedTrack normalizedTrack(Track track) {
-        NormalizedTrack normalizedTrack = new NormalizedTrack();
-        normalizedTrack.setArtists(track.getArtists());
-        normalizedTrack.setDuration(duration(track.getDuration()));
-        normalizedTrack.setPosition(position(track.getPosition()));
-        normalizedTrack.setTitle(track.getTitle());
-        return normalizedTrack;
     }
 
     public static Integer year(Release release) {
@@ -174,12 +159,19 @@ public class ReleaseUtils {
         return image.getHeight().doubleValue() / image.getWidth().doubleValue();
     }
 
-    public static Image primaryImage(Master master) {
-        if (master.getImages() == null) {
-            return null;
-        }
-        return master.getImages().stream().filter(ReleaseUtils::isPrimary).findFirst().orElse(null);
+    public static Image primaryImage(Release release) {
+        return primaryImage(release.getImages());
     }
 
+    private static Image primaryImage(List<Image> images) {
+        if (images == null) {
+            return null;
+        }
+        return images.stream().filter(ReleaseUtils::isPrimary).findFirst().orElse(null);
+    }
+
+    public static Image primaryImage(Master master) {
+        return primaryImage(master.getImages());
+    }
 
 }

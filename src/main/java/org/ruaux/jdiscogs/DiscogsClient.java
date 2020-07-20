@@ -30,24 +30,24 @@ public class DiscogsClient {
         this.restTemplate = restTemplate;
     }
 
-    public Master getMaster(String masterId) {
-        return getEntity("masters", Master.class, masterId);
+    public Master getMaster(long id) {
+        return getEntity("masters", Master.class, id);
     }
 
-    public Release getRelease(String releaseId) {
-        return getEntity("releases", Release.class, releaseId);
+    public Release getRelease(long id) {
+        return getEntity("releases", Release.class, id);
     }
 
     /**
      * synchronized to avoid running into this bug:
      * https://bugs.openjdk.java.net/browse/JDK-8213202
      */
-    private synchronized <T> T getEntity(String entity, Class<T> entityClass, String id) {
+    private synchronized <T> T getEntity(String entity, Class<T> entityClass, long id) {
         boolean after1Min = (System.currentTimeMillis() - rateLimitLastTime) > 60000;
         if (rateLimitRemaining > 1 || after1Min) {
             Map<String, String> uriParams = new HashMap<>();
             uriParams.put("entity", entity);
-            uriParams.put("id", id);
+            uriParams.put("id", String.valueOf(id));
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(URL_TEMPLATE).queryParam("token", options.getToken());
             URI uri = builder.buildAndExpand(uriParams).toUri();
             HttpHeaders headers = new HttpHeaders();

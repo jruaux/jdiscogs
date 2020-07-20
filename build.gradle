@@ -38,7 +38,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.hsqldb:hsqldb'
-    implementation 'org.springframework:spring-web'
+    api 'org.springframework:spring-web'
     implementation 'org.springframework:spring-oxm'
     implementation 'org.glassfish.jaxb:jaxb-runtime'
     implementation 'com.redislabs:spring-redisearch:2.3.2'

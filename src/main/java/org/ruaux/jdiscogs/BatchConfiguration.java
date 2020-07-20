@@ -118,7 +118,7 @@ public class BatchConfiguration {
     }
 
     private IndexCreateStep<String, String> indexCreateStep(String index, Schema schema) throws Exception {
-        IndexCreateStep<String, String> step = IndexCreateStep.<String, String>builder().redisURI(redisURI).index(index).schema(schema).ignoreErrors(true).build();
+        IndexCreateStep<String, String> step = IndexCreateStep.builder().redisURI(redisURI).index(index).schema(schema).ignoreErrors(true).build();
         step.setJobRepository(jobRepository);
         step.afterPropertiesSet();
         return step;

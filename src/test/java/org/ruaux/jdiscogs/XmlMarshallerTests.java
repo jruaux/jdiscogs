@@ -111,7 +111,7 @@ public class XmlMarshallerTests {
         List<NormalizedTrack> tracks = ReleaseUtils.normalizedTracks(release);
         assertEquals(51, tracks.size());
         NormalizedTrack track17Disc3 = tracks.get(tracks.size() - 1);
-        assertEquals(3, track17Disc3.getPosition().getDisc());
+        assertEquals(3, track17Disc3.getDisc());
     }
 
     @Test
@@ -119,8 +119,8 @@ public class XmlMarshallerTests {
         Release release = release("release-multidisc-sections.xml");
         List<NormalizedTrack> tracks = ReleaseUtils.normalizedTracks(release);
         assertEquals(44, tracks.size());
-        assertEquals(2, tracks.get(23).getPosition().getDisc());
-        assertEquals(1, tracks.get(23).getPosition().getNumber());
+        assertEquals(2, tracks.get(23).getDisc());
+        assertEquals(1, tracks.get(23).getNumber());
     }
 
     @Test
