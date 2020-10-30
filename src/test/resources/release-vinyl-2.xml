@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<release id="4322627" status="Accepted">
+    <title>1970</title>
+    <country>Brazil</country>
+    <released>1970
+    </released>
+    <data_quality>Correct</data_quality>
+    <master_id isMainRelease="false">1480943</master_id>
+    <images>
+        <image height="296" type="secondary" width="300" uri="" uri150=""/>
+    </images>
+    <artists>
+        <artist>
+            <id>736811</id>
+            <join></join>
+            <name>Lindolfo Gaya</name>
+            <anv>Gaya</anv>
+            <tracks></tracks>
+            <role></role>
+        </artist>
+    </artists>
+    <labels>
+        <label id="1060" name="London Records" catno="LLB-1067"/>
+    </labels>
+    <extraartists>
+        <artist>
+            <id>736811</id>
+            <join></join>
+            <name>Lindolfo Gaya</name>
+            <anv>Gaya</anv>
+            <tracks></tracks>
+            <role>Arranged By, Conductor</role>
+        </artist>
+    </extraartists>
+    <formats>
+        <format name="Vinyl" qty="1" text="">
+            <descriptions>
+                <description>LP</description>
+                <description>Stereo</description>
+            </descriptions>
+        </format>
+    </formats>
+    <genres>
+        <genre>Jazz</genre>
+        <genre>Latin</genre>
+        <genre>Pop</genre>
+    </genres>
+    <styles>
+        <style>MPB</style>
+        <style>Bossa Nova</style>
+    </styles>
+    <tracklist>
+        <track>
+            <position>A1</position>
+            <title>Viagem</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>A2</position>
+            <title>Airport Love Theme</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>A3</position>
+            <title>Let It Be</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>A4</position>
+            <title>Tema De Cristina</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>A5</position>
+            <title>Reflections Of My Life</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>B1</position>
+            <title>Yellow River</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>B2</position>
+            <title>(They Long To Be) Close To You</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>B3</position>
+            <title>Marilyn's Theme</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>B4</position>
+            <title>Something</title>
+            <duration></duration>
+        </track>
+        <track>
+            <position>B5</position>
+            <title>Serenade In Blue</title>
+            <duration></duration>
+        </track>
+    </tracklist>
+    <identifiers/>
+    <videos>
+        <video duration="166" embed="true"
+               src="https://www.youtube.com/watch?v=hQkz_NNPZY4">
+            <title>Gaya - Marilyn's Theme (1970)</title>
+            <description>Gaya - Marilyn's Theme (1970)</description>
+        </video>
+        <video duration="131" embed="true" src="https://www.youtube.com/watch?v=g49QUZIMFKc">
+            <title>Gaya - Tema De
+                Cristina (1970)
+            </title>
+            <description>Gaya - Tema De Cristina (1970)</description>
+        </video>
+        <video
+                duration="216" embed="true" src="https://www.youtube.com/watch?v=pttzA8XKx4Q">
+            <title>Gaya - Serenade In Blue
+                (1970)
+            </title>
+            <description>Gaya - Serenade In Blue (1970)</description>
+        </video>
+        <video
+                duration="171" embed="true" src="https://www.youtube.com/watch?v=R1ig664AaJw">
+            <title>Gaya - Viagem (1970)
+            </title>
+            <description>Gaya - Viagem (1970)</description>
+        </video>
+        <video
+                duration="191" embed="true" src="https://www.youtube.com/watch?v=7xSQnmb4m7c">
+            <title>Gaya - Airport Love Theme
+                (1970)
+            </title>
+            <description>Gaya - Airport Love Theme (1970)</description>
+        </video>
+    </videos>
+    <companies>
+        <company>
+            <id>317091</id>
+            <name>Ind\xc3\xbastrias El\xc3\xa9tricas E Musicais F\xc3\xa1brica Odeon S.A.</name>
+            <catno></catno>
+            <entity_type>10</entity_type>
+            <entity_type_name>Manufactured By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/317091</resource_url>
+        </company>
+    </companies>
+</release>

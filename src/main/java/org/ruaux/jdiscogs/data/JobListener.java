@@ -25,7 +25,7 @@ public class JobListener extends ItemListenerSupport<Object, Object> {
     }
 
     @Override
-    public void afterWrite(List items) {
+    public void afterWrite(List<?> items) {
         count += items.size();
         if ((System.currentTimeMillis() - lastPrint) > 3000) {
             long seconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);

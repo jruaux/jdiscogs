@@ -11,7 +11,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -94,33 +93,6 @@ public class XmlMarshallerTests {
         StringReader reader = new StringReader(writer.toString());
         Release right = (Release) marshaller().createUnmarshaller().unmarshal(reader);
         assertEquals(left, right);
-    }
-
-    @Test
-    public void testTracklist() throws JAXBException {
-        Release release = release("release-4273080.xml");
-        List<NormalizedTrack> tracks = ReleaseUtils.normalizedTracks(release);
-        assertEquals(23, tracks.size());
-        assertEquals("He Ain't Heavy, He's My Brother / Bridge Over Troubled Water", tracks.get(16).getTitle());
-    }
-
-
-    @Test
-    public void testMultiDiscPositions() throws JAXBException {
-        Release release = release("release-multidisc-positions.xml");
-        List<NormalizedTrack> tracks = ReleaseUtils.normalizedTracks(release);
-        assertEquals(51, tracks.size());
-        NormalizedTrack track17Disc3 = tracks.get(tracks.size() - 1);
-        assertEquals(3, track17Disc3.getDisc());
-    }
-
-    @Test
-    public void testMultiDiscSections() throws JAXBException {
-        Release release = release("release-multidisc-sections.xml");
-        List<NormalizedTrack> tracks = ReleaseUtils.normalizedTracks(release);
-        assertEquals(44, tracks.size());
-        assertEquals(2, tracks.get(23).getDisc());
-        assertEquals(1, tracks.get(23).getNumber());
     }
 
     @Test

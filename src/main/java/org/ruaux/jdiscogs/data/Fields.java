@@ -8,4 +8,8 @@ public interface Fields {
 	String ID = "id";
 	String TITLE = "title";
 	String YEAR = "year";
+	String JSON = "json";
+	String TRACKS = "tracks";
+	String TRACK = "track";
+	String DURATION = "duration";
 }

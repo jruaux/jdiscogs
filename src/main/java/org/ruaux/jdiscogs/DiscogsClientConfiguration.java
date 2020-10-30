@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 
 public class DiscogsClientConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(name = "discogsClient")
-    public DiscogsClient discogsClient(JDiscogsProperties props, RestTemplateBuilder restTemplateBuilder) {
-        return new DiscogsClient(props.getApi(), restTemplateBuilder.build());
-    }
+	@Bean
+	@ConditionalOnMissingBean(name = "discogsClient")
+	public DiscogsClient discogsClient(JDiscogsProperties props, RestTemplateBuilder restTemplateBuilder) {
+		return new DiscogsClient(props, restTemplateBuilder.build());
+	}
 
 }

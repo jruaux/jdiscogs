@@ -1,4 +1,4 @@
-package org.ruaux.jdiscogs.data;
+package org.ruaux.jdiscogs;
 
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;

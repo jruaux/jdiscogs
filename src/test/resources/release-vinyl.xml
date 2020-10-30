@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<release id="1413265" status="Accepted">
+    <title>Since Before Our Time</title>
+    <country>US</country>
+    <released>1979
+    </released>
+    <notes>Released with a lyric sheet/inner sleeve.
+        Recorded at Mediasound Studios - September 1977 &amp;
+        January 1978 and Bias Recording - June 1978.
+        Remixed at the Hit Factory - June 1978.
+        Mastered at: Alan Zentz Studios
+        (rear sleeve &amp; lyric sheet/inner sleeve); Allen Zentz Recording (labels)
+
+        1978 Warner Bros. Records
+        Inc. (spine &amp; labels)
+        1979 Warner Bros. Records Inc. (rear sleeve &amp; lyric sheet/inner sleeve)
+
+        1978 Star of David Music Co., Inc. [BMI] (lyric sheet/inner sleeve)
+
+        All songs published by Star of David
+        Music Co., Inc. [BMI]
+    </notes>
+    <data_quality>Needs Vote</data_quality>
+    <master_id isMainRelease="false">272143</master_id>
+    <images>
+        <image
+                height="600" type="primary" width="600" uri="" uri150=""/>
+        <image height="600" type="secondary"
+               width="600" uri="" uri150=""/>
+        <image height="600" type="secondary" width="600" uri="" uri150=""/>
+        <image
+                height="600" type="secondary" width="600" uri="" uri150=""/>
+        <image height="592" type="secondary"
+               width="600" uri="" uri150=""/>
+        <image height="599" type="secondary" width="600" uri="" uri150=""/>
+    </images>
+    <artists>
+        <artist>
+            <id>78862</id>
+            <join></join>
+            <name>Osiris (2)</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role></role>
+        </artist>
+    </artists>
+    <labels>
+        <label id="1000" name="Warner Bros. Records" catno="BSK 3311"/>
+    </labels>
+    <extraartists>
+        <artist>
+            <id>874138</id>
+            <join></join>
+            <name>Peter Whorf</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Art Direction</role>
+        </artist>
+        <artist>
+            <id>1183402</id>
+            <join></join>
+            <name>Rusty Cunningham</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Bass</role>
+        </artist>
+        <artist>
+            <id>135238</id>
+            <join></join>
+            <name>Tony Jones (2)</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Bass</role>
+        </artist>
+        <artist>
+            <id>26232</id>
+            <join></join>
+            <name>Tyrone Brunson</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Bass</role>
+        </artist>
+        <artist>
+            <id>658106</id>
+            <join></join>
+            <name>David Fleming</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Design</role>
+        </artist>
+        <artist>
+            <id>1829078</id>
+            <join></join>
+            <name>Frank Mulvey</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Design</role>
+        </artist>
+        <artist>
+            <id>1833351</id>
+            <join></join>
+            <name>Gribbitt!</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Design</role>
+        </artist>
+        <artist>
+            <id>1183406</id>
+            <join></join>
+            <name>Kelvin Nelson</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Drums</role>
+        </artist>
+        <artist>
+            <id>176121</id>
+            <join></join>
+            <name>Kenny Jones</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Drums</role>
+        </artist>
+        <artist>
+            <id>669717</id>
+            <join></join>
+            <name>Robert Manigault</name>
+            <anv>Bobby Manigault</anv>
+            <tracks></tracks>
+            <role>Drums</role>
+        </artist>
+        <artist>
+            <id>88513</id>
+            <join></join>
+            <name>Frankie D'Augusta</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Engineer</role>
+        </artist>
+        <artist>
+            <id>3082117</id>
+            <join></join>
+            <name>Tom Meyerhoff</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Executive-Producer</role>
+        </artist>
+        <artist>
+            <id>1183403</id>
+            <join></join>
+            <name>Sherri Winston</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Flute</role>
+        </artist>
+        <artist>
+            <id>767663</id>
+            <join></join>
+            <name>Brent Mingle</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Guitar</role>
+        </artist>
+        <artist>
+            <id>351798</id>
+            <join></join>
+            <name>Elliott Randall</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Guitar</role>
+        </artist>
+        <artist>
+            <id>1183400</id>
+            <join></join>
+            <name>John Kimsey</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Guitar</role>
+        </artist>
+        <artist>
+            <id>1074246</id>
+            <join></join>
+            <name>LeBurn Maddox</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Guitar</role>
+        </artist>
+        <artist>
+            <id>2231892</id>
+            <join></join>
+            <name>Jeff Wack</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Illustration</role>
+        </artist>
+        <artist>
+            <id>319811</id>
+            <join></join>
+            <name>Maceo Bond</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Keyboards</role>
+        </artist>
+        <artist>
+            <id>359447</id>
+            <join></join>
+            <name>Chris Bellman</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Mastered By</role>
+        </artist>
+        <artist>
+            <id>1183404</id>
+            <join></join>
+            <name>Jimmy Stapelton</name>
+            <anv>Jimmy "Sha-Sha" Stapelton</anv>
+            <tracks></tracks>
+            <role>Percussion</role>
+        </artist>
+        <artist>
+            <id>284113</id>
+            <join></join>
+            <name>Norman Pride</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Percussion</role>
+        </artist>
+        <artist>
+            <id>219067</id>
+            <join></join>
+            <name>Osiris Marsh</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Producer</role>
+        </artist>
+        <artist>
+            <id>413820</id>
+            <join></join>
+            <name>Ron Holloway</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Saxophone</role>
+        </artist>
+        <artist>
+            <id>219067</id>
+            <join></join>
+            <name>Osiris Marsh</name>
+            <anv></anv>
+            <tracks></tracks>
+            <role>Vocals</role>
+        </artist>
+    </extraartists>
+    <formats>
+        <format name="Vinyl" qty="1" text="">
+            <descriptions>
+                <description>LP</description>
+                <description>Album</description>
+            </descriptions>
+        </format>
+    </formats>
+    <genres>
+        <genre>Funk / Soul</genre>
+    </genres>
+    <styles>
+        <style>Soul</style>
+        <style>Funk</style>
+    </styles>
+    <tracklist>
+        <track>
+            <position>A1</position>
+            <title>Gamin'</title>
+            <duration>6:12</duration>
+        </track>
+        <track>
+            <position>A2</position>
+            <title>My Love</title>
+            <duration>4:36</duration>
+        </track>
+        <track>
+            <position>A3</position>
+            <title>Almost (Never Gets There)</title>
+            <duration>5:07</duration>
+        </track>
+        <track>
+            <position>B1</position>
+            <title>What's The Use?</title>
+            <duration>3:54</duration>
+        </track>
+        <track>
+            <position>B2</position>
+            <title>Consistency</title>
+            <duration>3:24</duration>
+        </track>
+        <track>
+            <position>B3</position>
+            <title>Damn</title>
+            <duration>7:48</duration>
+        </track>
+    </tracklist>
+    <identifiers>
+        <identifier type="Rights Society" value="BMI"/>
+        <identifier description="Runout side A
+etched" type="Matrix / Runout" value="BSK-1-3311 JW-2#2"/>
+        <identifier description="Runout side B
+etched" type="Matrix / Runout" value="BSK-2-3311 JW-2=2"/>
+    </identifiers>
+    <videos>
+        <video duration="460" embed="true" src="https://www.youtube.com/watch?v=J_UGskXNp6Y">
+            <title>OSIRIS - DAMN</title>
+            <description>OSIRIS - DAMN</description>
+        </video>
+        <video duration="206" embed="true" src="https://www.youtube.com/watch?v=f4y7_9-SM8k">
+            <title>Osiris -
+                Consistency - Vocal
+            </title>
+            <description>Osiris - Consistency - Vocal</description>
+        </video>
+        <video
+                duration="365" embed="true" src="https://www.youtube.com/watch?v=LkvO-eRU1fc">
+            <title>Osiris - Gamin' - Vocal
+            </title>
+            <description>Osiris - Gamin' - Vocal</description>
+        </video>
+        <video
+                duration="237" embed="true" src="https://www.youtube.com/watch?v=ZGkkwgcvd9U">
+            <title>Osiris - What's The Use? -
+                Vocal
+            </title>
+            <description>Osiris - What's The Use? - Vocal</description>
+        </video>
+    </videos>
+    <companies>
+        <company>
+            <id>90718</id>
+            <name>Warner Bros. Records Inc.</name>
+            <catno></catno>
+            <entity_type>13</entity_type>
+            <entity_type_name>Phonographic Copyright (p)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/90718</resource_url>
+        </company>
+        <company>
+            <id>90718</id>
+            <name>Warner Bros. Records Inc.</name>
+            <catno></catno>
+            <entity_type>14</entity_type>
+            <entity_type_name>Copyright (c)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/90718</resource_url>
+        </company>
+        <company>
+            <id>984404</id>
+            <name>Star Of David Music Co., Inc.</name>
+            <catno></catno>
+            <entity_type>14</entity_type>
+            <entity_type_name>Copyright (c)</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/984404</resource_url>
+        </company>
+        <company>
+            <id>984404</id>
+            <name>Star Of David Music Co., Inc.</name>
+            <catno></catno>
+            <entity_type>21</entity_type>
+            <entity_type_name>Published By</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/984404</resource_url>
+        </company>
+        <company>
+            <id>138798</id>
+            <name>Mediasound</name>
+            <catno></catno>
+            <entity_type>23</entity_type>
+            <entity_type_name>Recorded At</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/138798</resource_url>
+        </company>
+        <company>
+            <id>290480</id>
+            <name>Bias Studios</name>
+            <catno></catno>
+            <entity_type>23</entity_type>
+            <entity_type_name>Recorded At</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/290480</resource_url>
+        </company>
+        <company>
+            <id>266839</id>
+            <name>The Hit Factory</name>
+            <catno></catno>
+            <entity_type>28</entity_type>
+            <entity_type_name>Remixed At</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/266839</resource_url>
+        </company>
+        <company>
+            <id>254254</id>
+            <name>Allen Zentz Mastering</name>
+            <catno></catno>
+            <entity_type>29</entity_type>
+            <entity_type_name>Mastered At</entity_type_name>
+            <resource_url>https://api.discogs.com/labels/254254</resource_url>
+        </company>
+    </companies>
+</release>
